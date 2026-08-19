@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 58" width="150" height="58" role="img" aria-label="Nexus Technical Suite">
+  <title>Nexus Technical Suite</title>
+  <g fill="none" stroke="#2FBC5E" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- N -->
+    <path d="M5 32 V8 L25 32 V8"/>
+    <!-- E -->
+    <path d="M33 8 H53 M33 20 H51 M33 32 H53"/>
+    <!-- X -->
+    <path d="M61 8 L81 32 M81 8 L61 32"/>
+    <!-- U -->
+    <path d="M89 8 V23 Q89 32 99 32 Q109 32 109 23 V8"/>
+    <!-- S -->
+    <path d="M137 11.5 Q135 8 129 8 H125 Q117 8 117 14 Q117 19.5 125 20 H129 Q137 20.5 137 26 Q137 32 129 32 H125 Q119 32 117 28.5"/>
+  </g>
+  <text x="5" y="50" fill="#6CE9A6" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="9.6" font-weight="700" letter-spacing="2.2">TECHNICAL SUITE</text>
+</svg>

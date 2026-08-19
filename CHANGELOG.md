@@ -12,6 +12,7 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Adicionado
+- Logótipo "Nexus Technical Suite" (SVG) na barra superior e novo ícone de separador.
 - Configuração Apache para servir a aplicação numa sub-pasta
   (`deploy/apache-subpasta.conf`), usada no servidor interno da Nexus.
 - Secção no README sobre a instalação real (servidor 192.168.1.69,

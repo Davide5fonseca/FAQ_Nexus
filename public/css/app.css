@@ -89,13 +89,15 @@ textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
   margin-right: auto;
 }
 .barra__marca:hover { color: var(--menta); }
-.barra__logo {
-  width: 30px; height: 30px; border-radius: 6px; background: var(--verde);
-  display: inline-grid; place-items: center; color: var(--verde-muito-escuro);
-  font-weight: 800; font-size: .85rem; letter-spacing: -.02em;
+.barra__logo { height: 46px; width: auto; display: block; }
+.barra__titulo {
+  font-weight: 600; font-size: 1rem; line-height: 1.2;
+  padding-left: .85rem; border-left: 1px solid rgba(255,255,255,.25);
 }
-.barra__titulo { display: flex; flex-direction: column; line-height: 1.15; }
-.barra__titulo small { font-weight: 400; font-size: .75rem; color: #B7D9C4; }
+@media (max-width: 520px) {
+  .barra__logo { height: 38px; }
+  .barra__titulo { font-size: .9rem; }
+}
 
 .barra__nav { display: flex; gap: .25rem; flex-wrap: wrap; align-items: center; }
 .barra__nav a, .barra__nav button {

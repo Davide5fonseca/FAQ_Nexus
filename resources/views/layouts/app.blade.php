@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@hasSection('title')@yield('title') · @endif{{ config('app.name') }}</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%232FBC5E'/><text x='16' y='22' font-family='sans-serif' font-weight='800' font-size='15' text-anchor='middle' fill='%23081D10'>NX</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23081D10'/><path d='M8 25V7l16 18V7' fill='none' stroke='%232FBC5E' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 </head>
 <body @yield('body-attrs')>
 <a class="skip-link" href="#conteudo">Saltar para o conteúdo</a>
@@ -15,11 +15,8 @@
 <header class="barra no-print">
     <div class="barra__inner">
         <a class="barra__marca" href="{{ route('consulta') }}">
-            <span class="barra__logo" aria-hidden="true">NX</span>
-            <span class="barra__titulo">
-                <span>Base de Procedimentos Técnicos</span>
-                <small>Nexus Solutions</small>
-            </span>
+            <img class="barra__logo" src="{{ asset('img/logo.svg') }}" alt="Nexus Technical Suite" width="150" height="58">
+            <span class="barra__titulo">Base de Procedimentos Técnicos</span>
         </a>
         <nav class="barra__nav" aria-label="Navegação principal">
             <a href="{{ route('consulta') }}" @if(request()->routeIs('consulta')) aria-current="page" @endif>Consulta</a>
