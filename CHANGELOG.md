@@ -11,6 +11,16 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Adicionado
+- Configuração Apache para servir a aplicação numa sub-pasta
+  (`deploy/apache-subpasta.conf`), usada no servidor interno da Nexus.
+- Secção no README sobre a instalação real (servidor 192.168.1.69,
+  `https://infra.nexus-solutions.pt:9443/procedimentos`) e como actualizar.
+
+### Alterado
+- Documentado que, em sub-pasta, não se deve usar `route:cache`
+  (provoca erro 405 na página inicial).
+
 ## [1.0.0] — 2026-08-19
 
 Primeira versão da Base de Procedimentos Técnicos (Nexus Solutions).

@@ -76,7 +76,46 @@ Testes automáticos: `php artisan test`.
 
 ---
 
-## 3. Instalar no servidor (Ubuntu 22.04 ou 24.04)
+## 3a. Onde está instalada (servidor da Nexus, 192.168.1.69)
+
+A aplicação está instalada no servidor interno `linuxdev` (192.168.1.69), lado a
+lado com a Nexus Ops, servida pelo **Apache** já existente e com o **mesmo
+certificado HTTPS** (Let's Encrypt de `infra.nexus-solutions.pt`):
+
+- **Endereço:** `https://infra.nexus-solutions.pt:9443/procedimentos`
+- **Administração:** `https://infra.nexus-solutions.pt:9443/procedimentos/admin`
+- Pasta no servidor: `/var/www/procedimentos` · Base de dados PostgreSQL: `procedimentos`
+- Configuração Apache: `/etc/apache2/conf-available/procedimentos.conf`
+  (cópia em [deploy/apache-subpasta.conf](deploy/apache-subpasta.conf)); o ficheiro
+  da Nexus Ops não foi alterado.
+- Cópias de segurança: todos os dias às 02:30 para `/var/backups/procedimentos/`
+  (comando manual: `sudo backup-procedimentos`).
+- Neste servidor **não** se usa `php artisan route:cache` (dá erro 405 na página
+  inicial quando a aplicação vive numa sub-pasta). `config:cache` e `view:cache` sim.
+
+Porquê uma sub-pasta e não `procedimentos.nexus-solutions.pt`? Porque esse nome
+ainda não existe no DNS e eu não tenho acesso ao DNS nem ao router. Quando o
+criarem (registo A para o mesmo IP público e NAT para a porta 443), passa-se para
+subdomínio próprio: novo `VirtualHost`, `certbot --apache -d procedimentos.nexus-solutions.pt`
+e `APP_URL`/`SESSION_PATH` no `.env`.
+
+### Actualizar a aplicação neste servidor
+A partir do seu PC (na pasta da aplicação), depois de `git pull` ou das alterações:
+```bash
+tar --exclude=vendor --exclude=.env --exclude=.git --exclude=composer.phar -czf /tmp/p.tgz . && scp /tmp/p.tgz dev@192.168.1.69:/tmp/
+ssh dev@192.168.1.69
+sudo backup-procedimentos
+sudo tar -xzf /tmp/p.tgz -C /var/www/procedimentos
+cd /var/www/procedimentos
+sudo -u www-data composer install --no-dev --optimize-autoloader
+sudo -u www-data php artisan migrate --force
+sudo -u www-data php artisan config:cache && sudo -u www-data php artisan view:cache && sudo -u www-data php artisan route:clear
+sudo chown -R www-data:www-data /var/www/procedimentos
+```
+
+---
+
+## 3b. Instalar no servidor (Ubuntu 22.04 ou 24.04) — instalação nova, de raiz
 
 ### Antes de começar, precisa de:
 - Um servidor Ubuntu com acesso `sudo` (um VPS de 1 GB de RAM chega perfeitamente).
