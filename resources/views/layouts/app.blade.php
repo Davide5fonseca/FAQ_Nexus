@@ -4,12 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#081D10">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@hasSection('title')@yield('title') · @endif{{ config('app.name') }}</title>
+    {{-- Tipo de letra opcional (Inter). Se não houver internet, cai para a letra do sistema. --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23081D10'/><path d='M8 25V7l16 18V7' fill='none' stroke='%232FBC5E' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
 </head>
-<body @yield('body-attrs')>
+<body class="@yield('body-class')" @yield('body-attrs')>
 <a class="skip-link" href="#conteudo">Saltar para o conteúdo</a>
 
 <header class="barra no-print">
@@ -49,18 +54,20 @@
     @endif
 @endauth
 
+@yield('hero')
+
 <main id="conteudo" tabindex="-1">
     <div class="conteudo @yield('conteudo-class')">
         @if(session('status'))
             <div class="alerta alerta--ok no-print" role="status">
-                <span aria-hidden="true">✓</span>
+                <svg class="alerta__icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>
                 <div>{{ session('status') }}</div>
             </div>
         @endif
 
         @if($errors->any() && ! View::hasSection('sem-resumo-erros'))
             <div class="alerta alerta--erro no-print" role="alert">
-                <span aria-hidden="true">!</span>
+                <svg class="alerta__icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
                 <div>
                     <strong>Não foi possível concluir. Verifique:</strong>
                     <ul>

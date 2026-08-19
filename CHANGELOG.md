@@ -30,6 +30,11 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
   `https://infra.nexus-solutions.pt:9443/procedimentos`) e como actualizar.
 
 ### Alterado
+- Redesenho visual: faixa de destaque com pesquisa integrada e contadores, cartões
+  com barra de nível e conteúdo em duas colunas (solução à esquerda; "registar no
+  ticket", "quando escalar" e ficha à direita), estados vazios com ícone, página
+  de entrada sobre fundo escuro, tipografia Inter (opcional, com fallback), rodapé
+  escuro, ícones nos botões e alertas.
 - Documentado que, em sub-pasta, não se deve usar `route:cache`
   (provoca erro 405 na página inicial).
 

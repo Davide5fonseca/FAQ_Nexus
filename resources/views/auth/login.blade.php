@@ -1,11 +1,13 @@
 @extends('layouts.app')
 @section('title', 'Entrar')
+@section('body-class', 'pagina-entrar')
 @section('conteudo-class', 'conteudo--estreito entrar')
 @section('sem-resumo-erros', '1')
 
 @section('content')
 <div class="cartao">
     <h1>Entrar na administração</h1>
+    <p class="intro">Para técnicos e produção carregarem problemas e soluções.</p>
 
     <form method="post" action="{{ route('login.submit') }}" novalidate>
         @csrf
@@ -31,9 +33,9 @@
         <button type="submit" class="btn btn--primario" style="width:100%">Entrar</button>
     </form>
 
-    <p class="meta" style="margin-top:1.25rem;margin-bottom:0">
-        Esqueceu-se da palavra-passe? Peça ao responsável do servidor para a repor com o comando
-        <code>php artisan app:alterar-password</code>.
+    <p class="meta" style="margin:1.25rem 0 0">
+        Esqueceu-se da palavra-passe? Peça a um administrador para a repor em Administração → Utilizadores.
     </p>
 </div>
+<p style="text-align:center;margin-top:1rem"><a href="{{ route('consulta') }}" style="color:#C9E4D2">← Voltar à consulta</a></p>
 @endsection

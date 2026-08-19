@@ -1,25 +1,45 @@
 @extends('layouts.app')
 @section('title', 'Administração · Procedimentos')
 
-@section('content')
-<div class="cabecalho-pagina">
-    <h1>Procedimentos</h1>
-    <div class="accoes">
-        <a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Novo procedimento</a>
+@section('hero')
+<div class="hero hero--compacto">
+    <div class="hero__inner hero__topo">
+        <div>
+            <h1>Procedimentos</h1>
+            <p>Crie, edite, duplique e arquive. O que guardar aqui fica imediatamente visível na consulta.</p>
+        </div>
+        <a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Novo procedimento
+        </a>
     </div>
+</div>
+@endsection
+
+@section('content')
+<div class="resumo" aria-label="Resumo">
+    <div class="resumo__item"><span>Activos</span><strong>{{ $counts['activos'] }}</strong></div>
+    <div class="resumo__item"><span>Arquivados</span><strong>{{ $counts['arquivados'] }}</strong></div>
+    <div class="resumo__item"><span>Categorias</span><strong>{{ $counts['categorias'] }}</strong></div>
 </div>
 
 @if(! $hasAny)
     <div class="vazio">
+        <div class="vazio__icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M10 12h4M10 16h4M10 8h4"/></svg>
+        </div>
         <h2>Ainda não há procedimentos.</h2>
         <p>Crie o primeiro.@can('admin') Se ainda não tiver categorias, pode criá-las em <a href="{{ route('admin.categorias.index') }}">Categorias</a>.@endcan</p>
-        <a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a>
+        <div class="accoes"><a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a></div>
     </div>
 @else
     <form class="filtros filtros--admin" method="get" action="{{ route('admin.procedimentos.index') }}" role="search" aria-label="Filtrar procedimentos">
         <div class="campo">
             <label for="q">Pesquisar</label>
-            <input type="search" id="q" name="q" value="{{ $filters['q'] }}" autocomplete="off">
+            <div class="pesquisa">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input type="search" id="q" name="q" value="{{ $filters['q'] }}" autocomplete="off" placeholder="Título, problema, passo…">
+            </div>
         </div>
         <div class="campo">
             <label for="categoria">Categoria</label>
@@ -82,7 +102,7 @@
                             @if($p->is_archived) <span class="etiqueta etiqueta--arquivado">Arquivado</span> @endif
                         </td>
                         <td>{{ $p->category->name }}</td>
-                        <td><span class="etiqueta etiqueta--nivel-{{ $p->level }}">Nível {{ $p->level }}</span></td>
+                        <td><span class="etiqueta etiqueta--ponto etiqueta--nivel-{{ $p->level }}">Nível {{ $p->level }}</span></td>
                         <td>{{ $p->steps_count }}</td>
                         <td class="meta">{{ $p->updated_at->format('d/m/Y H:i') }}<br>{{ $p->updated_by }}</td>
                         <td class="accoes">

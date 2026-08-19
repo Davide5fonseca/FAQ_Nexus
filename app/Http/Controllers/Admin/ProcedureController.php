@@ -36,6 +36,11 @@ class ProcedureController extends Controller
             'categories' => Category::orderBy('name')->get(),
             'filters' => $filters,
             'hasAny' => Procedure::exists(),
+            'counts' => [
+                'activos' => Procedure::whereNull('archived_at')->count(),
+                'arquivados' => Procedure::whereNotNull('archived_at')->count(),
+                'categorias' => Category::count(),
+            ],
         ]);
     }
 
