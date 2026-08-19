@@ -15,7 +15,12 @@ class AplicacaoTest extends TestCase
 
     private function admin(): User
     {
-        return User::create(['name' => 'Admin Teste', 'email' => 'admin@teste.pt', 'password' => 'palavrapasse123']);
+        return User::create(['name' => 'Admin Teste', 'email' => 'admin@teste.pt', 'password' => 'palavrapasse123', 'role' => 'admin', 'area' => 'tecnica', 'active' => true]);
+    }
+
+    private function editor(string $area = 'producao'): User
+    {
+        return User::create(['name' => 'Editor Teste', 'email' => 'editor@teste.pt', 'password' => 'palavrapasse123', 'role' => 'editor', 'area' => $area, 'active' => true]);
     }
 
     private function categoria(string $nome = 'Impressoras'): Category
@@ -146,7 +151,7 @@ class AplicacaoTest extends TestCase
         $this->from(route('login'))
             ->post(route('login.submit'), ['email' => 'admin@teste.pt', 'password' => 'errada'])
             ->assertRedirect(route('login'))
-            ->assertSessionHasErrors(['email' => 'Email ou palavra-passe incorrectos.']);
+            ->assertSessionHasErrors(['email' => 'Email ou palavra-passe incorrectos, ou conta desactivada.']);
         $this->assertGuest();
     }
 
@@ -178,8 +183,8 @@ class AplicacaoTest extends TestCase
 
         $this->assertSame('PROC-01', $p->reference);
         $this->assertSame(['Primeiro', 'Segundo'], $p->steps->pluck('content')->all());
-        $this->assertSame('Admin Teste', $p->created_by);
-        $this->assertSame('Admin Teste', $p->updated_by);
+        $this->assertSame('Admin Teste (Área técnica)', $p->created_by);
+        $this->assertSame('Admin Teste (Área técnica)', $p->updated_by);
 
         $p2 = $this->criarProcedimento($admin);
         $this->assertSame('PROC-02', $p2->reference);
@@ -317,6 +322,81 @@ class AplicacaoTest extends TestCase
 
         $this->actingAs($admin)->delete(route('admin.regras.destroy', $b))->assertRedirect();
         $this->assertSame([1], SafetyRule::pluck('position')->all());
+    }
+
+    // ---------------- Perfis: editor vs administrador ----------------
+
+    public function test_editor_cria_e_edita_mas_nao_gere_nem_apaga(): void
+    {
+        $this->categoria();
+        $editor = $this->editor('producao');
+
+        $p = $this->criarProcedimento($editor, ['title' => 'Máquina pára a meio', 'problem' => 'A máquina pára e acende luz vermelha']);
+        $this->assertSame('Editor Teste (Produção)', $p->created_by);
+        $this->assertSame('A máquina pára e acende luz vermelha', $p->problem);
+
+        $this->actingAs($editor)->get(route('admin.procedimentos.index'))->assertOk()->assertDontSee('>Apagar<', false)->assertDontSee('Utilizadores');
+        $this->actingAs($editor)->post(route('admin.procedimentos.archive', $p))->assertRedirect();
+        $this->actingAs($editor)->post(route('admin.procedimentos.duplicate', $p))->assertRedirect();
+
+        $this->actingAs($editor)->delete(route('admin.procedimentos.destroy', $p))->assertForbidden();
+        $this->actingAs($editor)->get(route('admin.categorias.index'))->assertForbidden();
+        $this->actingAs($editor)->get(route('admin.regras.index'))->assertForbidden();
+        $this->actingAs($editor)->get(route('admin.utilizadores.index'))->assertForbidden();
+        $this->actingAs($editor)->post(route('admin.utilizadores.store'), [])->assertForbidden();
+    }
+
+    public function test_problema_aparece_na_consulta_e_na_pesquisa(): void
+    {
+        $admin = $this->admin();
+        $this->criarProcedimento($admin, ['problem' => 'Luz vermelha intermitente no painel']);
+
+        $this->comoVisitante()->get('/')->assertSee('Problema / sintomas')->assertSee('Luz vermelha intermitente no painel');
+        $this->get('/?q=intermitente')->assertSee('Substituir toner');
+        $this->get(route('imprimir'))->assertSee('Luz vermelha intermitente no painel');
+    }
+
+    public function test_gestao_de_utilizadores(): void
+    {
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->get(route('admin.utilizadores.index'))->assertOk()->assertSee('Admin Teste');
+        $this->actingAs($admin)->get(route('admin.utilizadores.create'))->assertOk();
+
+        $this->actingAs($admin)->post(route('admin.utilizadores.store'), [
+            'name' => 'Rita Produção', 'email' => 'rita@teste.pt', 'role' => 'editor', 'area' => 'producao', 'password' => 'palavrapasse123',
+        ])->assertRedirect(route('admin.utilizadores.index'));
+        $rita = User::where('email', 'rita@teste.pt')->first();
+        $this->assertSame('editor', $rita->role);
+        $this->assertSame('producao', $rita->area);
+        $this->assertTrue(password_verify('palavrapasse123', $rita->password));
+
+        // validação
+        $this->actingAs($admin)->post(route('admin.utilizadores.store'), ['name' => '', 'email' => 'rita@teste.pt', 'role' => 'x', 'area' => '', 'password' => 'curta'])
+            ->assertSessionHasErrors(['name', 'email' => 'Já existe uma conta com esse email.', 'role', 'area', 'password']);
+
+        // editar sem mudar palavra-passe, desactivar
+        $this->actingAs($admin)->put(route('admin.utilizadores.update', $rita), [
+            'name' => 'Rita P.', 'email' => 'rita@teste.pt', 'role' => 'editor', 'area' => 'producao', 'password' => '', 'active' => '0',
+        ])->assertRedirect();
+        $rita->refresh();
+        $this->assertSame('Rita P.', $rita->name);
+        $this->assertFalse($rita->active);
+        $this->assertTrue(password_verify('palavrapasse123', $rita->password));
+
+        // conta desactivada não entra
+        $this->comoVisitante()->post(route('login.submit'), ['email' => 'rita@teste.pt', 'password' => 'palavrapasse123'])->assertSessionHasErrors('email');
+        $this->assertGuest();
+
+        // protecções: não se apaga a si próprio nem o último admin
+        $this->actingAs($admin)->delete(route('admin.utilizadores.destroy', $admin))->assertSessionHasErrors('user');
+        $this->actingAs($admin)->put(route('admin.utilizadores.update', $admin), [
+            'name' => 'Admin Teste', 'email' => 'admin@teste.pt', 'role' => 'editor', 'area' => 'tecnica', 'password' => '', 'active' => '1',
+        ])->assertSessionHasErrors('role');
+        $this->assertSame('admin', $admin->fresh()->role);
+
+        $this->actingAs($admin)->delete(route('admin.utilizadores.destroy', $rita))->assertRedirect();
+        $this->assertDatabaseMissing('users', ['id' => $rita->id]);
     }
 
     // ---------------- Comandos ----------------

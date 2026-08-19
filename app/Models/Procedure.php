@@ -13,7 +13,7 @@ class Procedure extends Model
     public const LEVELS = [1, 2, 3];
 
     protected $fillable = [
-        'reference_number', 'title', 'category_id', 'level',
+        'reference_number', 'title', 'problem', 'category_id', 'level',
         'ticket_notes', 'escalation', 'archived_at', 'created_by', 'updated_by',
     ];
 
@@ -72,6 +72,7 @@ class Procedure extends Model
 
         return $query->where(function (Builder $q) use ($like, $esc) {
             $q->whereRaw("LOWER(title) LIKE ? {$esc}", [$like])
+                ->orWhereRaw("LOWER(COALESCE(problem, '')) LIKE ? {$esc}", [$like])
                 ->orWhereRaw("LOWER(COALESCE(ticket_notes, '')) LIKE ? {$esc}", [$like])
                 ->orWhereRaw("LOWER(COALESCE(escalation, '')) LIKE ? {$esc}", [$like])
                 ->orWhereHas('steps', fn (Builder $s) => $s->whereRaw("LOWER(content) LIKE ? {$esc}", [$like]))

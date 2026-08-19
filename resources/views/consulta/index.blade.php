@@ -94,7 +94,7 @@
             <details class="proc" id="proc-{{ $p->reference_number }}"
                      data-categoria="{{ $p->category_id }}"
                      data-nivel="{{ $p->level }}"
-                     data-texto="{{ $p->reference }} {{ $p->title }} {{ $p->category->name }} {{ $p->steps->pluck('content')->implode(' ') }} {{ $p->ticket_notes }} {{ $p->escalation }}">
+                     data-texto="{{ $p->reference }} {{ $p->title }} {{ $p->problem }} {{ $p->category->name }} {{ $p->steps->pluck('content')->implode(' ') }} {{ $p->ticket_notes }} {{ $p->escalation }}">
                 <summary>
                     <svg class="proc__seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
                     <span class="proc__titulo">{{ $p->title }}</span>
@@ -105,7 +105,12 @@
                     </span>
                 </summary>
                 <div class="proc__corpo">
-                    <h3>Passos</h3>
+                    @if(filled($p->problem))
+                        <h3>Problema / sintomas</h3>
+                        <p class="proc__texto">{{ $p->problem }}</p>
+                    @endif
+
+                    <h3>Solução — passos</h3>
                     @if($p->steps->isEmpty())
                         <p class="meta">Este procedimento ainda não tem passos.</p>
                     @else

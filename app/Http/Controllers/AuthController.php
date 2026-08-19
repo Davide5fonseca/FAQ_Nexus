@@ -21,10 +21,10 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials, false)) {
+        if (! Auth::attempt(array_merge($credentials, ['active' => true]), false)) {
             return back()
                 ->withInput($request->only('email'))
-                ->withErrors(['email' => 'Email ou palavra-passe incorrectos.']);
+                ->withErrors(['email' => 'Email ou palavra-passe incorrectos, ou conta desactivada.']);
         }
 
         $request->session()->regenerate();

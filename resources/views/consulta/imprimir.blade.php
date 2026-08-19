@@ -42,8 +42,15 @@
             @if($p->is_archived)<span><strong>ARQUIVADO</strong></span>@endif
         </div>
 
+        @if(filled($p->problem))
         <section class="imp-sec">
-            <h3>Passos</h3>
+            <h3>Problema / sintomas</h3>
+            <p>{{ $p->problem }}</p>
+        </section>
+        @endif
+
+        <section class="imp-sec">
+            <h3>Solução — passos</h3>
             @if($p->steps->isEmpty())
                 <p>—</p>
             @else

@@ -56,12 +56,13 @@ class ProcedureController extends Controller
             $procedure = Procedure::create([
                 'reference_number' => Procedure::nextReferenceNumber(),
                 'title' => $data['title'],
+                'problem' => $data['problem'] ?? null,
                 'category_id' => $data['category_id'],
                 'level' => $data['level'],
                 'ticket_notes' => $data['ticket_notes'] ?? null,
                 'escalation' => $data['escalation'] ?? null,
-                'created_by' => $request->user()->name,
-                'updated_by' => $request->user()->name,
+                'created_by' => $request->user()->signature,
+                'updated_by' => $request->user()->signature,
             ]);
             $procedure->syncSteps($data['steps']);
 
@@ -90,11 +91,12 @@ class ProcedureController extends Controller
         DB::transaction(function () use ($data, $request, $procedure) {
             $procedure->update([
                 'title' => $data['title'],
+                'problem' => $data['problem'] ?? null,
                 'category_id' => $data['category_id'],
                 'level' => $data['level'],
                 'ticket_notes' => $data['ticket_notes'] ?? null,
                 'escalation' => $data['escalation'] ?? null,
-                'updated_by' => $request->user()->name,
+                'updated_by' => $request->user()->signature,
             ]);
             $procedure->syncSteps($data['steps']);
         });
@@ -111,12 +113,13 @@ class ProcedureController extends Controller
             $copy = Procedure::create([
                 'reference_number' => Procedure::nextReferenceNumber(),
                 'title' => mb_substr('Cópia de '.$procedure->title, 0, 200),
+                'problem' => $procedure->problem,
                 'category_id' => $procedure->category_id,
                 'level' => $procedure->level,
                 'ticket_notes' => $procedure->ticket_notes,
                 'escalation' => $procedure->escalation,
-                'created_by' => $request->user()->name,
-                'updated_by' => $request->user()->name,
+                'created_by' => $request->user()->signature,
+                'updated_by' => $request->user()->signature,
             ]);
             $copy->syncSteps($procedure->steps->pluck('content')->all());
 
@@ -129,14 +132,14 @@ class ProcedureController extends Controller
 
     public function archive(Request $request, Procedure $procedure): RedirectResponse
     {
-        $procedure->update(['archived_at' => now(), 'updated_by' => $request->user()->name]);
+        $procedure->update(['archived_at' => now(), 'updated_by' => $request->user()->signature]);
 
         return back()->with('status', "Procedimento {$procedure->reference} arquivado. Deixa de aparecer na consulta.");
     }
 
     public function unarchive(Request $request, Procedure $procedure): RedirectResponse
     {
-        $procedure->update(['archived_at' => null, 'updated_by' => $request->user()->name]);
+        $procedure->update(['archived_at' => null, 'updated_by' => $request->user()->signature]);
 
         return back()->with('status', "Procedimento {$procedure->reference} voltou a estar activo.");
     }

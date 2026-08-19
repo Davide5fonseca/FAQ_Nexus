@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProcedureController as AdminProcedureController;
 use App\Http\Controllers\Admin\SafetyRuleController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProcedureController;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +35,18 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::post('procedimentos/{procedure}/duplicar', [AdminProcedureController::class, 'duplicate'])->name('procedimentos.duplicate');
     Route::post('procedimentos/{procedure}/arquivar', [AdminProcedureController::class, 'archive'])->name('procedimentos.archive');
     Route::post('procedimentos/{procedure}/desarquivar', [AdminProcedureController::class, 'unarchive'])->name('procedimentos.unarchive');
-    Route::delete('procedimentos/{procedure}', [AdminProcedureController::class, 'destroy'])->name('procedimentos.destroy');
+    Route::delete('procedimentos/{procedure}', [AdminProcedureController::class, 'destroy'])->middleware('can:admin')->name('procedimentos.destroy');
+
+    // ---- Só administradores a partir daqui ----
+    Route::middleware('can:admin')->group(function () {
+
+    // Utilizadores
+    Route::get('utilizadores', [UserController::class, 'index'])->name('utilizadores.index');
+    Route::get('utilizadores/novo', [UserController::class, 'create'])->name('utilizadores.create');
+    Route::post('utilizadores', [UserController::class, 'store'])->name('utilizadores.store');
+    Route::get('utilizadores/{user}/editar', [UserController::class, 'edit'])->name('utilizadores.edit');
+    Route::put('utilizadores/{user}', [UserController::class, 'update'])->name('utilizadores.update');
+    Route::delete('utilizadores/{user}', [UserController::class, 'destroy'])->name('utilizadores.destroy');
 
     // Categorias
     Route::get('categorias', [CategoryController::class, 'index'])->name('categorias.index');
@@ -48,4 +60,6 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::put('regras-seguranca/{rule}', [SafetyRuleController::class, 'update'])->name('regras.update');
     Route::post('regras-seguranca/{rule}/mover', [SafetyRuleController::class, 'move'])->name('regras.move');
     Route::delete('regras-seguranca/{rule}', [SafetyRuleController::class, 'destroy'])->name('regras.destroy');
+
+    }); // fim: só administradores
 });

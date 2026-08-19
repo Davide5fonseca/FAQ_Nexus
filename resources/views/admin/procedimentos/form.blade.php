@@ -22,7 +22,7 @@
 @if($categories->isEmpty())
     <div class="alerta alerta--aviso" role="alert">
         <span aria-hidden="true">!</span>
-        <div>Ainda não existem categorias. <a href="{{ route('admin.categorias.index') }}">Crie pelo menos uma categoria</a> antes de guardar o procedimento.</div>
+        <div>Ainda não existem categorias. @can('admin')<a href="{{ route('admin.categorias.index') }}">Crie pelo menos uma categoria</a> antes de guardar o procedimento.@else Peça a um administrador para criar categorias antes de guardar o procedimento.@endcan</div>
     </div>
 @endif
 
@@ -46,6 +46,14 @@
         @error('title')<p class="erro" id="title-erro">{{ $message }}</p>@enderror
     </div>
 
+    <div class="campo">
+        <label for="problem">Problema / sintomas</label>
+        <textarea id="problem" name="problem" rows="3" maxlength="5000" placeholder="O que se observa: erro, comportamento, em que equipamento…"
+                  @error('problem') aria-invalid="true" aria-describedby="problem-erro" @enderror>{{ old('problem', $procedure->problem) }}</textarea>
+        @error('problem')<p class="erro" id="problem-erro">{{ $message }}</p>@enderror
+        <p class="ajuda">Descreva o problema tal como aparece a quem o encontra. Os passos abaixo são a solução.</p>
+    </div>
+
     <div class="grelha-2">
         <div class="campo">
             <label for="category_id">Categoria</label>
@@ -56,7 +64,7 @@
                 @endforeach
             </select>
             @error('category_id')<p class="erro" id="category-erro">{{ $message }}</p>@enderror
-            <p class="ajuda">Falta alguma? <a href="{{ route('admin.categorias.index') }}">Gerir categorias</a>.</p>
+            @can('admin')<p class="ajuda">Falta alguma? <a href="{{ route('admin.categorias.index') }}">Gerir categorias</a>.</p>@endcan
         </div>
 
         <fieldset class="campo">
@@ -167,11 +175,13 @@
                     <button type="submit" class="btn btn--secundario">Arquivar</button>
                 </form>
             @endif
+            @can('admin')
             <form method="post" action="{{ route('admin.procedimentos.destroy', $procedure) }}"
                   data-confirm="Apagar definitivamente «{{ $procedure->reference }} — {{ $procedure->title }}»? Esta acção não pode ser anulada.">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn btn--perigo">Apagar definitivamente</button>
             </form>
+            @endcan
         </div>
     </div>
 @endif

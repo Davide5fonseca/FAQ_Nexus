@@ -29,7 +29,7 @@ class SafetyRuleController extends Controller
         SafetyRule::create([
             'content' => trim($data['content']),
             'position' => ((int) SafetyRule::max('position')) + 1,
-            'updated_by' => $request->user()->name,
+            'updated_by' => $request->user()->signature,
         ]);
 
         return redirect()->route('admin.regras.index')->with('status', 'Regra adicionada.');
@@ -43,7 +43,7 @@ class SafetyRuleController extends Controller
             ['content' => 'texto da regra']
         );
 
-        $rule->update(['content' => trim($data['content']), 'updated_by' => $request->user()->name]);
+        $rule->update(['content' => trim($data['content']), 'updated_by' => $request->user()->signature]);
 
         return redirect()->route('admin.regras.index')->with('status', 'Regra guardada.');
     }

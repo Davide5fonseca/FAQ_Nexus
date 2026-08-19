@@ -12,6 +12,17 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Adicionado
+- **Gestão de utilizadores** na administração: o administrador cria, edita,
+  desactiva e apaga contas pela interface. Cada conta tem **área** (Área técnica
+  ou Produção) e **perfil** (Administrador ou Editor) — alinhado com o pedido de
+  o portal ser alimentado pela área técnica e pela produção.
+- Perfil **Editor**: cria, edita, duplica e arquiva procedimentos; não gere
+  categorias, regras nem contas, e não apaga definitivamente.
+- Campo **"Problema / sintomas"** nos procedimentos, mostrado antes da solução
+  na consulta e na impressão, e incluído na pesquisa.
+- "Criado por / alterado por" passa a registar nome e área, ex.: "Ana (Produção)".
+- Contas desactivadas não conseguem entrar; protecção contra ficar sem
+  administrador activo.
 - Logótipo "Nexus Technical Suite" (SVG) na barra superior e novo ícone de separador.
 - Configuração Apache para servir a aplicação numa sub-pasta
   (`deploy/apache-subpasta.conf`), usada no servidor interno da Nexus.

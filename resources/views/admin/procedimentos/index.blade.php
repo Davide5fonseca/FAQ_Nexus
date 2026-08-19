@@ -12,7 +12,7 @@
 @if(! $hasAny)
     <div class="vazio">
         <h2>Ainda não há procedimentos.</h2>
-        <p>Crie o primeiro. Se ainda não tiver categorias, pode criá-las em <a href="{{ route('admin.categorias.index') }}">Categorias</a>.</p>
+        <p>Crie o primeiro.@can('admin') Se ainda não tiver categorias, pode criá-las em <a href="{{ route('admin.categorias.index') }}">Categorias</a>.@endcan</p>
         <a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a>
     </div>
 @else
@@ -103,11 +103,13 @@
                                     <button type="submit" class="btn btn--secundario btn--pequeno">Arquivar</button>
                                 </form>
                             @endif
+                            @can('admin')
                             <form method="post" action="{{ route('admin.procedimentos.destroy', $p) }}"
                                   data-confirm="Apagar definitivamente «{{ $p->reference }} — {{ $p->title }}»? Esta acção não pode ser anulada.">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="btn btn--perigo btn--pequeno">Apagar</button>
                             </form>
+                            @endcan
                         </td>
                     </tr>
                 @endforeach

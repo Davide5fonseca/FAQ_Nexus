@@ -5,8 +5,13 @@ responsáveis os inserem e editam numa área de administração.
 
 - **Consulta** (`/`): aberta, sem login. Pesquisa por texto, filtro por categoria e
   nível, regras de segurança no topo, impressão em A4 (um procedimento por página).
-- **Administração** (`/admin`): com email e palavra-passe. Criar, editar, duplicar,
-  arquivar e apagar procedimentos; gerir categorias e regras de segurança.
+- **Administração** (`/admin`): com email e palavra-passe. Dois perfis:
+  - **Editor** — é quem, na **área técnica** ou na **produção**, carrega problemas e
+    soluções: cria, edita, duplica e arquiva procedimentos.
+  - **Administrador** — tudo isso mais: gerir contas, categorias, regras de
+    segurança e apagar definitivamente.
+  Cada conta tem uma área (Área técnica / Produção); quem criou ou alterou cada
+  procedimento fica registado com nome e área (ex.: "Rita Silva (Produção)").
 
 Tecnologia: **PHP 8.3 + Laravel 13 + PostgreSQL**. Sem Node, sem compilação, sem
 serviços externos. As páginas são geradas no servidor; há uma folha de estilos
@@ -30,7 +35,7 @@ serviços externos. As páginas são geradas no servidor; há uma folha de estil
 | `tests/Feature/AplicacaoTest.php` | Testes automáticos (20 cenários) |
 
 Cada procedimento tem: referência automática (`PROC-01`, `PROC-02`… nunca reutilizada),
-título, categoria, nível 1/2/3, passos ordenados, "o que registar no ticket",
+título, **problema / sintomas**, categoria, nível 1/2/3, passos ordenados (a solução), "o que registar no ticket",
 "quando escalar", data de criação e de última alteração, quem alterou, e estado
 activo/arquivado. Arquivados não aparecem na consulta.
 
@@ -102,7 +107,7 @@ e `APP_URL`/`SESSION_PATH` no `.env`.
 ### Actualizar a aplicação neste servidor
 A partir do seu PC (na pasta da aplicação), depois de `git pull` ou das alterações:
 ```bash
-tar --exclude=vendor --exclude=.env --exclude=.git --exclude=composer.phar -czf /tmp/p.tgz . && scp /tmp/p.tgz dev@192.168.1.69:/tmp/
+tar --exclude=vendor --exclude=.env --exclude=.git --exclude=composer.phar --exclude='bootstrap/cache/*' --exclude='storage/logs/*' --exclude='storage/framework/*' -czf /tmp/p.tgz . && scp /tmp/p.tgz dev@192.168.1.69:/tmp/
 ssh dev@192.168.1.69
 sudo backup-procedimentos
 sudo tar -xzf /tmp/p.tgz -C /var/www/procedimentos
@@ -216,8 +221,9 @@ os comandos acima, e copie também o ficheiro `.env` antigo (tem a chave `APP_KE
 
 | Quero… | Comando (em `/var/www/procedimentos`) |
 |---|---|
-| Mudar a palavra-passe do administrador | `sudo -u www-data php artisan app:alterar-password` |
-| Mudar nome/email do administrador | `sudo -u www-data php artisan app:criar-admin` (com o mesmo email actualiza; com outro cria nova conta) |
+| Criar contas para técnicos/produção | Administração → **Utilizadores** → Nova conta (pela interface) |
+| Mudar a palavra-passe de alguém | Administração → Utilizadores → Editar (ou, sem acesso à interface, `sudo -u www-data php artisan app:alterar-password --email=...`) |
+| Recuperar acesso de administrador | `sudo -u www-data php artisan app:criar-admin` (com o mesmo email actualiza; com outro cria nova conta de administrador) |
 | Ver erros da aplicação | `sudo tail -n 100 storage/logs/laravel.log` |
 | Ver se o Nginx/PHP estão a correr | `systemctl status nginx php8.3-fpm postgresql` |
 | Pôr em manutenção temporária | `sudo -u www-data php artisan down` / `... artisan up` |
@@ -255,9 +261,12 @@ Depois de alterar o `.env`, correr `sudo -u www-data php artisan config:cache`.
 - **Consulta sem login** (como pediu na conversa): os procedimentos ficam visíveis
   a quem tiver o endereço. Se um dia quiser exigir login também na consulta,
   basta mover as rotas de consulta para dentro do grupo `auth` em `routes/web.php`.
-- **Uma só conta de administrador**, criada por comando: sem registo público,
-  sem recuperação por email, menos superfície de ataque. Pode criar mais contas
-  com `app:criar-admin` se precisar.
+- **Contas criadas por um administrador** (sem registo público, sem recuperação
+  por email): menos superfície de ataque. A primeira conta é criada por comando
+  (`app:criar-admin`); as restantes pela interface, com perfil e área.
+- **Sem validação prévia**: o que técnicos e produção inserem publica-se de
+  imediato, como diz o pedido original. Se vier a ser preciso um passo de
+  aprovação, acrescenta-se um estado "pendente" aos procedimentos.
 - **Referências nunca reutilizadas**: há um contador (`tabela counters`) que só
   aumenta; apagar o PROC-07 não faz o próximo ser PROC-07 outra vez — evita
   confusões em papéis já afixados na oficina.

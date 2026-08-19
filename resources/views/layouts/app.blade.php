@@ -22,7 +22,7 @@
             <a href="{{ route('consulta') }}" @if(request()->routeIs('consulta')) aria-current="page" @endif>Consulta</a>
             @auth
                 <a href="{{ route('admin.procedimentos.index') }}" @if(request()->is('admin*')) aria-current="page" @endif>Administração</a>
-                <span class="barra__user">{{ auth()->user()->name }}</span>
+                <span class="barra__user">{{ auth()->user()->name }}@if(auth()->user()->area_label) · {{ auth()->user()->area_label }}@endif</span>
                 <form method="post" action="{{ route('logout') }}" class="inline">
                     @csrf
                     <button type="submit">Sair</button>
@@ -39,8 +39,11 @@
         <nav class="subnav no-print" aria-label="Secções da administração">
             <div class="subnav__inner">
                 <a href="{{ route('admin.procedimentos.index') }}" @if(request()->routeIs('admin.procedimentos.*')) aria-current="page" @endif>Procedimentos</a>
-                <a href="{{ route('admin.categorias.index') }}" @if(request()->routeIs('admin.categorias.*')) aria-current="page" @endif>Categorias</a>
-                <a href="{{ route('admin.regras.index') }}" @if(request()->routeIs('admin.regras.*')) aria-current="page" @endif>Regras de segurança</a>
+                @can('admin')
+                    <a href="{{ route('admin.categorias.index') }}" @if(request()->routeIs('admin.categorias.*')) aria-current="page" @endif>Categorias</a>
+                    <a href="{{ route('admin.regras.index') }}" @if(request()->routeIs('admin.regras.*')) aria-current="page" @endif>Regras de segurança</a>
+                    <a href="{{ route('admin.utilizadores.index') }}" @if(request()->routeIs('admin.utilizadores.*')) aria-current="page" @endif>Utilizadores</a>
+                @endcan
             </div>
         </nav>
     @endif

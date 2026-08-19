@@ -17,6 +17,7 @@ class ProcedureRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:200'],
+            'problem' => ['nullable', 'string', 'max:5000'],
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')],
             'level' => ['required', 'integer', Rule::in(Procedure::LEVELS)],
             'steps' => ['required', 'array', 'min:1'],
@@ -30,6 +31,7 @@ class ProcedureRequest extends FormRequest
     {
         return [
             'title' => 'título',
+            'problem' => 'problema / sintomas',
             'category_id' => 'categoria',
             'level' => 'nível de intervenção',
             'steps' => 'passos',

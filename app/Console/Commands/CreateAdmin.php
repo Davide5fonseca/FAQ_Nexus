@@ -43,7 +43,7 @@ class CreateAdmin extends Command
 
         $user = User::updateOrCreate(
             ['email' => mb_strtolower(trim($email))],
-            ['name' => trim($name), 'password' => Hash::make($password)]
+            ['name' => trim($name), 'password' => Hash::make($password), 'role' => 'admin', 'area' => 'tecnica', 'active' => true]
         );
 
         $this->info($user->wasRecentlyCreated
