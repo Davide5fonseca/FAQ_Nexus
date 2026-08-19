@@ -1,0 +1,178 @@
+@extends('layouts.app')
+@php $editing = $procedure->exists; @endphp
+@section('title', $editing ? 'Editar '.$procedure->reference : 'Novo procedimento')
+
+@section('content')
+<div class="cabecalho-pagina">
+    <h1>
+        @if($editing)
+            Editar <span class="etiqueta etiqueta--ref">{{ $procedure->reference }}</span>
+        @else
+            Novo procedimento
+        @endif
+    </h1>
+    <div class="accoes">
+        <a class="btn btn--secundario" href="{{ route('admin.procedimentos.index') }}">← Voltar à lista</a>
+        @if($editing)
+            <a class="btn btn--secundario" href="{{ route('consulta') }}#proc-{{ $procedure->reference_number }}">Ver na consulta</a>
+        @endif
+    </div>
+</div>
+
+@if($categories->isEmpty())
+    <div class="alerta alerta--aviso" role="alert">
+        <span aria-hidden="true">!</span>
+        <div>Ainda não existem categorias. <a href="{{ route('admin.categorias.index') }}">Crie pelo menos uma categoria</a> antes de guardar o procedimento.</div>
+    </div>
+@endif
+
+@if($editing && $procedure->is_archived)
+    <div class="alerta alerta--aviso" role="status">
+        <span aria-hidden="true">!</span>
+        <div>Este procedimento está <strong>arquivado</strong> e não aparece na consulta.</div>
+    </div>
+@endif
+
+<form method="post" action="{{ $editing ? route('admin.procedimentos.update', $procedure) : route('admin.procedimentos.store') }}" class="cartao" novalidate>
+    @csrf
+    @if($editing) @method('PUT') @endif
+
+    @php $steps = old('steps', $steps) ?: ['']; @endphp
+
+    <div class="campo">
+        <label for="title">Título</label>
+        <input type="text" id="title" name="title" value="{{ old('title', $procedure->title) }}" required maxlength="200" autofocus
+               @error('title') aria-invalid="true" aria-describedby="title-erro" @enderror>
+        @error('title')<p class="erro" id="title-erro">{{ $message }}</p>@enderror
+    </div>
+
+    <div class="grelha-2">
+        <div class="campo">
+            <label for="category_id">Categoria</label>
+            <select id="category_id" name="category_id" required @error('category_id') aria-invalid="true" aria-describedby="category-erro" @enderror>
+                <option value="">— Escolher —</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat->id }}" @selected((int) old('category_id', $procedure->category_id) === $cat->id)>{{ $cat->name }}</option>
+                @endforeach
+            </select>
+            @error('category_id')<p class="erro" id="category-erro">{{ $message }}</p>@enderror
+            <p class="ajuda">Falta alguma? <a href="{{ route('admin.categorias.index') }}">Gerir categorias</a>.</p>
+        </div>
+
+        <fieldset class="campo">
+            <legend class="legenda">Nível de intervenção</legend>
+            <div class="radios" @error('level') aria-describedby="level-erro" @enderror>
+                @foreach(\App\Models\Procedure::LEVELS as $lvl)
+                    <label>
+                        <input type="radio" name="level" value="{{ $lvl }}" @checked((int) old('level', $procedure->level ?? 1) === $lvl)>
+                        Nível {{ $lvl }}
+                    </label>
+                @endforeach
+            </div>
+            @error('level')<p class="erro" id="level-erro">{{ $message }}</p>@enderror
+            <p class="ajuda">1 = intervenção simples · 2 = intermédia · 3 = complexa ou requer técnico sénior.</p>
+        </fieldset>
+    </div>
+
+    <fieldset class="campo" data-passos>
+        <legend class="legenda">Passos, por ordem</legend>
+        @error('steps')<p class="erro">{{ $message }}</p>@enderror
+        <p class="ajuda" style="margin-bottom:.5rem">Use os botões ↑ ↓ (ou Alt+↑ / Alt+↓ dentro do texto) para reordenar, ou arraste pela pega ⠿. Passos em branco são ignorados.</p>
+        <p class="visually-hidden" aria-live="polite" data-aviso-passos></p>
+
+        <ol class="passos">
+            @foreach($steps as $i => $content)
+                <li class="passo">
+                    <span class="passo__num" aria-hidden="true">{{ $i + 1 }}.</span>
+                    <textarea name="steps[]" rows="2" aria-label="Passo {{ $i + 1 }}" maxlength="5000">{{ $content }}</textarea>
+                    <span class="passo__accoes">
+                        <button type="button" class="btn btn--secundario btn--icone passo__pega" title="Arrastar para reordenar" aria-hidden="true" tabindex="-1">⠿</button>
+                        <button type="button" class="btn btn--secundario btn--icone" data-subir aria-label="Mover para cima" title="Mover para cima">↑</button>
+                        <button type="button" class="btn btn--secundario btn--icone" data-descer aria-label="Mover para baixo" title="Mover para baixo">↓</button>
+                        <button type="button" class="btn btn--perigo btn--icone" data-remover aria-label="Remover passo" title="Remover passo">×</button>
+                    </span>
+                </li>
+            @endforeach
+            <noscript>
+                {{-- Sem JavaScript: há sempre um campo extra para acrescentar um passo. --}}
+                <li class="passo">
+                    <span class="passo__num" aria-hidden="true">+</span>
+                    <textarea name="steps[]" rows="2" aria-label="Novo passo" maxlength="5000" placeholder="Novo passo (opcional)"></textarea>
+                    <span class="passo__accoes"></span>
+                </li>
+            </noscript>
+        </ol>
+
+        <template>
+            <li class="passo">
+                <span class="passo__num" aria-hidden="true"></span>
+                <textarea name="steps[]" rows="2" maxlength="5000"></textarea>
+                <span class="passo__accoes">
+                    <button type="button" class="btn btn--secundario btn--icone passo__pega" title="Arrastar para reordenar" aria-hidden="true" tabindex="-1">⠿</button>
+                    <button type="button" class="btn btn--secundario btn--icone" data-subir aria-label="Mover para cima" title="Mover para cima">↑</button>
+                    <button type="button" class="btn btn--secundario btn--icone" data-descer aria-label="Mover para baixo" title="Mover para baixo">↓</button>
+                    <button type="button" class="btn btn--perigo btn--icone" data-remover aria-label="Remover passo" title="Remover passo">×</button>
+                </span>
+            </li>
+        </template>
+
+        <button type="button" class="btn btn--secundario" data-adicionar-passo>+ Adicionar passo</button>
+        <noscript><p class="ajuda">Sem JavaScript: para acrescentar mais do que um passo de cada vez, guarde e volte a editar.</p></noscript>
+    </fieldset>
+
+    <div class="campo">
+        <label for="ticket_notes">O que registar no ticket</label>
+        <textarea id="ticket_notes" name="ticket_notes" rows="4" maxlength="5000"
+                  @error('ticket_notes') aria-invalid="true" aria-describedby="ticket-erro" @enderror>{{ old('ticket_notes', $procedure->ticket_notes) }}</textarea>
+        @error('ticket_notes')<p class="erro" id="ticket-erro">{{ $message }}</p>@enderror
+    </div>
+
+    <div class="campo">
+        <label for="escalation">Quando escalar</label>
+        <textarea id="escalation" name="escalation" rows="4" maxlength="5000"
+                  @error('escalation') aria-invalid="true" aria-describedby="escalation-erro" @enderror>{{ old('escalation', $procedure->escalation) }}</textarea>
+        @error('escalation')<p class="erro" id="escalation-erro">{{ $message }}</p>@enderror
+    </div>
+
+    @if($editing)
+        <p class="meta">
+            Criado em {{ $procedure->created_at->format('d/m/Y H:i') }}@if($procedure->created_by) por {{ $procedure->created_by }}@endif
+            · Última alteração em {{ $procedure->updated_at->format('d/m/Y H:i') }}@if($procedure->updated_by) por {{ $procedure->updated_by }}@endif
+        </p>
+    @endif
+
+    <div class="accoes-form">
+        <button type="submit" class="btn btn--primario">{{ $editing ? 'Guardar alterações' : 'Criar procedimento' }}</button>
+        <a class="btn btn--secundario" href="{{ route('admin.procedimentos.index') }}">Cancelar</a>
+    </div>
+</form>
+
+@if($editing)
+    <div class="cartao">
+        <h2>Outras acções</h2>
+        <div class="accoes-form" style="border:0;padding:0;margin:0">
+            <form method="post" action="{{ route('admin.procedimentos.duplicate', $procedure) }}">
+                @csrf
+                <button type="submit" class="btn btn--secundario">Duplicar</button>
+            </form>
+            @if($procedure->is_archived)
+                <form method="post" action="{{ route('admin.procedimentos.unarchive', $procedure) }}">
+                    @csrf
+                    <button type="submit" class="btn btn--secundario">Desarquivar</button>
+                </form>
+            @else
+                <form method="post" action="{{ route('admin.procedimentos.archive', $procedure) }}"
+                      data-confirm="Arquivar «{{ $procedure->reference }} — {{ $procedure->title }}»? Deixa de aparecer na consulta, mas pode ser recuperado.">
+                    @csrf
+                    <button type="submit" class="btn btn--secundario">Arquivar</button>
+                </form>
+            @endif
+            <form method="post" action="{{ route('admin.procedimentos.destroy', $procedure) }}"
+                  data-confirm="Apagar definitivamente «{{ $procedure->reference }} — {{ $procedure->title }}»? Esta acção não pode ser anulada.">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn btn--perigo">Apagar definitivamente</button>
+            </form>
+        </div>
+    </div>
+@endif
+@endsection
