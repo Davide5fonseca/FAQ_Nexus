@@ -22,6 +22,8 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 - Na consulta, o filtro de categorias só mostra as que têm procedimentos visíveis.
 
 ### Removido
+- Texto **"Base de Procedimentos Técnicos"** ao lado do logótipo: o cabeçalho fica
+  só com a marca. O nome mantém-se no separador do browser.
 - Filtro **"Estado"** na lista de administração. A lista passa a mostrar activos e
   arquivados em conjunto, com os arquivados marcados por etiqueta — assim
   continuam acessíveis para se poderem desarquivar.

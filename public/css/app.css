@@ -104,14 +104,9 @@ textarea:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
   font-size: .55rem; font-weight: 700; letter-spacing: .285em; line-height: 1;
   color: #8FB3A0; text-transform: uppercase; white-space: nowrap;
 }
-.barra__titulo {
-  font-weight: 600; font-size: 1.02rem; line-height: 1.2; letter-spacing: -.01em;
-  padding-left: .9rem; border-left: 1px solid rgba(255,255,255,.22);
-}
 @media (max-width: 520px) {
   .barra__logo { height: 24px; }
   .barra__marca-sub { font-size: .48rem; letter-spacing: .24em; }
-  .barra__titulo { font-size: .9rem; padding-left: .7rem; }
 }
 
 .barra__nav { display: flex; gap: .25rem; flex-wrap: wrap; align-items: center; }
@@ -431,7 +426,6 @@ td.accoes .btn { margin-left: .25rem; }
    -------------------------------------------------------------------------- */
 body.pagina-entrar { background: linear-gradient(135deg, var(--verde-muito-escuro) 0%, var(--verde-escuro) 100%); }
 body.pagina-entrar .barra, body.pagina-entrar .rodape { background: transparent; border: 0; }
-body.pagina-entrar .barra__titulo { display: none; }
 .entrar { margin-top: 1.5rem; }
 .entrar .cartao { padding: 2rem 2rem 1.5rem; box-shadow: var(--sombra-g); border: 0; }
 .entrar h1 { margin-bottom: .25rem; font-size: 1.5rem; }

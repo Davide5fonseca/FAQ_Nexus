@@ -25,7 +25,6 @@
                 <img class="barra__logo" src="{{ asset('img/nexus-1.png') }}" alt="Nexus" width="150" height="28">
                 <span class="barra__marca-sub">Technical Suite</span>
             </span>
-            <span class="barra__titulo">Base de Procedimentos Técnicos</span>
         </a>
         <nav class="barra__nav" aria-label="Navegação principal">
             <a href="{{ route('consulta') }}" @if(request()->routeIs('consulta')) aria-current="page" @endif>Consulta</a>
