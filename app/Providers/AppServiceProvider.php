@@ -46,14 +46,23 @@ class AppServiceProvider extends ServiceProvider
                 'email' => $notifiable->getEmailForPasswordReset(),
             ]);
 
+            $dias = (int) round(config('auth.passwords.users.expire') / 1440);
+
             return (new MailMessage)
                 ->subject('Recuperação de palavra-passe — '.config('app.name'))
-                ->greeting('Olá, '.$notifiable->name.',')
-                ->line('Recebemos um pedido para definir uma nova palavra-passe para a sua conta.')
-                ->action('Definir nova palavra-passe', $url)
-                ->line('Este link expira em '.(int) round(config('auth.passwords.users.expire') / 1440).' dias.')
-                ->line('Se não foi você que fez este pedido, ignore este email.')
-                ->salutation('Cumprimentos, Nexus Solutions');
+                ->view(['emails.accao', 'emails.accao-texto'], [
+                    'saudacao' => 'Olá, '.$notifiable->name.',',
+                    'linhas' => [
+                        'Recebemos um pedido para definir uma nova palavra-passe para a sua conta.',
+                        'Use o botão abaixo para escolher a nova palavra-passe.',
+                    ],
+                    'botaoTexto' => 'Definir nova palavra-passe',
+                    'url' => $url,
+                    'notas' => [
+                        "Este link é válido durante {$dias} ".($dias === 1 ? 'dia' : 'dias').'.',
+                        'Se não foi você que fez este pedido, ignore este email — a palavra-passe actual mantém-se.',
+                    ],
+                ]);
         });
 
         // Só administradores gerem utilizadores, categorias, regras e apagam procedimentos.

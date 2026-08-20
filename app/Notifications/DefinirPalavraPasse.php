@@ -28,15 +28,22 @@ class DefinirPalavraPasse extends Notification
         ]);
 
         $dias = (int) round(config('auth.passwords.users.expire') / 1440);
+        $app = config('app.name');
 
         return (new MailMessage)
-            ->subject('A sua conta na '.config('app.name').' — defina a palavra-passe')
-            ->greeting('Olá, '.$notifiable->name.',')
-            ->line('Foi criada uma conta para si na '.config('app.name').', da Nexus Solutions.')
-            ->line('Para começar a usar, defina a sua palavra-passe através do botão abaixo.')
-            ->action('Definir palavra-passe', $url)
-            ->line("Este link é válido durante {$dias} ".($dias === 1 ? 'dia' : 'dias').'. Depois disso, peça um novo em "Esqueci-me da palavra-passe" na página de entrada.')
-            ->line('Se não esperava este email, ignore-o.')
-            ->salutation('Cumprimentos, Nexus Solutions');
+            ->subject("A sua conta na {$app} — defina a palavra-passe")
+            ->view(['emails.accao', 'emails.accao-texto'], [
+                'saudacao' => 'Olá, '.$notifiable->name.',',
+                'linhas' => [
+                    "Foi criada uma conta para si na <strong style=\"color:#0F172A;\">{$app}</strong>, da Nexus Solutions.",
+                    'Para começar a usar, defina a sua palavra-passe no botão abaixo.',
+                ],
+                'botaoTexto' => 'Definir palavra-passe',
+                'url' => $url,
+                'notas' => [
+                    "Este link é válido durante {$dias} ".($dias === 1 ? 'dia' : 'dias').'.',
+                    'Se não esperava este email, ignore-o.',
+                ],
+            ]);
     }
 }

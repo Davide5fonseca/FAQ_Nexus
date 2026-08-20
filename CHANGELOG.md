@@ -12,6 +12,10 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- **Emails com a identidade da Nexus**, no mesmo formato da Nexus Ops: cartão
+  branco com faixa verde no topo, marca, botão verde legível e endereço de
+  recurso em baixo. Substitui o modelo genérico do Laravel, em que o botão
+  aparecia preto com texto ilegível. Inclui versão em texto simples.
 - A aplicação passa a chamar-se **Knowledgebase Nexus** (separador do browser,
   assunto dos emails e cabeçalho das folhas impressas). O nome vem de `APP_NAME`
   no `.env`, por isso muda-se num único sítio.
