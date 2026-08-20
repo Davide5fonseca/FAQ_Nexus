@@ -23,17 +23,11 @@
             @enderror
         </div>
 
-        <div class="campo">
-            <div class="campo__topo">
-                <label for="password">Palavra-passe</label>
-                <button type="button" class="btn--ligacao" data-ver-password="password" aria-pressed="false">Mostrar</button>
-            </div>
-            <input type="password" id="password" name="password" required autocomplete="current-password"
-                   @error('password') aria-invalid="true" aria-describedby="password-erro" @enderror>
-            @error('password')
-                <p class="erro" id="password-erro" role="alert">{{ $message }}</p>
-            @enderror
-        </div>
+        @include('auth.campo-password', [
+            'id' => 'password',
+            'rotulo' => 'Palavra-passe',
+            'autocomplete' => 'current-password',
+        ])
 
         <button type="submit" class="btn btn--primario btn--bloco">Entrar</button>
     </form>

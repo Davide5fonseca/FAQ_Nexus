@@ -142,11 +142,20 @@
     var campo = document.getElementById(btn.getAttribute('data-ver-password'));
     if (!campo) return;
 
+    var olhoMostrar = btn.querySelector('[data-olho-mostrar]');
+    var olhoOcultar = btn.querySelector('[data-olho-ocultar]');
+
     btn.addEventListener('click', function () {
       var aMostrar = campo.type === 'password';
       campo.type = aMostrar ? 'text' : 'password';
-      btn.textContent = aMostrar ? 'Ocultar' : 'Mostrar';
+
+      if (olhoMostrar) olhoMostrar.hidden = aMostrar;
+      if (olhoOcultar) olhoOcultar.hidden = !aMostrar;
+
+      var etiqueta = (aMostrar ? 'Ocultar' : 'Mostrar') + ' palavra-passe';
       btn.setAttribute('aria-pressed', aMostrar ? 'true' : 'false');
+      btn.setAttribute('aria-label', etiqueta);
+      btn.setAttribute('title', etiqueta);
       campo.focus();
     });
   });

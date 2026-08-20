@@ -445,10 +445,20 @@ body.pagina-entrar .conteudo { padding-top: 2rem; padding-bottom: 2rem; }
 .entrar .intro { color: var(--texto-suave); margin: -.85rem 0 1.5rem; font-size: .93rem; }
 .entrar .campo:last-of-type { margin-bottom: 1.4rem; }
 
-/* Rótulo com acção à direita (ex.: Mostrar palavra-passe) */
-.campo__topo { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
-.campo__topo label { margin-bottom: .35rem; }
-.campo__topo .btn--ligacao { font-size: .82rem; }
+/* Campo de palavra-passe com o "olhinho" lá dentro */
+.campo-password { position: relative; }
+.campo-password input { padding-right: 3rem; }
+.campo-password__olho {
+  position: absolute; right: .35rem; top: 50%; transform: translateY(-50%);
+  display: grid; place-items: center;
+  width: 2.4rem; height: 2.4rem; padding: 0;
+  background: none; border: 0; border-radius: var(--raio);
+  color: var(--texto-leve); cursor: pointer;
+  transition: color .15s, background .15s;
+}
+.campo-password__olho:hover { color: var(--verde-escuro); background: #F1F5F9; }
+.campo-password__olho svg { width: 20px; height: 20px; display: block; }
+.campo-password__olho[aria-pressed="true"] { color: var(--verde-escuro); }
 
 .btn--bloco { width: 100%; min-height: 48px; font-size: 1rem; }
 

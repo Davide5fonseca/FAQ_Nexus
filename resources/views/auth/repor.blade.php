@@ -24,22 +24,20 @@
             @enderror
         </div>
 
-        <div class="campo">
-            <div class="campo__topo">
-                <label for="password">Nova palavra-passe</label>
-                <button type="button" class="btn--ligacao" data-ver-password="password" aria-pressed="false">Mostrar</button>
-            </div>
-            <input type="password" id="password" name="password" required minlength="10" autocomplete="new-password" autofocus
-                   @error('password') aria-invalid="true" aria-describedby="password-erro" @enderror>
-            @error('password')
-                <p class="erro" id="password-erro" role="alert">{{ $message }}</p>
-            @enderror
-        </div>
+        @include('auth.campo-password', [
+            'id' => 'password',
+            'rotulo' => 'Nova palavra-passe',
+            'autocomplete' => 'new-password',
+            'minlength' => 10,
+            'autofocus' => true,
+        ])
 
-        <div class="campo">
-            <label for="password_confirmation">Repetir a palavra-passe</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required minlength="10" autocomplete="new-password">
-        </div>
+        @include('auth.campo-password', [
+            'id' => 'password_confirmation',
+            'rotulo' => 'Repetir a palavra-passe',
+            'autocomplete' => 'new-password',
+            'minlength' => 10,
+        ])
 
         <button type="submit" class="btn btn--primario btn--bloco">Guardar e entrar</button>
     </form>
