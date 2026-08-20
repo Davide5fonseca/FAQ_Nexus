@@ -64,7 +64,6 @@ class ProcedureController extends Controller
         return [
             'q' => trim((string) $request->query('q', '')),
             'categoria' => (int) $request->query('categoria', 0) ?: null,
-            'nivel' => in_array((int) $request->query('nivel'), Procedure::LEVELS, true) ? (int) $request->query('nivel') : null,
         ];
     }
 }

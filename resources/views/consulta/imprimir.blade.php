@@ -38,7 +38,6 @@
         <div class="imp-meta">
             <span><strong>Referência:</strong> {{ $p->reference }}</span>
             <span><strong>Categoria:</strong> {{ $p->category->name }}</span>
-            <span><strong>Nível de intervenção:</strong> {{ $p->level }}</span>
             @if($p->is_archived)<span><strong>ARQUIVADO</strong></span>@endif
         </div>
 

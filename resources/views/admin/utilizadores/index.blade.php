@@ -32,7 +32,7 @@
                 <td><a href="{{ route('admin.utilizadores.edit', $u) }}"><strong>{{ $u->name }}</strong></a>@if(auth()->user()->is($u)) <span class="meta">(eu)</span>@endif</td>
                 <td>{{ $u->email }}</td>
                 <td>{{ $u->area_label ?? '—' }}</td>
-                <td><span class="etiqueta {{ $u->is_admin ? 'etiqueta--nivel-1' : '' }}">{{ $u->role_label }}</span></td>
+                <td><span class="etiqueta {{ $u->is_admin ? 'etiqueta--perfil-admin' : '' }}">{{ $u->role_label }}</span></td>
                 <td>@if($u->active) Activa @else <span class="etiqueta etiqueta--arquivado">Desactivada</span> @endif</td>
                 <td class="accoes">
                     <a class="btn btn--secundario btn--pequeno" href="{{ route('admin.utilizadores.edit', $u) }}">Editar</a>

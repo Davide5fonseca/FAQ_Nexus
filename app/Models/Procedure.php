@@ -10,10 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 class Procedure extends Model
 {
-    public const LEVELS = [1, 2, 3];
-
     protected $fillable = [
-        'reference_number', 'title', 'problem', 'category_id', 'level',
+        'reference_number', 'title', 'problem', 'category_id',
         'ticket_notes', 'escalation', 'archived_at', 'created_by', 'updated_by',
     ];
 
@@ -21,7 +19,6 @@ class Procedure extends Model
     {
         return [
             'archived_at' => 'datetime',
-            'level' => 'integer',
             'reference_number' => 'integer',
         ];
     }
@@ -84,8 +81,7 @@ class Procedure extends Model
     {
         return $query
             ->search($filters['q'] ?? null)
-            ->when(! empty($filters['categoria']), fn (Builder $q) => $q->where('category_id', (int) $filters['categoria']))
-            ->when(! empty($filters['nivel']), fn (Builder $q) => $q->where('level', (int) $filters['nivel']));
+            ->when(! empty($filters['categoria']), fn (Builder $q) => $q->where('category_id', (int) $filters['categoria']));
     }
 
     // --- Referência automática ---

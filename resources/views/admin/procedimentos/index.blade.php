@@ -33,7 +33,7 @@
         <div class="accoes"><a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a></div>
     </div>
 @else
-    <form class="filtros filtros--admin" method="get" action="{{ route('admin.procedimentos.index') }}" role="search" aria-label="Filtrar procedimentos">
+    <form class="filtros" method="get" action="{{ route('admin.procedimentos.index') }}" role="search" aria-label="Filtrar procedimentos">
         <div class="campo">
             <label for="q">Pesquisar</label>
             <div class="pesquisa">
@@ -47,15 +47,6 @@
                 <option value="">Todas</option>
                 @foreach($categories as $cat)
                     <option value="{{ $cat->id }}" @selected($filters['categoria'] === $cat->id)>{{ $cat->name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="campo">
-            <label for="nivel">Nível</label>
-            <select id="nivel" name="nivel">
-                <option value="">Todos</option>
-                @foreach(\App\Models\Procedure::LEVELS as $lvl)
-                    <option value="{{ $lvl }}" @selected($filters['nivel'] === $lvl)>Nível {{ $lvl }}</option>
                 @endforeach
             </select>
         </div>
@@ -87,7 +78,6 @@
                         <th scope="col">Ref.</th>
                         <th scope="col">Título</th>
                         <th scope="col">Categoria</th>
-                        <th scope="col">Nível</th>
                         <th scope="col">Passos</th>
                         <th scope="col">Alterado</th>
                         <th scope="col"><span class="visually-hidden">Acções</span></th>
@@ -102,7 +92,6 @@
                             @if($p->is_archived) <span class="etiqueta etiqueta--arquivado">Arquivado</span> @endif
                         </td>
                         <td>{{ $p->category->name }}</td>
-                        <td><span class="etiqueta etiqueta--ponto etiqueta--nivel-{{ $p->level }}">Nível {{ $p->level }}</span></td>
                         <td>{{ $p->steps_count }}</td>
                         <td class="meta">{{ $p->updated_at->format('d/m/Y H:i') }}<br>{{ $p->updated_by }}</td>
                         <td class="accoes">

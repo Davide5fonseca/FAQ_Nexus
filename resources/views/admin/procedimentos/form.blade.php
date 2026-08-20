@@ -54,8 +54,8 @@
         <p class="ajuda">Descreva o problema tal como aparece a quem o encontra. Os passos abaixo são a solução.</p>
     </div>
 
-    <div class="grelha-2">
-        <div class="campo">
+    <div class="campo">
+        <div>
             <label for="category_id">Categoria</label>
             <select id="category_id" name="category_id" required @error('category_id') aria-invalid="true" aria-describedby="category-erro" @enderror>
                 <option value="">— Escolher —</option>
@@ -67,19 +67,6 @@
             @can('admin')<p class="ajuda">Falta alguma? <a href="{{ route('admin.categorias.index') }}">Gerir categorias</a>.</p>@endcan
         </div>
 
-        <fieldset class="campo">
-            <legend class="legenda">Nível de intervenção</legend>
-            <div class="radios" @error('level') aria-describedby="level-erro" @enderror>
-                @foreach(\App\Models\Procedure::LEVELS as $lvl)
-                    <label>
-                        <input type="radio" name="level" value="{{ $lvl }}" @checked((int) old('level', $procedure->level ?? 1) === $lvl)>
-                        Nível {{ $lvl }}
-                    </label>
-                @endforeach
-            </div>
-            @error('level')<p class="erro" id="level-erro">{{ $message }}</p>@enderror
-            <p class="ajuda">1 = intervenção simples · 2 = intermédia · 3 = complexa ou requer técnico sénior.</p>
-        </fieldset>
     </div>
 
     <fieldset class="campo" data-passos>

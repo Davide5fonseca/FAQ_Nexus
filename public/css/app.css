@@ -507,3 +507,6 @@ body.pagina-entrar .barra__titulo { display: none; }
   .hero p { font-size: .92rem; margin-bottom: .75rem; }
   .hero--compacto { padding: 1.25rem 0; }
 }
+
+/* Perfil de administrador na tabela de utilizadores (substitui a antiga cor de nível) */
+.etiqueta--perfil-admin { color: #0F3D24; background: #EAF9EF; border-color: #A7E3BC; }

@@ -19,7 +19,6 @@ class ProcedureRequest extends FormRequest
             'title' => ['required', 'string', 'max:200'],
             'problem' => ['nullable', 'string', 'max:5000'],
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')],
-            'level' => ['required', 'integer', Rule::in(Procedure::LEVELS)],
             'steps' => ['required', 'array', 'min:1'],
             'steps.*' => ['nullable', 'string', 'max:5000'],
             'ticket_notes' => ['nullable', 'string', 'max:5000'],
@@ -33,7 +32,6 @@ class ProcedureRequest extends FormRequest
             'title' => 'título',
             'problem' => 'problema / sintomas',
             'category_id' => 'categoria',
-            'level' => 'nível de intervenção',
             'steps' => 'passos',
             'steps.*' => 'passo',
             'ticket_notes' => 'o que registar no ticket',
@@ -48,7 +46,6 @@ class ProcedureRequest extends FormRequest
             'steps.min' => 'Indique pelo menos um passo.',
             'category_id.required' => 'Escolha uma categoria.',
             'category_id.exists' => 'A categoria escolhida já não existe.',
-            'level.in' => 'O nível de intervenção tem de ser 1, 2 ou 3.',
         ];
     }
 

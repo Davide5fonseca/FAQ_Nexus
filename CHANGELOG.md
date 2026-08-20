@@ -11,6 +11,11 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Removido
+- **Nível de intervenção** (1/2/3): retirado dos procedimentos, da consulta,
+  dos filtros, do formulário, da impressão e da base de dados (coluna `level`).
+
+
 ### Adicionado
 - **Gestão de utilizadores** na administração: o administrador cria, edita,
   desactiva e apaga contas pela interface. Cada conta tem **área** (Área técnica

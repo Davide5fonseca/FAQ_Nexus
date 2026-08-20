@@ -143,7 +143,6 @@
     var form = consulta.querySelector('form.filtros');
     var inputQ = form.querySelector('[name="q"]');
     var selCat = form.querySelector('[name="categoria"]');
-    var selNivel = form.querySelector('[name="nivel"]');
     var cards = Array.prototype.slice.call(consulta.querySelectorAll('.proc'));
     var contagem = consulta.querySelector('[data-contagem]');
     var semResultados = consulta.querySelector('[data-sem-resultados]');
@@ -157,13 +156,11 @@
     function aplicar() {
       var q = normalizar(inputQ.value.trim());
       var cat = selCat.value;
-      var nivel = selNivel.value;
       var visiveis = 0;
 
       cards.forEach(function (card) {
         var ok = true;
         if (cat && card.dataset.categoria !== cat) ok = false;
-        if (ok && nivel && card.dataset.nivel !== nivel) ok = false;
         if (ok && q && normalizar(card.dataset.texto).indexOf(q) === -1) ok = false;
         card.hidden = !ok;
         if (ok) visiveis++;
@@ -179,7 +176,6 @@
       var params = new URLSearchParams();
       if (inputQ.value.trim()) params.set('q', inputQ.value.trim());
       if (cat) params.set('categoria', cat);
-      if (nivel) params.set('nivel', nivel);
       var qs = params.toString();
       if (window.history.replaceState) {
         window.history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : ''));
@@ -194,14 +190,13 @@
       temporizador = setTimeout(aplicar, 120);
     });
     selCat.addEventListener('change', aplicar);
-    selNivel.addEventListener('change', aplicar);
     form.addEventListener('submit', function (e) { e.preventDefault(); aplicar(); });
 
     var btnLimpar = form.querySelector('[data-limpar]');
     if (btnLimpar) {
       btnLimpar.addEventListener('click', function (e) {
         e.preventDefault();
-        inputQ.value = ''; selCat.value = ''; selNivel.value = '';
+        inputQ.value = ''; selCat.value = '';
         aplicar();
         inputQ.focus();
       });

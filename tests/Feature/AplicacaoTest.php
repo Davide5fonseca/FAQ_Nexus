@@ -44,7 +44,6 @@ class AplicacaoTest extends TestCase
         $this->actingAs($user)->post(route('admin.procedimentos.store'), array_merge([
             'title' => 'Substituir toner',
             'category_id' => $cat->id,
-            'level' => 1,
             'steps' => ['Desligar a impressora', 'Abrir a tampa', 'Trocar o toner'],
             'ticket_notes' => 'Modelo e número de série',
             'escalation' => 'Se o erro persistir após troca',
@@ -85,14 +84,13 @@ class AplicacaoTest extends TestCase
         $admin = $this->admin();
         $redes = $this->categoria('Redes');
         $this->criarProcedimento($admin); // Impressoras, nível 1
-        $this->criarProcedimento($admin, ['title' => 'Reiniciar router', 'category_id' => $redes->id, 'level' => 3, 'steps' => ['Desligar router 30 segundos']]);
+        $this->criarProcedimento($admin, ['title' => 'Reiniciar router', 'category_id' => $redes->id, 'steps' => ['Desligar router 30 segundos']]);
 
         $this->comoVisitante();
         $this->get('/?q=router')->assertSee('Reiniciar router')->assertDontSee('Substituir toner');
         $this->get('/?q=toner')->assertSee('Substituir toner')->assertDontSee('Reiniciar router');
         $this->get('/?q=TAMPA')->assertSee('Substituir toner'); // pesquisa nos passos, sem distinguir maiúsculas
         $this->get('/?categoria='.$redes->id)->assertSee('Reiniciar router')->assertDontSee('Substituir toner');
-        $this->get('/?nivel=1')->assertSee('Substituir toner')->assertDontSee('Reiniciar router');
         $this->get('/?q=inexistente')->assertSee('Nenhum procedimento corresponde aos filtros.');
         $this->get('/?q=100%')->assertOk(); // caracteres especiais do LIKE não rebentam
     }
@@ -209,12 +207,11 @@ class AplicacaoTest extends TestCase
 
         $this->actingAs($admin)
             ->from(route('admin.procedimentos.create'))
-            ->post(route('admin.procedimentos.store'), ['title' => '', 'category_id' => '', 'level' => 9, 'steps' => ['', '']])
+            ->post(route('admin.procedimentos.store'), ['title' => '', 'category_id' => '', 'steps' => ['', '']])
             ->assertRedirect(route('admin.procedimentos.create'))
             ->assertSessionHasErrors([
                 'title' => 'O campo título é obrigatório.',
                 'category_id' => 'Escolha uma categoria.',
-                'level' => 'O nível de intervenção tem de ser 1, 2 ou 3.',
                 'steps' => 'Indique pelo menos um passo.',
             ]);
     }
@@ -227,7 +224,6 @@ class AplicacaoTest extends TestCase
         $this->actingAs($admin)->put(route('admin.procedimentos.update', $p), [
             'title' => 'Substituir toner (rev.)',
             'category_id' => $p->category_id,
-            'level' => 2,
             'steps' => ['Trocar o toner', 'Abrir a tampa'],
             'ticket_notes' => '',
             'escalation' => '',
@@ -235,7 +231,6 @@ class AplicacaoTest extends TestCase
 
         $p->refresh();
         $this->assertSame('Substituir toner (rev.)', $p->title);
-        $this->assertSame(2, $p->level);
         $this->assertSame(['Trocar o toner', 'Abrir a tampa'], $p->steps->pluck('content')->all());
         $this->assertNull($p->ticket_notes);
     }

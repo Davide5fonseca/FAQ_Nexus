@@ -61,15 +61,6 @@
                     @endforeach
                 </select>
             </div>
-            <div class="campo">
-                <label for="nivel">Nível</label>
-                <select id="nivel" name="nivel">
-                    <option value="">Todos</option>
-                    @foreach(\App\Models\Procedure::LEVELS as $lvl)
-                        <option value="{{ $lvl }}" @selected($filters['nivel'] === $lvl)>Nível {{ $lvl }}</option>
-                    @endforeach
-                </select>
-            </div>
             <div class="filtros__accoes">
                 <button type="submit" class="btn btn--escuro">Filtrar</button>
                 <a href="{{ route('consulta') }}" class="btn btn--secundario" data-limpar>Limpar</a>
@@ -93,7 +84,7 @@
         @endif
 
         @php
-            $qs = http_build_query(array_filter(['q' => $filters['q'], 'categoria' => $filters['categoria'], 'nivel' => $filters['nivel']]));
+            $qs = http_build_query(array_filter(['q' => $filters['q'], 'categoria' => $filters['categoria']]));
         @endphp
 
         <div class="resumo-lista no-print">
@@ -124,9 +115,8 @@
         </div>
 
         @foreach($procedures as $p)
-            <details class="proc proc--nivel-{{ $p->level }}" id="proc-{{ $p->reference_number }}"
+            <details class="proc" id="proc-{{ $p->reference_number }}"
                      data-categoria="{{ $p->category_id }}"
-                     data-nivel="{{ $p->level }}"
                      data-texto="{{ $p->reference }} {{ $p->title }} {{ $p->problem }} {{ $p->category->name }} {{ $p->steps->pluck('content')->implode(' ') }} {{ $p->ticket_notes }} {{ $p->escalation }}">
                 <summary>
                     <svg class="proc__seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
@@ -134,7 +124,6 @@
                     <span class="proc__tags">
                         <span class="etiqueta etiqueta--ref">{{ $p->reference }}</span>
                         <span class="etiqueta">{{ $p->category->name }}</span>
-                        <span class="etiqueta etiqueta--ponto etiqueta--nivel-{{ $p->level }}">Nível {{ $p->level }}</span>
                     </span>
                 </summary>
                 <div class="proc__corpo">
@@ -173,7 +162,7 @@
                                 <h3>Ficha</h3>
                                 <p class="meta">
                                     Referência <strong>{{ $p->reference }}</strong><br>
-                                    Categoria {{ $p->category->name }} · Nível {{ $p->level }}<br>
+                                    Categoria {{ $p->category->name }}<br>
                                     Criado em {{ $p->created_at->format('d/m/Y') }}@if($p->created_by) por {{ $p->created_by }}@endif<br>
                                     Última alteração {{ $p->updated_at->format('d/m/Y H:i') }}@if($p->updated_by) por {{ $p->updated_by }}@endif
                                 </p>

@@ -18,7 +18,6 @@ class ProcedureController extends Controller
         $filters = [
             'q' => trim((string) $request->query('q', '')),
             'categoria' => (int) $request->query('categoria', 0) ?: null,
-            'nivel' => in_array((int) $request->query('nivel'), Procedure::LEVELS, true) ? (int) $request->query('nivel') : null,
             'estado' => in_array($request->query('estado'), ['activos', 'arquivados', 'todos'], true) ? $request->query('estado') : 'activos',
         ];
 
@@ -47,7 +46,7 @@ class ProcedureController extends Controller
     public function create(): View
     {
         return view('admin.procedimentos.form', [
-            'procedure' => new Procedure(['level' => 1]),
+            'procedure' => new Procedure(),
             'steps' => [''],
             'categories' => Category::orderBy('name')->get(),
         ]);
@@ -63,7 +62,6 @@ class ProcedureController extends Controller
                 'title' => $data['title'],
                 'problem' => $data['problem'] ?? null,
                 'category_id' => $data['category_id'],
-                'level' => $data['level'],
                 'ticket_notes' => $data['ticket_notes'] ?? null,
                 'escalation' => $data['escalation'] ?? null,
                 'created_by' => $request->user()->signature,
@@ -98,7 +96,6 @@ class ProcedureController extends Controller
                 'title' => $data['title'],
                 'problem' => $data['problem'] ?? null,
                 'category_id' => $data['category_id'],
-                'level' => $data['level'],
                 'ticket_notes' => $data['ticket_notes'] ?? null,
                 'escalation' => $data['escalation'] ?? null,
                 'updated_by' => $request->user()->signature,
@@ -120,7 +117,6 @@ class ProcedureController extends Controller
                 'title' => mb_substr('Cópia de '.$procedure->title, 0, 200),
                 'problem' => $procedure->problem,
                 'category_id' => $procedure->category_id,
-                'level' => $procedure->level,
                 'ticket_notes' => $procedure->ticket_notes,
                 'escalation' => $procedure->escalation,
                 'created_by' => $request->user()->signature,
