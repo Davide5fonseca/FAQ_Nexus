@@ -11,6 +11,12 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Alterado
+- O endereço passa a ser **`/knowledgebase-nexus`** em vez de `/procedimentos`,
+  para condizer com o nome do projeto. O endereço antigo redirecciona para o novo,
+  preservando caminho e parâmetros, para não partir favoritos nem os links dos
+  emails já enviados.
+
 ### Adicionado
 - Caixa **"Manter sessão iniciada"** na entrada, válida 30 dias (o Laravel usa
   400 por omissão, o que era demasiado para conteúdo interno).

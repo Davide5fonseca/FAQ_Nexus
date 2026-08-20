@@ -107,12 +107,18 @@ A aplicação está instalada no servidor interno `linuxdev` (192.168.1.69), lad
 lado com a Nexus Ops, servida pelo **Apache** já existente e com o **mesmo
 certificado HTTPS** (Let's Encrypt de `infra.nexus-solutions.pt`):
 
-- **Endereço:** `https://infra.nexus-solutions.pt:9443/procedimentos`
-- **Administração:** `https://infra.nexus-solutions.pt:9443/procedimentos/admin`
+- **Endereço:** `https://infra.nexus-solutions.pt:9443/knowledgebase-nexus`
+- **Administração:** `https://infra.nexus-solutions.pt:9443/knowledgebase-nexus/admin`
+- O endereço antigo (`/procedimentos`) redirecciona para o novo, preservando o
+  caminho e os parâmetros — favoritos e links de emails antigos continuam a funcionar.
 - Pasta no servidor: `/var/www/procedimentos` · Base de dados PostgreSQL: `procedimentos`
 - Configuração Apache: `/etc/apache2/conf-available/procedimentos.conf`
   (cópia em [deploy/apache-subpasta.conf](deploy/apache-subpasta.conf)); o ficheiro
   da Nexus Ops não foi alterado.
+- A pasta no servidor continua a chamar-se `procedimentos`; só o endereço público
+  mudou. Se mudar o endereço, é preciso acertar três sítios: o `Alias` e o
+  `RewriteBase` na configuração do Apache, e `APP_URL`/`SESSION_PATH` no `.env`
+  (o `SESSION_PATH` tem de coincidir com o endereço, senão a sessão não se mantém).
 - Cópias de segurança: todos os dias às 02:30 para `/var/backups/procedimentos/`
   (comando manual: `sudo backup-procedimentos`).
 - Neste servidor **não** se usa `php artisan route:cache` (dá erro 405 na página
