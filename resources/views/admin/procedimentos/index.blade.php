@@ -15,8 +15,7 @@
 
 @section('content')
 <div class="resumo" aria-label="Resumo">
-    <div class="resumo__item"><span>Activos</span><strong>{{ $counts['activos'] }}</strong></div>
-    <div class="resumo__item"><span>Arquivados</span><strong>{{ $counts['arquivados'] }}</strong></div>
+    <div class="resumo__item"><span>Procedimentos</span><strong>{{ $counts['procedimentos'] }}</strong></div>
     <div class="resumo__item"><span>Categorias</span><strong>{{ $counts['categorias'] }}</strong></div>
 </div>
 
@@ -81,7 +80,6 @@
                         <td><span class="etiqueta etiqueta--ref">{{ $p->reference }}</span></td>
                         <td>
                             <a href="{{ route('admin.procedimentos.edit', $p) }}"><strong>{{ $p->title }}</strong></a>
-                            @if($p->is_archived) <span class="etiqueta etiqueta--arquivado">Arquivado</span> @endif
                         </td>
                         <td>{{ $p->category->name }}</td>
                         @can('admin')<td class="meta">{{ $p->area_label }}</td>@endcan
@@ -91,9 +89,9 @@
                             <a class="btn btn--secundario btn--pequeno" href="{{ route('admin.procedimentos.edit', $p) }}">Editar</a>
                             @can('admin')
                             <form method="post" action="{{ route('admin.procedimentos.destroy', $p) }}"
-                                  data-confirm="Apagar definitivamente «{{ $p->reference }} — {{ $p->title }}»? Esta acção não pode ser anulada.">
+                                  data-confirm="Eliminar «{{ $p->reference }} — {{ $p->title }}»? Esta acção não pode ser anulada.">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn--perigo btn--pequeno">Apagar</button>
+                                <button type="submit" class="btn btn--perigo btn--pequeno">Eliminar</button>
                             </form>
                             @endcan
                         </td>

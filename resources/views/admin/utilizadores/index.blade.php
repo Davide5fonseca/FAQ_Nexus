@@ -28,7 +28,7 @@
                 <td>{{ $u->email }}</td>
                 <td>{{ $u->area_label ?? '—' }}</td>
                 <td><span class="etiqueta {{ $u->is_admin ? 'etiqueta--perfil-admin' : '' }}">{{ $u->role_label }}</span></td>
-                <td>@if($u->active) Activa @else <span class="etiqueta etiqueta--arquivado">Desactivada</span> @endif</td>
+                <td>@if($u->active) Activa @else <span class="etiqueta etiqueta--inactiva">Desactivada</span> @endif</td>
                 <td class="accoes">
                     <a class="btn btn--secundario btn--pequeno" href="{{ route('admin.utilizadores.edit', $u) }}">Editar</a>
                     <form method="post" action="{{ route('admin.utilizadores.convite', $u) }}"
@@ -37,9 +37,9 @@
                         <button type="submit" class="btn btn--secundario btn--pequeno">Enviar convite</button>
                     </form>
                     @unless(auth()->user()->is($u))
-                        <form method="post" action="{{ route('admin.utilizadores.destroy', $u) }}" data-confirm="Apagar a conta de «{{ $u->name }}»? Os procedimentos que criou mantêm-se.">
+                        <form method="post" action="{{ route('admin.utilizadores.destroy', $u) }}" data-confirm="Eliminar a conta de «{{ $u->name }}»? Os procedimentos que criou mantêm-se.">
                             @csrf @method('DELETE')
-                            <button type="submit" class="btn btn--perigo btn--pequeno">Apagar</button>
+                            <button type="submit" class="btn btn--perigo btn--pequeno">Eliminar</button>
                         </form>
                     @endunless
                 </td>

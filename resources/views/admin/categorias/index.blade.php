@@ -41,9 +41,9 @@
                     {{ $cat->procedures_count }} {{ $cat->procedures_count === 1 ? 'procedimento' : 'procedimentos' }}
                 </span>
                 <form method="post" action="{{ route('admin.categorias.destroy', $cat) }}"
-                      data-confirm="Apagar a categoria «{{ $cat->name }}»?">
+                      data-confirm="Eliminar a categoria «{{ $cat->name }}»?">
                     @csrf @method('DELETE')
-                    <button type="submit" class="btn btn--perigo" @if($cat->procedures_count > 0) title="Tem procedimentos associados; mude-os primeiro de categoria" @endif>Apagar</button>
+                    <button type="submit" class="btn btn--perigo" @if($cat->procedures_count > 0) title="Tem procedimentos associados; mude-os primeiro de categoria" @endif>Eliminar</button>
                 </form>
             </li>
         @endforeach

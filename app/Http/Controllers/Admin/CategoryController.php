@@ -52,13 +52,13 @@ class CategoryController extends Controller
             $sufixo = $n === 1 ? 'procedimento associado' : 'procedimentos associados';
 
             return back()->withErrors([
-                'category' => "Não é possível apagar «{$category->name}»: ainda tem {$n} {$sufixo}. Mude-os primeiro para outra categoria (incluindo os arquivados).",
+                'category' => "Não é possível eliminar «{$category->name}»: ainda tem {$n} {$sufixo}. Mude-os primeiro para outra categoria.",
             ]);
         }
 
         $name = $category->name;
         $category->delete();
 
-        return redirect()->route('admin.categorias.index')->with('status', "Categoria «{$name}» apagada.");
+        return redirect()->route('admin.categorias.index')->with('status', "Categoria «{$name}» eliminada.");
     }
 }

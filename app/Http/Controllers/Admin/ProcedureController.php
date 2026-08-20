@@ -28,8 +28,6 @@ class ProcedureController extends Controller
             ->with('category')
             ->withCount('steps')
             ->filter($filters)
-            // Mostra activos e arquivados: os arquivados ficam marcados com etiqueta
-            // e continuam acessíveis para se poderem desarquivar.
             ->orderBy('reference_number')
             ->get();
 
@@ -39,8 +37,7 @@ class ProcedureController extends Controller
             'filters' => $filters,
             'hasAny' => Procedure::visivelPara($utilizador)->exists(),
             'counts' => [
-                'activos' => Procedure::visivelPara($utilizador)->whereNull('archived_at')->count(),
-                'arquivados' => Procedure::visivelPara($utilizador)->whereNotNull('archived_at')->count(),
+                'procedimentos' => Procedure::visivelPara($utilizador)->count(),
                 'categorias' => Category::count(),
             ],
         ]);
@@ -114,22 +111,6 @@ class ProcedureController extends Controller
             ->with('status', "Procedimento {$procedure->reference} guardado.");
     }
 
-    public function archive(Request $request, Procedure $procedure): RedirectResponse
-    {
-        $this->autorizar($request, $procedure);
-        $procedure->update(['archived_at' => now(), 'updated_by' => $request->user()->signature]);
-
-        return back()->with('status', "Procedimento {$procedure->reference} arquivado. Deixa de aparecer na consulta.");
-    }
-
-    public function unarchive(Request $request, Procedure $procedure): RedirectResponse
-    {
-        $this->autorizar($request, $procedure);
-        $procedure->update(['archived_at' => null, 'updated_by' => $request->user()->signature]);
-
-        return back()->with('status', "Procedimento {$procedure->reference} voltou a estar activo.");
-    }
-
     public function destroy(Request $request, Procedure $procedure): RedirectResponse
     {
         $this->autorizar($request, $procedure);
@@ -137,7 +118,7 @@ class ProcedureController extends Controller
         $procedure->delete();
 
         return redirect()->route('admin.procedimentos.index')
-            ->with('status', "Procedimento {$ref} apagado definitivamente.");
+            ->with('status', "Procedimento {$ref} eliminado.");
     }
 
     /** Ninguém mexe em procedimentos de outra área (excepto administradores). */

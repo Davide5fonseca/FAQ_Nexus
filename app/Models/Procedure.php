@@ -12,13 +12,12 @@ class Procedure extends Model
 {
     protected $fillable = [
         'reference_number', 'title', 'problem', 'category_id', 'area',
-        'ticket_notes', 'escalation', 'archived_at', 'created_by', 'updated_by',
+        'ticket_notes', 'escalation', 'created_by', 'updated_by',
     ];
 
     protected function casts(): array
     {
         return [
-            'archived_at' => 'datetime',
             'reference_number' => 'integer',
         ];
     }
@@ -41,11 +40,6 @@ class Procedure extends Model
     public function getReferenceAttribute(): string
     {
         return sprintf('PROC-%02d', $this->reference_number);
-    }
-
-    public function getIsArchivedAttribute(): bool
-    {
-        return $this->archived_at !== null;
     }
 
     /** Ex.: "Área técnica" */
@@ -74,11 +68,6 @@ class Procedure extends Model
     }
 
     // --- Filtros (scopes) ---
-
-    public function scopeActive(Builder $query): Builder
-    {
-        return $query->whereNull('archived_at');
-    }
 
     public function scopeSearch(Builder $query, ?string $term): Builder
     {

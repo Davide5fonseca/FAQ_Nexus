@@ -50,9 +50,9 @@
                     <textarea id="rule-{{ $rule->id }}" name="content" rows="2" required maxlength="2000">{{ $rule->content }}</textarea>
                     <button type="submit" class="btn btn--secundario">Guardar</button>
                 </form>
-                <form method="post" action="{{ route('admin.regras.destroy', $rule) }}" data-confirm="Apagar esta regra de segurança?">
+                <form method="post" action="{{ route('admin.regras.destroy', $rule) }}" data-confirm="Eliminar esta regra de segurança?">
                     @csrf @method('DELETE')
-                    <button type="submit" class="btn btn--perigo">Apagar</button>
+                    <button type="submit" class="btn btn--perigo">Eliminar</button>
                 </form>
             </li>
         @endforeach

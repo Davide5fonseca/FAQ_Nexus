@@ -36,7 +36,6 @@
         <div class="imp-meta">
             <span><strong>Referência:</strong> {{ $p->reference }}</span>
             <span><strong>Categoria:</strong> {{ $p->category->name }}</span>
-            @if($p->is_archived)<span><strong>ARQUIVADO</strong></span>@endif
         </div>
 
         @if(filled($p->problem))

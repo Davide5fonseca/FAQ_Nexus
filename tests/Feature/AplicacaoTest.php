@@ -104,17 +104,34 @@ class AplicacaoTest extends TestCase
         $this->get('/?q=100%')->assertOk(); // caracteres especiais do LIKE não rebentam
     }
 
-    public function test_arquivados_nao_aparecem_na_consulta(): void
+    public function test_eliminar_remove_da_consulta(): void
+    {
+        $admin = $this->admin();
+        $p = $this->criarProcedimento($admin);
+        $this->actingAs($admin)->get('/')->assertSee('Substituir toner');
+
+        $this->actingAs($admin)->delete(route('admin.procedimentos.destroy', $p))->assertRedirect();
+
+        $this->actingAs($admin)->get('/')->assertDontSee('Substituir toner');
+        $this->assertDatabaseMissing('procedures', ['id' => $p->id]);
+    }
+
+    public function test_nao_existe_nenhuma_forma_de_arquivar(): void
     {
         $admin = $this->admin();
         $p = $this->criarProcedimento($admin);
 
-        $this->actingAs($admin)->post(route('admin.procedimentos.archive', $p))->assertRedirect();
-        $this->get('/')->assertDontSee('Substituir toner');
-        $this->get(route('imprimir.um', $p))->assertOk(); // com sessão, um arquivado ainda se imprime
+        // Nem interface nem endereços: o conceito deixou de existir
+        $this->actingAs($admin)->get(route('admin.procedimentos.index'))
+            ->assertDontSee('Arquivar')
+            ->assertDontSee('Arquivado');
+        $this->actingAs($admin)->get(route('admin.procedimentos.edit', $p))
+            ->assertDontSee('Arquivar')
+            ->assertDontSee('Desarquivar');
 
-        $this->actingAs($admin)->post(route('admin.procedimentos.unarchive', $p))->assertRedirect();
-        $this->get('/')->assertSee('Substituir toner');
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.procedimentos.archive'));
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.procedimentos.unarchive'));
+        $this->assertFalse(\Illuminate\Support\Facades\Schema::hasColumn('procedures', 'archived_at'));
     }
 
     public function test_paginas_de_impressao(): void
@@ -197,7 +214,7 @@ class AplicacaoTest extends TestCase
         $this->assertSame('PROC-02', $p2->reference);
     }
 
-    public function test_referencia_nao_e_reutilizada_depois_de_apagar(): void
+    public function test_referencia_nao_e_reutilizada_depois_de_eliminar(): void
     {
         $admin = $this->admin();
         $p1 = $this->criarProcedimento($admin);
@@ -244,25 +261,6 @@ class AplicacaoTest extends TestCase
         $this->assertNull($p->ticket_notes);
     }
 
-    public function test_lista_admin_mostra_arquivados_marcados_e_permite_desarquivar(): void
-    {
-        $admin = $this->admin();
-        $p = $this->criarProcedimento($admin);
-        $this->actingAs($admin)->post(route('admin.procedimentos.archive', $p));
-
-        // Some da consulta, mas continua visível (e marcado) na administração
-        $this->actingAs($admin)->get('/')->assertDontSee('Substituir toner');
-        $this->actingAs($admin)->get(route('admin.procedimentos.index'))
-            ->assertSee('Substituir toner')
-            ->assertSee('Arquivado');
-
-        // Desarquivar faz-se na página de edição
-        $this->actingAs($admin)->get(route('admin.procedimentos.edit', $p))->assertSee('Desarquivar');
-
-        $this->actingAs($admin)->post(route('admin.procedimentos.unarchive', $p))->assertRedirect();
-        $this->actingAs($admin)->get('/')->assertSee('Substituir toner');
-    }
-
     public function test_formularios_admin_abrem(): void
     {
         $admin = $this->admin();
@@ -274,7 +272,7 @@ class AplicacaoTest extends TestCase
 
     // ---------------- Categorias ----------------
 
-    public function test_categorias_crud_e_proteccao_ao_apagar(): void
+    public function test_categorias_crud_e_proteccao_ao_eliminar(): void
     {
         $admin = $this->admin();
 
@@ -324,7 +322,7 @@ class AplicacaoTest extends TestCase
 
     // ---------------- Perfis: editor vs administrador ----------------
 
-    public function test_editor_cria_e_edita_mas_nao_gere_nem_apaga(): void
+    public function test_editor_cria_e_edita_mas_nao_gere_nem_elimina(): void
     {
         $this->categoria();
         $editor = $this->editor('producao');
@@ -334,8 +332,8 @@ class AplicacaoTest extends TestCase
         $this->assertSame('Editor Teste (Produção)', $p->created_by);
         $this->assertSame('A máquina pára e acende luz vermelha', $p->problem);
 
-        $this->actingAs($editor)->get(route('admin.procedimentos.index'))->assertOk()->assertDontSee('>Apagar<', false)->assertDontSee('Utilizadores');
-        $this->actingAs($editor)->post(route('admin.procedimentos.archive', $p))->assertRedirect();
+        $this->actingAs($editor)->get(route('admin.procedimentos.index'))->assertOk()->assertDontSee('>Eliminar<', false)->assertDontSee('Utilizadores');
+        $this->actingAs($editor)->get(route('admin.procedimentos.edit', $p))->assertOk();
 
         $this->actingAs($editor)->delete(route('admin.procedimentos.destroy', $p))->assertForbidden();
         $this->actingAs($editor)->get(route('admin.categorias.index'))->assertForbidden();
@@ -430,9 +428,8 @@ class AplicacaoTest extends TestCase
         $this->actingAs($leitor)->post(route('admin.procedimentos.store'), [
             'title' => 'Tentativa', 'category_id' => $p->category_id, 'steps' => ['x'],
         ])->assertForbidden();
-        $this->actingAs($leitor)->post(route('admin.procedimentos.archive', $p))->assertForbidden();
         $this->actingAs($leitor)->delete(route('admin.procedimentos.destroy', $p))->assertForbidden();
-        $this->assertDatabaseHas('procedures', ['id' => $p->id, 'archived_at' => null]);
+        $this->assertDatabaseHas('procedures', ['id' => $p->id]);
     }
 
     public function test_admin_pode_criar_conta_de_leitor(): void
@@ -490,7 +487,6 @@ class AplicacaoTest extends TestCase
         // Nem para ver/imprimir, nem para editar ou apagar
         $this->actingAs($editorProd)->get(route('imprimir.um', $tecnico))->assertForbidden();
         $this->actingAs($editorProd)->get(route('admin.procedimentos.edit', $tecnico))->assertForbidden();
-        $this->actingAs($editorProd)->post(route('admin.procedimentos.archive', $tecnico))->assertForbidden();
         $this->actingAs($editorProd)->put(route('admin.procedimentos.update', $tecnico), [
             'title' => 'Alterado à força', 'category_id' => $tecnico->category_id, 'steps' => ['x'],
         ])->assertForbidden();

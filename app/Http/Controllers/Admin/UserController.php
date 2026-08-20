@@ -105,7 +105,7 @@ class UserController extends Controller
     public function destroy(Request $request, User $user): RedirectResponse
     {
         if ($request->user()->is($user)) {
-            return back()->withErrors(['user' => 'Não pode apagar a sua própria conta.']);
+            return back()->withErrors(['user' => 'Não pode eliminar a sua própria conta.']);
         }
         if ($user->is_admin && User::where('role', 'admin')->where('active', true)->count() <= 1) {
             return back()->withErrors(['user' => 'Tem de existir pelo menos um administrador activo.']);
@@ -116,7 +116,7 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.utilizadores.index')
-            ->with('status', "Conta de {$name} apagada. Os procedimentos que criou mantêm-se, com o nome registado.");
+            ->with('status', "Conta de {$name} eliminada. Os procedimentos que criou mantêm-se, com o nome registado.");
     }
 
     private function validateData(Request $request, ?User $user = null): array

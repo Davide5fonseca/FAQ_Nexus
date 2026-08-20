@@ -12,6 +12,8 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- O botão **"Apagar"** passa a chamar-se **"Eliminar"** em toda a aplicação
+  (procedimentos, categorias, regras e contas), com as mensagens a condizer.
 - Na lista de administração, o botão **"Arquivar"** dá lugar a **"Editar"**.
   Arquivar, desarquivar e apagar continuam disponíveis dentro da página de
   edição, em "Outras acções".
@@ -34,6 +36,8 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 - Na consulta, o filtro de categorias só mostra as que têm procedimentos visíveis.
 
 ### Removido
+- **Arquivar / desarquivar**, por completo: botões, rotas, código e a coluna
+  `archived_at` na base de dados. Um procedimento existe ou é eliminado.
 - Texto **"Base de Procedimentos Técnicos"** ao lado do logótipo: o cabeçalho fica
   só com a marca. O nome mantém-se no separador do browser.
 - Filtro **"Estado"** na lista de administração. A lista passa a mostrar activos e

@@ -298,7 +298,7 @@ legend { padding: 0; }
 .etiqueta--nivel-1 { color: #0F3D24; background: #EAF9EF; border-color: #A7E3BC; }
 .etiqueta--nivel-2 { color: #6B4D00; background: #FFF6DB; border-color: #F2D78B; }
 .etiqueta--nivel-3 { color: #8A1C10; background: #FEF0EE; border-color: #F1B5AE; }
-.etiqueta--arquivado { color: var(--texto-suave); background: #EEF2F6; border-style: dashed; }
+.etiqueta--inactiva { color: var(--texto-suave); background: #EEF2F6; border-style: dashed; }
 .etiqueta--ponto::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 
 .tabela-wrap { overflow-x: auto; background: var(--branco); border: 1px solid var(--linha); border-radius: var(--raio-g); box-shadow: var(--sombra); }

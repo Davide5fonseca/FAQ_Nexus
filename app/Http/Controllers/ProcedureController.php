@@ -18,7 +18,6 @@ class ProcedureController extends Controller
         $utilizador = $request->user();
 
         $procedures = Procedure::query()
-            ->active()
             ->visivelPara($utilizador)
             ->with(['category', 'steps'])
             ->filter($filters)
@@ -27,7 +26,7 @@ class ProcedureController extends Controller
 
         // Só mostra categorias que tenham procedimentos visíveis a esta pessoa.
         $categories = Category::whereHas('procedures',
-            fn ($q) => $q->active()->visivelPara($utilizador)
+            fn ($q) => $q->visivelPara($utilizador)
         )->orderBy('name')->get();
 
         return view('consulta.index', [
@@ -35,7 +34,7 @@ class ProcedureController extends Controller
             'categories' => $categories,
             'rules' => SafetyRule::orderBy('position')->get(),
             'filters' => $filters,
-            'hasAny' => Procedure::active()->visivelPara($utilizador)->exists(),
+            'hasAny' => Procedure::visivelPara($utilizador)->exists(),
         ]);
     }
 
@@ -44,7 +43,6 @@ class ProcedureController extends Controller
         $filters = $this->filters($request);
 
         $procedures = Procedure::query()
-            ->active()
             ->visivelPara($request->user())
             ->with(['category', 'steps'])
             ->filter($filters)

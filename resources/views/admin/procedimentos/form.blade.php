@@ -26,13 +26,6 @@
     </div>
 @endif
 
-@if($editing && $procedure->is_archived)
-    <div class="alerta alerta--aviso" role="status">
-        <span aria-hidden="true">!</span>
-        <div>Este procedimento está <strong>arquivado</strong> e não aparece na consulta.</div>
-    </div>
-@endif
-
 <form method="post" action="{{ $editing ? route('admin.procedimentos.update', $procedure) : route('admin.procedimentos.store') }}" class="cartao" novalidate>
     @csrf
     @if($editing) @method('PUT') @endif
@@ -167,23 +160,11 @@
     <div class="cartao">
         <h2>Outras acções</h2>
         <div class="accoes-form" style="border:0;padding:0;margin:0">
-            @if($procedure->is_archived)
-                <form method="post" action="{{ route('admin.procedimentos.unarchive', $procedure) }}">
-                    @csrf
-                    <button type="submit" class="btn btn--secundario">Desarquivar</button>
-                </form>
-            @else
-                <form method="post" action="{{ route('admin.procedimentos.archive', $procedure) }}"
-                      data-confirm="Arquivar «{{ $procedure->reference }} — {{ $procedure->title }}»? Deixa de aparecer na consulta, mas pode ser recuperado.">
-                    @csrf
-                    <button type="submit" class="btn btn--secundario">Arquivar</button>
-                </form>
-            @endif
             @can('admin')
             <form method="post" action="{{ route('admin.procedimentos.destroy', $procedure) }}"
-                  data-confirm="Apagar definitivamente «{{ $procedure->reference }} — {{ $procedure->title }}»? Esta acção não pode ser anulada.">
+                  data-confirm="Eliminar «{{ $procedure->reference }} — {{ $procedure->title }}»? Esta acção não pode ser anulada.">
                 @csrf @method('DELETE')
-                <button type="submit" class="btn btn--perigo">Apagar definitivamente</button>
+                <button type="submit" class="btn btn--perigo">Eliminar</button>
             </form>
             @endcan
         </div>

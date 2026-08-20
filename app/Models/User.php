@@ -18,8 +18,8 @@ class User extends Authenticatable
 
     /** Descrição de cada perfil, mostrada nos formulários. */
     public const ROLES_DESCRICAO = [
-        'admin' => 'Faz tudo: procedimentos, categorias, regras de segurança, contas e apagar.',
-        'editor' => 'Cria, edita e arquiva procedimentos.',
+        'admin' => 'Faz tudo: procedimentos, categorias, regras de segurança, contas e eliminar.',
+        'editor' => 'Cria e edita procedimentos.',
         'leitor' => 'Só consulta e imprime. Não altera nada.',
     ];
 

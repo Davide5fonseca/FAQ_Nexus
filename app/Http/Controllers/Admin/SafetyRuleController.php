@@ -75,6 +75,6 @@ class SafetyRuleController extends Controller
         // Renumera para manter as posições seguidas (1, 2, 3...).
         SafetyRule::orderBy('position')->get()->each(fn ($r, $i) => $r->update(['position' => $i + 1]));
 
-        return redirect()->route('admin.regras.index')->with('status', 'Regra apagada.');
+        return redirect()->route('admin.regras.index')->with('status', 'Regra eliminada.');
     }
 }
