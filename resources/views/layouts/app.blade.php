@@ -33,7 +33,7 @@
                     <button type="submit">Sair</button>
                 </form>
             @else
-                <a href="{{ route('login') }}" @if(request()->routeIs('login')) aria-current="page" @endif>Administração</a>
+                <a href="{{ route('login') }}" @if(request()->routeIs('login')) aria-current="page" @endif>Entrar</a>
             @endauth
         </nav>
     </div>

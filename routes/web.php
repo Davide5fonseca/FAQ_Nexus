@@ -5,13 +5,16 @@ use App\Http\Controllers\Admin\ProcedureController as AdminProcedureController;
 use App\Http\Controllers\Admin\SafetyRuleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProcedureController;
 use Illuminate\Support\Facades\Route;
 
-// ---------- Consulta (pública) ----------
-Route::get('/', [ProcedureController::class, 'index'])->name('consulta');
-Route::get('/imprimir', [ProcedureController::class, 'printAll'])->name('imprimir');
-Route::get('/procedimentos/{procedure}/imprimir', [ProcedureController::class, 'printOne'])->name('imprimir.um');
+// ---------- Consulta (requer sessão: toda a aplicação é interna) ----------
+Route::middleware('auth')->group(function () {
+    Route::get('/', [ProcedureController::class, 'index'])->name('consulta');
+    Route::get('/imprimir', [ProcedureController::class, 'printAll'])->name('imprimir');
+    Route::get('/procedimentos/{procedure}/imprimir', [ProcedureController::class, 'printOne'])->name('imprimir.um');
+});
 
 // ---------- Autenticação ----------
 Route::middleware('guest')->group(function () {
@@ -19,6 +22,16 @@ Route::middleware('guest')->group(function () {
     Route::post('/admin/entrar', [AuthController::class, 'login'])
         ->middleware('throttle:login')
         ->name('login.submit');
+
+    // Recuperação / definição de palavra-passe (também usada pelo email de convite)
+    Route::get('/admin/recuperar', [PasswordResetController::class, 'pedirForm'])->name('password.request');
+    Route::post('/admin/recuperar', [PasswordResetController::class, 'enviar'])
+        ->middleware('throttle:6,1')
+        ->name('password.email');
+    Route::get('/admin/repor/{token}', [PasswordResetController::class, 'reporForm'])->name('password.reset');
+    Route::post('/admin/repor', [PasswordResetController::class, 'repor'])
+        ->middleware('throttle:6,1')
+        ->name('password.update');
 });
 Route::post('/admin/sair', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
@@ -47,6 +60,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('utilizadores/{user}/editar', [UserController::class, 'edit'])->name('utilizadores.edit');
     Route::put('utilizadores/{user}', [UserController::class, 'update'])->name('utilizadores.update');
     Route::delete('utilizadores/{user}', [UserController::class, 'destroy'])->name('utilizadores.destroy');
+    Route::post('utilizadores/{user}/convite', [UserController::class, 'convite'])->name('utilizadores.convite');
 
     // Categorias
     Route::get('categorias', [CategoryController::class, 'index'])->name('categorias.index');

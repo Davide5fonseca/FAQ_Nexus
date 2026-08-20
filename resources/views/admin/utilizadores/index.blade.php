@@ -36,6 +36,11 @@
                 <td>@if($u->active) Activa @else <span class="etiqueta etiqueta--arquivado">Desactivada</span> @endif</td>
                 <td class="accoes">
                     <a class="btn btn--secundario btn--pequeno" href="{{ route('admin.utilizadores.edit', $u) }}">Editar</a>
+                    <form method="post" action="{{ route('admin.utilizadores.convite', $u) }}"
+                          data-confirm="Enviar a {{ $u->name }} ({{ $u->email }}) um email com o link para definir nova palavra-passe?">
+                        @csrf
+                        <button type="submit" class="btn btn--secundario btn--pequeno">Enviar convite</button>
+                    </form>
                     @unless(auth()->user()->is($u))
                         <form method="post" action="{{ route('admin.utilizadores.destroy', $u) }}" data-confirm="Apagar a conta de «{{ $u->name }}»? Os procedimentos que criou mantêm-se.">
                             @csrf @method('DELETE')

@@ -11,6 +11,20 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Adicionado
+- **Login obrigatório em toda a aplicação**: a consulta deixou de ser aberta;
+  qualquer página exige sessão iniciada (é conteúdo interno num servidor acessível
+  pela internet).
+- **Convite por email**: o administrador cria a conta apenas com nome, email, área
+  e perfil — a pessoa recebe um email com um link para **definir a própria
+  palavra-passe** (válido 3 dias). O administrador nunca vê nem escolhe a palavra-passe.
+- Botão **"Enviar convite"** na lista de utilizadores, para reenviar o link.
+- **"Esqueci-me da palavra-passe"** na página de entrada, com email de recuperação.
+  A resposta é sempre igual, para não revelar se um email tem conta.
+- Envio de email via **Microsoft Graph** (mesma conta Suporte@nxs.pt e app do Entra ID
+  já usada pela Nexus Ops), com transporte próprio em `app/Mail/Transport/GraphTransport.php`.
+
+
 ### Removido
 - **Nível de intervenção** (1/2/3): retirado dos procedimentos, da consulta,
   dos filtros, do formulário, da impressão e da base de dados (coluna `level`).

@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\DefinirPalavraPasse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -29,17 +32,34 @@ class UserController extends Controller
     {
         $data = $this->validateData($request);
 
-        User::create([
+        $user = User::create([
             'name' => trim($data['name']),
             'email' => mb_strtolower(trim($data['email'])),
-            'password' => $data['password'],
+            // Palavra-passe provisória aleatória, que ninguém conhece;
+            // a pessoa define a sua através do link enviado por email.
+            'password' => Str::random(40),
             'role' => $data['role'],
             'area' => $data['area'],
             'active' => true,
         ]);
 
+        $this->enviarConvite($user);
+
         return redirect()->route('admin.utilizadores.index')
-            ->with('status', "Conta de {$data['name']} criada. Entregue-lhe o email e a palavra-passe por um canal seguro.");
+            ->with('status', "Conta de {$user->name} criada. Foi enviado um email para {$user->email} com o link para definir a palavra-passe.");
+    }
+
+    /** Reenvia o email com o link para definir a palavra-passe. */
+    public function convite(User $user): RedirectResponse
+    {
+        $this->enviarConvite($user);
+
+        return back()->with('status', "Email para definir a palavra-passe reenviado para {$user->email}.");
+    }
+
+    private function enviarConvite(User $user): void
+    {
+        $user->notify(new DefinirPalavraPasse(Password::createToken($user)));
     }
 
     public function edit(User $user): View
@@ -106,7 +126,7 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:190', Rule::unique('users', 'email')->ignore($user?->id)],
             'role' => ['required', Rule::in(array_keys(User::ROLES))],
             'area' => ['required', Rule::in(array_keys(User::AREAS))],
-            'password' => [$user ? 'nullable' : 'required', 'string', 'min:10', 'max:200'],
+            'password' => ['nullable', 'string', 'min:10', 'max:200'],
         ], [
             'email.unique' => 'Já existe uma conta com esse email.',
             'password.min' => 'A palavra-passe tem de ter pelo menos 10 caracteres.',

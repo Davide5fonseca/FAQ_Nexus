@@ -3,15 +3,27 @@
 Aplicação web interna onde os técnicos consultam procedimentos de reparação e os
 responsáveis os inserem e editam numa área de administração.
 
-- **Consulta** (`/`): aberta, sem login. Pesquisa por texto, filtro por categoria e
-  nível, regras de segurança no topo, impressão em A4 (um procedimento por página).
-- **Administração** (`/admin`): com email e palavra-passe. Dois perfis:
+- **Consulta** (`/`): pesquisa por texto, filtro por categoria, regras de segurança
+  no topo, impressão em A4 (um procedimento por página). **Requer sessão iniciada** —
+  toda a aplicação é de acesso interno.
+- **Administração** (`/admin`): dois perfis:
   - **Editor** — é quem, na **área técnica** ou na **produção**, carrega problemas e
     soluções: cria, edita, duplica e arquiva procedimentos.
   - **Administrador** — tudo isso mais: gerir contas, categorias, regras de
     segurança e apagar definitivamente.
   Cada conta tem uma área (Área técnica / Produção); quem criou ou alterou cada
   procedimento fica registado com nome e área (ex.: "Rita Silva (Produção)").
+
+**Como se criam as contas:** o administrador (`suporte@nxs.pt`) vai a
+Administração → Utilizadores → Nova conta e indica nome, email, área e perfil.
+A pessoa recebe um **email com um link para definir a sua palavra-passe** (válido
+3 dias). Ninguém — nem o administrador — escolhe a palavra-passe de outra pessoa.
+Se o link expirar, a pessoa usa "Esqueci-me da palavra-passe" na página de entrada,
+ou o administrador carrega em "Enviar convite" na lista de utilizadores.
+
+Os emails saem pela conta **Suporte@nxs.pt** através do Microsoft Graph, com as
+mesmas credenciais do Entra ID que a Nexus Ops já usa (variáveis `MS_GRAPH_*` no
+`.env` do servidor).
 
 Tecnologia: **PHP 8.3 + Laravel 13 + PostgreSQL**. Sem Node, sem compilação, sem
 serviços externos. As páginas são geradas no servidor; há uma folha de estilos
@@ -221,8 +233,9 @@ os comandos acima, e copie também o ficheiro `.env` antigo (tem a chave `APP_KE
 
 | Quero… | Comando (em `/var/www/procedimentos`) |
 |---|---|
-| Criar contas para técnicos/produção | Administração → **Utilizadores** → Nova conta (pela interface) |
-| Mudar a palavra-passe de alguém | Administração → Utilizadores → Editar (ou, sem acesso à interface, `sudo -u www-data php artisan app:alterar-password --email=...`) |
+| Criar contas para técnicos/produção | Administração → **Utilizadores** → Nova conta (a pessoa recebe email para definir a palavra-passe) |
+| Alguém não recebeu / o link expirou | Administração → Utilizadores → **Enviar convite** |
+| Mudar a palavra-passe de alguém | Não é preciso: a pessoa usa "Esqueci-me da palavra-passe". Em último recurso: `sudo -u www-data php artisan app:alterar-password --email=...` |
 | Recuperar acesso de administrador | `sudo -u www-data php artisan app:criar-admin` (com o mesmo email actualiza; com outro cria nova conta de administrador) |
 | Ver erros da aplicação | `sudo tail -n 100 storage/logs/laravel.log` |
 | Ver se o Nginx/PHP estão a correr | `systemctl status nginx php8.3-fpm postgresql` |

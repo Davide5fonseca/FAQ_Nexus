@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    // Microsoft Graph (envio de email app-only). Segredos só no .env do servidor.
+    // Ver App\Mail\Transport\GraphTransport.
+    'microsoft_graph' => [
+        'tenant_id' => env('MS_GRAPH_TENANT_ID'),
+        'client_id' => env('MS_GRAPH_CLIENT_ID'),
+        'client_secret' => env('MS_GRAPH_CLIENT_SECRET'),
+        'sender' => env('MS_GRAPH_SENDER'),
+    ],
+
 ];

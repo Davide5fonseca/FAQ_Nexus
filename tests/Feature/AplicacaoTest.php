@@ -6,7 +6,11 @@ use App\Models\Category;
 use App\Models\Procedure;
 use App\Models\SafetyRule;
 use App\Models\User;
+use App\Notifications\DefinirPalavraPasse;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 
 class AplicacaoTest extends TestCase
@@ -54,12 +58,14 @@ class AplicacaoTest extends TestCase
 
     // ---------------- Consulta pública ----------------
 
-    public function test_consulta_e_publica_e_mostra_estado_vazio(): void
+    public function test_consulta_exige_sessao(): void
     {
-        $this->get('/')
+        $this->get('/')->assertRedirect(route('login'));
+        $this->get(route('imprimir'))->assertRedirect(route('login'));
+
+        $this->actingAs($this->admin())->get('/')
             ->assertOk()
-            ->assertSee('Ainda não há procedimentos.')
-            ->assertSee('Entrar na administração');
+            ->assertSee('Ainda não há procedimentos.');
     }
 
     public function test_consulta_mostra_procedimentos_e_regras(): void
@@ -68,15 +74,14 @@ class AplicacaoTest extends TestCase
         SafetyRule::create(['position' => 1, 'content' => 'Desligar sempre da corrente.']);
         $p = $this->criarProcedimento($admin);
 
-        $this->comoVisitante()->get('/')
+        $this->get('/')
             ->assertOk()
             ->assertSee('Regras de segurança')
             ->assertSee('Desligar sempre da corrente.')
             ->assertSee('PROC-01')
             ->assertSee('Substituir toner')
             ->assertSee('Trocar o toner')
-            ->assertSee('Modelo e número de série')
-            ->assertDontSee('Editar</a>', false);
+            ->assertSee('Modelo e número de série');
     }
 
     public function test_pesquisa_e_filtros_na_consulta(): void
@@ -86,7 +91,6 @@ class AplicacaoTest extends TestCase
         $this->criarProcedimento($admin); // Impressoras, nível 1
         $this->criarProcedimento($admin, ['title' => 'Reiniciar router', 'category_id' => $redes->id, 'steps' => ['Desligar router 30 segundos']]);
 
-        $this->comoVisitante();
         $this->get('/?q=router')->assertSee('Reiniciar router')->assertDontSee('Substituir toner');
         $this->get('/?q=toner')->assertSee('Substituir toner')->assertDontSee('Reiniciar router');
         $this->get('/?q=TAMPA')->assertSee('Substituir toner'); // pesquisa nos passos, sem distinguir maiúsculas
@@ -101,11 +105,11 @@ class AplicacaoTest extends TestCase
         $p = $this->criarProcedimento($admin);
 
         $this->actingAs($admin)->post(route('admin.procedimentos.archive', $p))->assertRedirect();
-        $this->comoVisitante()->get('/')->assertDontSee('Substituir toner');
-        $this->get(route('imprimir.um', $p))->assertNotFound();
+        $this->get('/')->assertDontSee('Substituir toner');
+        $this->get(route('imprimir.um', $p))->assertOk(); // com sessão, um arquivado ainda se imprime
 
         $this->actingAs($admin)->post(route('admin.procedimentos.unarchive', $p))->assertRedirect();
-        $this->comoVisitante()->get('/')->assertSee('Substituir toner');
+        $this->get('/')->assertSee('Substituir toner');
     }
 
     public function test_paginas_de_impressao(): void
@@ -114,7 +118,7 @@ class AplicacaoTest extends TestCase
         SafetyRule::create(['position' => 1, 'content' => 'Usar pulseira antiestática.']);
         $p = $this->criarProcedimento($admin);
 
-        $this->comoVisitante()->get(route('imprimir'))->assertOk()->assertSee('Usar pulseira antiestática.')->assertSee('PROC-01')->assertSee('pag-imp');
+        $this->get(route('imprimir'))->assertOk()->assertSee('Usar pulseira antiestática.')->assertSee('PROC-01')->assertSee('pag-imp');
         $this->get(route('imprimir.um', $p))->assertOk()->assertSee('Substituir toner')->assertDontSee('Usar pulseira antiestática.');
     }
 
@@ -132,10 +136,10 @@ class AplicacaoTest extends TestCase
     {
         $this->admin();
 
-        $this->get(route('login'))->assertOk()->assertSee('Entrar na administração');
+        $this->get(route('login'))->assertOk()->assertSee('Acesso reservado aos colaboradores');
 
         $this->post(route('login.submit'), ['email' => 'admin@teste.pt', 'password' => 'palavrapasse123'])
-            ->assertRedirect(route('admin.procedimentos.index'));
+            ->assertRedirect(route('consulta'));
         $this->assertAuthenticated();
 
         $this->post(route('logout'))->assertRedirect(route('consulta'));
@@ -346,7 +350,7 @@ class AplicacaoTest extends TestCase
         $admin = $this->admin();
         $this->criarProcedimento($admin, ['problem' => 'Luz vermelha intermitente no painel']);
 
-        $this->comoVisitante()->get('/')->assertSee('Problema / sintomas')->assertSee('Luz vermelha intermitente no painel');
+        $this->get('/')->assertSee('Problema / sintomas')->assertSee('Luz vermelha intermitente no painel');
         $this->get('/?q=intermitente')->assertSee('Substituir toner');
         $this->get(route('imprimir'))->assertSee('Luz vermelha intermitente no painel');
     }
@@ -358,17 +362,19 @@ class AplicacaoTest extends TestCase
         $this->actingAs($admin)->get(route('admin.utilizadores.index'))->assertOk()->assertSee('Admin Teste');
         $this->actingAs($admin)->get(route('admin.utilizadores.create'))->assertOk();
 
+        Notification::fake();
+
         $this->actingAs($admin)->post(route('admin.utilizadores.store'), [
-            'name' => 'Rita Produção', 'email' => 'rita@teste.pt', 'role' => 'editor', 'area' => 'producao', 'password' => 'palavrapasse123',
+            'name' => 'Rita Produção', 'email' => 'rita@teste.pt', 'role' => 'editor', 'area' => 'producao',
         ])->assertRedirect(route('admin.utilizadores.index'));
         $rita = User::where('email', 'rita@teste.pt')->first();
         $this->assertSame('editor', $rita->role);
         $this->assertSame('producao', $rita->area);
-        $this->assertTrue(password_verify('palavrapasse123', $rita->password));
+        Notification::assertSentTo($rita, DefinirPalavraPasse::class);
 
         // validação
-        $this->actingAs($admin)->post(route('admin.utilizadores.store'), ['name' => '', 'email' => 'rita@teste.pt', 'role' => 'x', 'area' => '', 'password' => 'curta'])
-            ->assertSessionHasErrors(['name', 'email' => 'Já existe uma conta com esse email.', 'role', 'area', 'password']);
+        $this->actingAs($admin)->post(route('admin.utilizadores.store'), ['name' => '', 'email' => 'rita@teste.pt', 'role' => 'x', 'area' => ''])
+            ->assertSessionHasErrors(['name', 'email' => 'Já existe uma conta com esse email.', 'role', 'area']);
 
         // editar sem mudar palavra-passe, desactivar
         $this->actingAs($admin)->put(route('admin.utilizadores.update', $rita), [
@@ -377,7 +383,6 @@ class AplicacaoTest extends TestCase
         $rita->refresh();
         $this->assertSame('Rita P.', $rita->name);
         $this->assertFalse($rita->active);
-        $this->assertTrue(password_verify('palavrapasse123', $rita->password));
 
         // conta desactivada não entra
         $this->comoVisitante()->post(route('login.submit'), ['email' => 'rita@teste.pt', 'password' => 'palavrapasse123'])->assertSessionHasErrors('email');
@@ -392,6 +397,72 @@ class AplicacaoTest extends TestCase
 
         $this->actingAs($admin)->delete(route('admin.utilizadores.destroy', $rita))->assertRedirect();
         $this->assertDatabaseMissing('users', ['id' => $rita->id]);
+    }
+
+    // ---------------- Convite e recuperação de palavra-passe ----------------
+
+    public function test_convite_por_email_e_definicao_de_palavra_passe(): void
+    {
+        Notification::fake();
+        $admin = $this->admin();
+
+        // Admin cria a conta só com os dados (sem palavra-passe)
+        $this->actingAs($admin)->post(route('admin.utilizadores.store'), [
+            'name' => 'Rui Técnico', 'email' => 'rui@teste.pt', 'role' => 'editor', 'area' => 'tecnica',
+        ])->assertRedirect(route('admin.utilizadores.index'));
+
+        $rui = User::where('email', 'rui@teste.pt')->first();
+        Notification::assertSentTo($rui, DefinirPalavraPasse::class);
+
+        // Reenviar convite
+        $this->actingAs($admin)->post(route('admin.utilizadores.convite', $rui))->assertRedirect();
+        Notification::assertSentToTimes($rui, DefinirPalavraPasse::class, 2);
+
+        // A pessoa abre o link e define a palavra-passe
+        $token = Password::createToken($rui);
+        $this->comoVisitante();
+        $this->get(route('password.reset', ['token' => $token, 'email' => 'rui@teste.pt']))
+            ->assertOk()->assertSee('Definir palavra-passe');
+        $this->post(route('password.update'), [
+            'token' => $token, 'email' => 'rui@teste.pt',
+            'password' => 'novapalavra123', 'password_confirmation' => 'novapalavra123',
+        ])->assertRedirect(route('login'));
+
+        // E entra com ela
+        $this->post(route('login.submit'), ['email' => 'rui@teste.pt', 'password' => 'novapalavra123'])
+            ->assertRedirect(route('consulta'));
+        $this->assertAuthenticated();
+    }
+
+    public function test_token_invalido_nao_define_palavra_passe(): void
+    {
+        Notification::fake();
+        $user = $this->admin();
+
+        $this->comoVisitante();
+        $this->post(route('password.update'), [
+            'token' => 'token-errado', 'email' => $user->email,
+            'password' => 'novapalavra123', 'password_confirmation' => 'novapalavra123',
+        ])->assertSessionHasErrors('email');
+
+        $this->post(route('login.submit'), ['email' => $user->email, 'password' => 'novapalavra123'])
+            ->assertSessionHasErrors('email');
+        $this->assertGuest();
+    }
+
+    public function test_recuperacao_de_palavra_passe(): void
+    {
+        Notification::fake();
+        $user = $this->admin();
+
+        $this->get(route('password.request'))->assertOk()->assertSee('Recuperar palavra-passe');
+        $this->post(route('password.email'), ['email' => $user->email])
+            ->assertRedirect()->assertSessionHas('status');
+        Notification::assertSentTo($user, ResetPassword::class);
+
+        // Email inexistente: resposta igual, sem revelar se a conta existe
+        $this->post(route('password.email'), ['email' => 'ninguem@teste.pt'])
+            ->assertRedirect()->assertSessionHas('status');
     }
 
     // ---------------- Comandos ----------------

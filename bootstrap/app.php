@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Quem não tem sessão é enviado para a página de entrada.
         $middleware->redirectGuestsTo(fn () => route('login'));
         // Quem já tem sessão não precisa de ver a página de entrada.
-        $middleware->redirectUsersTo('/admin/procedimentos');
+        $middleware->redirectUsersTo(fn () => route('consulta'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

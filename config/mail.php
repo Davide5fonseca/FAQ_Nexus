@@ -37,6 +37,12 @@ return [
 
     'mailers' => [
 
+        // Microsoft Graph (app-only). Registado em AppServiceProvider via Mail::extend('graph').
+        'graph' => [
+            'transport' => 'graph',
+        ],
+
+
         'smtp' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),

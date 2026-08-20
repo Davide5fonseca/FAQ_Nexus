@@ -35,13 +35,8 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M10 12h4M10 16h4M10 8h4"/></svg>
             </div>
             <h2>Ainda não há procedimentos.</h2>
-            @auth
-                <p>Comece por criar o primeiro procedimento: o problema, a solução passo a passo e o que registar no ticket.</p>
-                <div class="accoes"><a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a></div>
-            @else
-                <p>Quando a área técnica ou a produção os inserir, aparecem aqui. Tem conta? Entre para começar a carregar.</p>
-                <div class="accoes"><a class="btn btn--secundario" href="{{ route('login') }}">Entrar na administração</a></div>
-            @endauth
+            <p>Comece por criar o primeiro procedimento: o problema, a solução passo a passo e o que registar no ticket.</p>
+            <div class="accoes"><a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a></div>
         </div>
     @else
         <form class="filtros no-print" method="get" action="{{ route('consulta') }}" role="search" aria-label="Filtrar procedimentos">

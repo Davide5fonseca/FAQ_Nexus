@@ -6,8 +6,8 @@
 
 @section('content')
 <div class="cartao">
-    <h1>Entrar na administração</h1>
-    <p class="intro">Para técnicos e produção carregarem problemas e soluções.</p>
+    <h1>Entrar</h1>
+    <p class="intro">Acesso reservado aos colaboradores da Nexus Solutions.</p>
 
     <form method="post" action="{{ route('login.submit') }}" novalidate>
         @csrf
@@ -34,8 +34,7 @@
     </form>
 
     <p class="meta" style="margin:1.25rem 0 0">
-        Esqueceu-se da palavra-passe? Peça a um administrador para a repor em Administração → Utilizadores.
+        <a href="{{ route('password.request') }}">Esqueci-me da palavra-passe</a>
     </p>
 </div>
-<p style="text-align:center;margin-top:1rem"><a href="{{ route('consulta') }}" style="color:#C9E4D2">← Voltar à consulta</a></p>
 @endsection
