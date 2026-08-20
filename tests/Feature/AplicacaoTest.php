@@ -244,15 +244,21 @@ class AplicacaoTest extends TestCase
         $this->assertNull($p->ticket_notes);
     }
 
-    public function test_lista_admin_mostra_arquivados_com_filtro(): void
+    public function test_lista_admin_mostra_arquivados_marcados_e_permite_desarquivar(): void
     {
         $admin = $this->admin();
         $p = $this->criarProcedimento($admin);
         $this->actingAs($admin)->post(route('admin.procedimentos.archive', $p));
 
-        $this->actingAs($admin)->get(route('admin.procedimentos.index'))->assertDontSee('Substituir toner');
-        $this->actingAs($admin)->get(route('admin.procedimentos.index', ['estado' => 'arquivados']))->assertSee('Substituir toner')->assertSee('Arquivado');
-        $this->actingAs($admin)->get(route('admin.procedimentos.index', ['estado' => 'todos']))->assertSee('Substituir toner');
+        // Some da consulta, mas continua visível (e marcado) na administração
+        $this->actingAs($admin)->get('/')->assertDontSee('Substituir toner');
+        $this->actingAs($admin)->get(route('admin.procedimentos.index'))
+            ->assertSee('Substituir toner')
+            ->assertSee('Arquivado')
+            ->assertSee('Desarquivar');
+
+        $this->actingAs($admin)->post(route('admin.procedimentos.unarchive', $p))->assertRedirect();
+        $this->actingAs($admin)->get('/')->assertSee('Substituir toner');
     }
 
     public function test_formularios_admin_abrem(): void

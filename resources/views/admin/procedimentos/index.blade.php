@@ -47,14 +47,6 @@
                 @endforeach
             </select>
         </div>
-        <div class="campo">
-            <label for="estado">Estado</label>
-            <select id="estado" name="estado">
-                <option value="activos" @selected($filters['estado'] === 'activos')>Activos</option>
-                <option value="arquivados" @selected($filters['estado'] === 'arquivados')>Arquivados</option>
-                <option value="todos" @selected($filters['estado'] === 'todos')>Todos</option>
-            </select>
-        </div>
         <div class="filtros__accoes">
             <button type="submit" class="btn btn--escuro">Filtrar</button>
             <a href="{{ route('admin.procedimentos.index') }}" class="btn btn--secundario">Limpar</a>
@@ -67,7 +59,7 @@
             <p><a href="{{ route('admin.procedimentos.index') }}">Limpar filtros</a></p>
         </div>
     @else
-        @if($filters['q'] || $filters['categoria'] || $filters['estado'] !== 'activos')
+        @if($filters['q'] || $filters['categoria'])
             <p class="meta">{{ $procedures->count() }} {{ $procedures->count() === 1 ? 'resultado' : 'resultados' }}</p>
         @endif
         <div class="tabela-wrap">

@@ -350,19 +350,18 @@ td.accoes .btn { margin-left: .25rem; }
 @media (max-width: 520px) { .regras { grid-template-columns: 1fr; } .regras__icone { display: none; } }
 
 .filtros {
-  display: grid; grid-template-columns: 2.2fr 1fr 1fr auto; gap: .75rem; align-items: end;
+  display: grid; grid-template-columns: 2.2fr 1fr auto; gap: .75rem; align-items: end;
   background: var(--branco); border: 1px solid var(--linha); border-radius: var(--raio-g); padding: 1rem; margin-bottom: 1.25rem;
   box-shadow: var(--sombra-m);
 }
 .filtros .campo { margin: 0; }
 .filtros .campo label { font-size: .75rem; color: var(--texto-suave); text-transform: uppercase; letter-spacing: .06em; }
 .filtros__accoes { display: flex; gap: .5rem; }
-.filtros--admin { grid-template-columns: 2fr 1fr 1fr 1fr auto; }
 .pesquisa { position: relative; }
 .pesquisa svg { position: absolute; left: .8rem; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--texto-leve); pointer-events: none; }
 .pesquisa input { padding-left: 2.5rem; }
 @media (max-width: 800px) {
-  .filtros, .filtros--admin { grid-template-columns: 1fr 1fr; }
+  .filtros { grid-template-columns: 1fr 1fr; }
   .filtros .campo:first-child { grid-column: 1 / -1; }
   .filtros__accoes { grid-column: 1 / -1; }
 }

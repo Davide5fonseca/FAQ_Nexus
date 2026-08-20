@@ -12,6 +12,9 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Removido
+- Filtro **"Estado"** na lista de administração. A lista passa a mostrar activos e
+  arquivados em conjunto, com os arquivados marcados por etiqueta — assim
+  continuam acessíveis para se poderem desarquivar.
 - Função **"Duplicar"** procedimento: botões, rota e código. Deixou de fazer
   sentido no fluxo de trabalho.
 

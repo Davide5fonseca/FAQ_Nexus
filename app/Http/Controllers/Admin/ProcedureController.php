@@ -18,15 +18,14 @@ class ProcedureController extends Controller
         $filters = [
             'q' => trim((string) $request->query('q', '')),
             'categoria' => (int) $request->query('categoria', 0) ?: null,
-            'estado' => in_array($request->query('estado'), ['activos', 'arquivados', 'todos'], true) ? $request->query('estado') : 'activos',
         ];
 
         $procedures = Procedure::query()
             ->with('category')
             ->withCount('steps')
             ->filter($filters)
-            ->when($filters['estado'] === 'activos', fn ($q) => $q->whereNull('archived_at'))
-            ->when($filters['estado'] === 'arquivados', fn ($q) => $q->whereNotNull('archived_at'))
+            // Mostra activos e arquivados: os arquivados ficam marcados com etiqueta
+            // e continuam acessíveis para se poderem desarquivar.
             ->orderBy('reference_number')
             ->get();
 
