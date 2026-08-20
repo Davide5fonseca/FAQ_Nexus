@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProcedureRequest;
 use App\Models\Category;
 use App\Models\Procedure;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,10 @@ class ProcedureController extends Controller
             'categoria' => (int) $request->query('categoria', 0) ?: null,
         ];
 
+        $utilizador = $request->user();
+
         $procedures = Procedure::query()
+            ->visivelPara($utilizador)
             ->with('category')
             ->withCount('steps')
             ->filter($filters)
@@ -33,19 +37,19 @@ class ProcedureController extends Controller
             'procedures' => $procedures,
             'categories' => Category::orderBy('name')->get(),
             'filters' => $filters,
-            'hasAny' => Procedure::exists(),
+            'hasAny' => Procedure::visivelPara($utilizador)->exists(),
             'counts' => [
-                'activos' => Procedure::whereNull('archived_at')->count(),
-                'arquivados' => Procedure::whereNotNull('archived_at')->count(),
+                'activos' => Procedure::visivelPara($utilizador)->whereNull('archived_at')->count(),
+                'arquivados' => Procedure::visivelPara($utilizador)->whereNotNull('archived_at')->count(),
                 'categorias' => Category::count(),
             ],
         ]);
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         return view('admin.procedimentos.form', [
-            'procedure' => new Procedure(),
+            'procedure' => new Procedure(['area' => $request->user()->area]),
             'steps' => [''],
             'categories' => Category::orderBy('name')->get(),
         ]);
@@ -61,6 +65,7 @@ class ProcedureController extends Controller
                 'title' => $data['title'],
                 'problem' => $data['problem'] ?? null,
                 'category_id' => $data['category_id'],
+                'area' => $this->areaEscolhida($request, $data),
                 'ticket_notes' => $data['ticket_notes'] ?? null,
                 'escalation' => $data['escalation'] ?? null,
                 'created_by' => $request->user()->signature,
@@ -75,8 +80,9 @@ class ProcedureController extends Controller
             ->with('status', "Procedimento {$procedure->reference} criado.");
     }
 
-    public function edit(Procedure $procedure): View
+    public function edit(Request $request, Procedure $procedure): View
     {
+        $this->autorizar($request, $procedure);
         $procedure->load('steps');
 
         return view('admin.procedimentos.form', [
@@ -88,6 +94,7 @@ class ProcedureController extends Controller
 
     public function update(ProcedureRequest $request, Procedure $procedure): RedirectResponse
     {
+        $this->autorizar($request, $procedure);
         $data = $request->validated();
 
         DB::transaction(function () use ($data, $request, $procedure) {
@@ -95,6 +102,7 @@ class ProcedureController extends Controller
                 'title' => $data['title'],
                 'problem' => $data['problem'] ?? null,
                 'category_id' => $data['category_id'],
+                'area' => $this->areaEscolhida($request, $data, $procedure),
                 'ticket_notes' => $data['ticket_notes'] ?? null,
                 'escalation' => $data['escalation'] ?? null,
                 'updated_by' => $request->user()->signature,
@@ -108,6 +116,7 @@ class ProcedureController extends Controller
 
     public function archive(Request $request, Procedure $procedure): RedirectResponse
     {
+        $this->autorizar($request, $procedure);
         $procedure->update(['archived_at' => now(), 'updated_by' => $request->user()->signature]);
 
         return back()->with('status', "Procedimento {$procedure->reference} arquivado. Deixa de aparecer na consulta.");
@@ -115,17 +124,38 @@ class ProcedureController extends Controller
 
     public function unarchive(Request $request, Procedure $procedure): RedirectResponse
     {
+        $this->autorizar($request, $procedure);
         $procedure->update(['archived_at' => null, 'updated_by' => $request->user()->signature]);
 
         return back()->with('status', "Procedimento {$procedure->reference} voltou a estar activo.");
     }
 
-    public function destroy(Procedure $procedure): RedirectResponse
+    public function destroy(Request $request, Procedure $procedure): RedirectResponse
     {
+        $this->autorizar($request, $procedure);
         $ref = $procedure->reference;
         $procedure->delete();
 
         return redirect()->route('admin.procedimentos.index')
             ->with('status', "Procedimento {$ref} apagado definitivamente.");
+    }
+
+    /** Ninguém mexe em procedimentos de outra área (excepto administradores). */
+    private function autorizar(Request $request, Procedure $procedure): void
+    {
+        abort_unless($procedure->visivelPor($request->user()), 403);
+    }
+
+    /**
+     * O administrador escolhe a área; quem não é administrador fica sempre
+     * com a sua própria área (ou mantém a do procedimento que está a editar).
+     */
+    private function areaEscolhida(Request $request, array $data, ?Procedure $procedure = null): string
+    {
+        if ($request->user()->is_admin && filled($data['area'] ?? null)) {
+            return $data['area'];
+        }
+
+        return $procedure?->area ?? $request->user()->area;
     }
 }

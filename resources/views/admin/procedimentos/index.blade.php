@@ -69,6 +69,7 @@
                         <th scope="col">Ref.</th>
                         <th scope="col">Título</th>
                         <th scope="col">Categoria</th>
+                        @can('admin')<th scope="col">Área</th>@endcan
                         <th scope="col">Passos</th>
                         <th scope="col">Alterado</th>
                         <th scope="col"><span class="visually-hidden">Acções</span></th>
@@ -83,6 +84,7 @@
                             @if($p->is_archived) <span class="etiqueta etiqueta--arquivado">Arquivado</span> @endif
                         </td>
                         <td>{{ $p->category->name }}</td>
+                        @can('admin')<td class="meta">{{ $p->area_label }}</td>@endcan
                         <td>{{ $p->steps_count }}</td>
                         <td class="meta" title="{{ $p->updated_at->format('d/m/Y H:i') }}@if($p->updated_by) · {{ $p->updated_by }}@endif">{{ $p->updated_at->format('d/m/Y') }}</td>
                         <td class="accoes">

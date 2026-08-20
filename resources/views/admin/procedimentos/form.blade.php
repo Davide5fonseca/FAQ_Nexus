@@ -68,6 +68,28 @@
 
     </div>
 
+    @can('admin')
+        <fieldset class="campo">
+            <legend class="legenda">Área</legend>
+            <div class="radios">
+                @foreach(\App\Models\User::AREAS as $key => $label)
+                    <label>
+                        <input type="radio" name="area" value="{{ $key }}"
+                               @checked(old('area', $procedure->area ?? auth()->user()->area) === $key)>
+                        {{ $label }}
+                    </label>
+                @endforeach
+            </div>
+            @error('area')<p class="erro">{{ $message }}</p>@enderror
+            <p class="ajuda">Só quem pertence a esta área (e os administradores) verá o procedimento.</p>
+        </fieldset>
+    @else
+        <div class="campo">
+            <span class="legenda">Área</span>
+            <p class="meta" style="margin:0">{{ auth()->user()->area_label }} — só a sua área verá este procedimento.</p>
+        </div>
+    @endcan
+
     <fieldset class="campo" data-passos>
         <legend class="legenda">Passos, por ordem</legend>
         @error('steps')<p class="erro">{{ $message }}</p>@enderror

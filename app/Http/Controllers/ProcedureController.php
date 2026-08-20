@@ -8,26 +8,34 @@ use App\Models\SafetyRule;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-/** Página de consulta (pública) e impressão. */
+/** Página de consulta e impressão. Cada pessoa vê apenas a sua área. */
 class ProcedureController extends Controller
 {
     public function index(Request $request): View
     {
         $filters = $this->filters($request);
 
+        $utilizador = $request->user();
+
         $procedures = Procedure::query()
             ->active()
+            ->visivelPara($utilizador)
             ->with(['category', 'steps'])
             ->filter($filters)
             ->orderBy('reference_number')
             ->get();
 
+        // Só mostra categorias que tenham procedimentos visíveis a esta pessoa.
+        $categories = Category::whereHas('procedures',
+            fn ($q) => $q->active()->visivelPara($utilizador)
+        )->orderBy('name')->get();
+
         return view('consulta.index', [
             'procedures' => $procedures,
-            'categories' => Category::orderBy('name')->get(),
+            'categories' => $categories,
             'rules' => SafetyRule::orderBy('position')->get(),
             'filters' => $filters,
-            'hasAny' => Procedure::active()->exists(),
+            'hasAny' => Procedure::active()->visivelPara($utilizador)->exists(),
         ]);
     }
 
@@ -37,6 +45,7 @@ class ProcedureController extends Controller
 
         $procedures = Procedure::query()
             ->active()
+            ->visivelPara($request->user())
             ->with(['category', 'steps'])
             ->filter($filters)
             ->orderBy('reference_number')
@@ -48,9 +57,9 @@ class ProcedureController extends Controller
         ]);
     }
 
-    public function printOne(Procedure $procedure): View
+    public function printOne(Request $request, Procedure $procedure): View
     {
-        abort_if($procedure->is_archived && ! auth()->check(), 404);
+        abort_unless($procedure->visivelPor($request->user()), 403);
         $procedure->load(['category', 'steps']);
 
         return view('consulta.imprimir', [

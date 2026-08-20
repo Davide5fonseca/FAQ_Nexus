@@ -17,6 +17,11 @@ responsáveis os inserem e editam numa área de administração.
   Cada conta tem uma área (Área técnica / Produção); quem criou ou alterou cada
   procedimento fica registado com nome e área (ex.: "Rita Silva (Produção)").
 
+**Separação por área:** cada procedimento pertence à *Área técnica* ou à
+*Produção*, e cada pessoa só vê os da sua área — os administradores vêem todas.
+O conteúdo carregado inicialmente é todo da Área técnica. As *regras de
+segurança* são as mesmas para toda a gente.
+
 **Como se criam as contas:** o administrador (`suporte@nxs.pt`) vai a
 Administração → Utilizadores → Nova conta e indica nome, email, área e perfil.
 A pessoa recebe um **email com um link para definir a sua palavra-passe** (válido

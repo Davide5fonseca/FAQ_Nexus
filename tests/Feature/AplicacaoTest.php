@@ -32,9 +32,9 @@ class AplicacaoTest extends TestCase
         return Category::create(['name' => $nome]);
     }
 
-    private function leitor(): User
+    private function leitor(string $area = 'tecnica'): User
     {
-        return User::create(['name' => 'Leitor Teste', 'email' => 'leitor@teste.pt', 'password' => 'palavrapasse123', 'role' => 'leitor', 'area' => 'producao', 'active' => true]);
+        return User::create(['name' => 'Leitor Teste', 'email' => 'leitor@teste.pt', 'password' => 'palavrapasse123', 'role' => 'leitor', 'area' => $area, 'active' => true]);
     }
 
     /** Termina a sessão do teste, para os pedidos seguintes serem anónimos. */
@@ -327,6 +327,7 @@ class AplicacaoTest extends TestCase
         $this->categoria();
         $editor = $this->editor('producao');
 
+
         $p = $this->criarProcedimento($editor, ['title' => 'Máquina pára a meio', 'problem' => 'A máquina pára e acende luz vermelha']);
         $this->assertSame('Editor Teste (Produção)', $p->created_by);
         $this->assertSame('A máquina pára e acende luz vermelha', $p->problem);
@@ -446,6 +447,90 @@ class AplicacaoTest extends TestCase
         $this->assertFalse($ana->pode_editar);
         $this->assertSame('Leitor', $ana->role_label);
         Notification::assertSentTo($ana, DefinirPalavraPasse::class);
+    }
+
+    // ---------------- Separação por área ----------------
+
+    public function test_cada_area_so_ve_o_seu_conteudo(): void
+    {
+        $admin = $this->admin();                       // área técnica
+        $tecnico = $this->criarProcedimento($admin);   // fica na área técnica
+
+        // Procedimento da produção, criado por um editor dessa área
+        $editorProd = $this->editor('producao');
+        $prod = $this->criarProcedimento($editorProd, ['title' => 'Máquina de embalar encrava']);
+        $this->assertSame('producao', $prod->area);
+        $this->assertSame('tecnica', $tecnico->area);
+
+        // Técnico: vê o seu, não vê o da produção
+        $tec = $this->leitor('tecnica');
+        $this->actingAs($tec)->get('/')
+            ->assertSee('Substituir toner')
+            ->assertDontSee('Máquina de embalar encrava');
+
+        // Produção: o contrário
+        $this->actingAs($editorProd)->get('/')
+            ->assertSee('Máquina de embalar encrava')
+            ->assertDontSee('Substituir toner');
+
+        // Administrador vê tudo
+        $this->actingAs($admin)->get('/')
+            ->assertSee('Substituir toner')
+            ->assertSee('Máquina de embalar encrava');
+    }
+
+    public function test_nao_se_acede_a_procedimento_de_outra_area(): void
+    {
+        $admin = $this->admin();
+        $tecnico = $this->criarProcedimento($admin);   // área técnica
+        $editorProd = $this->editor('producao');
+
+        // Nem para ver/imprimir, nem para editar ou apagar
+        $this->actingAs($editorProd)->get(route('imprimir.um', $tecnico))->assertForbidden();
+        $this->actingAs($editorProd)->get(route('admin.procedimentos.edit', $tecnico))->assertForbidden();
+        $this->actingAs($editorProd)->post(route('admin.procedimentos.archive', $tecnico))->assertForbidden();
+        $this->actingAs($editorProd)->put(route('admin.procedimentos.update', $tecnico), [
+            'title' => 'Alterado à força', 'category_id' => $tecnico->category_id, 'steps' => ['x'],
+        ])->assertForbidden();
+
+        $this->assertSame('Substituir toner', $tecnico->fresh()->title);
+
+        // Na lista de administração também não aparece
+        $this->actingAs($editorProd)->get(route('admin.procedimentos.index'))
+            ->assertDontSee('Substituir toner');
+    }
+
+    public function test_administrador_escolhe_a_area_do_procedimento(): void
+    {
+        $admin = $this->admin();                    // área técnica
+        $cat = $this->categoria();
+
+        // Cria conteúdo para a produção, apesar de ser da área técnica
+        $this->actingAs($admin)->post(route('admin.procedimentos.store'), [
+            'title' => 'Instrução da linha 3', 'category_id' => $cat->id,
+            'area' => 'producao', 'steps' => ['Passo um'],
+        ])->assertRedirect(route('admin.procedimentos.index'));
+
+        $p = Procedure::latest('id')->first();
+        $this->assertSame('producao', $p->area);
+
+        // A produção vê-o; a área técnica não
+        $this->actingAs($this->editor('producao'))->get('/')->assertSee('Instrução da linha 3');
+        $this->actingAs($this->leitor('tecnica'))->get('/')->assertDontSee('Instrução da linha 3');
+    }
+
+    public function test_categorias_da_consulta_so_mostram_as_da_propria_area(): void
+    {
+        $admin = $this->admin();
+        $this->criarProcedimento($admin); // categoria "Impressoras", área técnica
+
+        $linha = Category::create(['name' => 'Linha de montagem']);
+        $editorProd = $this->editor('producao');
+        $this->criarProcedimento($editorProd, ['title' => 'Ajustar tapete', 'category_id' => $linha->id]);
+
+        $this->actingAs($editorProd)->get('/')
+            ->assertSee('Linha de montagem')
+            ->assertDontSee('Impressoras');
     }
 
     // ---------------- Convite e recuperação de palavra-passe ----------------

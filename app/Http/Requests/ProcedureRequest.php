@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Procedure;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,6 +19,8 @@ class ProcedureRequest extends FormRequest
             'title' => ['required', 'string', 'max:200'],
             'problem' => ['nullable', 'string', 'max:5000'],
             'category_id' => ['required', 'integer', Rule::exists('categories', 'id')],
+            // Só o administrador escolhe a área; para os restantes é a sua.
+            'area' => ['nullable', Rule::in(array_keys(User::AREAS))],
             'steps' => ['required', 'array', 'min:1'],
             'steps.*' => ['nullable', 'string', 'max:5000'],
             'ticket_notes' => ['nullable', 'string', 'max:5000'],
@@ -32,6 +34,7 @@ class ProcedureRequest extends FormRequest
             'title' => 'título',
             'problem' => 'problema / sintomas',
             'category_id' => 'categoria',
+            'area' => 'área',
             'steps' => 'passos',
             'steps.*' => 'passo',
             'ticket_notes' => 'o que registar no ticket',
@@ -46,6 +49,7 @@ class ProcedureRequest extends FormRequest
             'steps.min' => 'Indique pelo menos um passo.',
             'category_id.required' => 'Escolha uma categoria.',
             'category_id.exists' => 'A categoria escolhida já não existe.',
+            'area.in' => 'Escolha uma área válida.',
         ];
     }
 

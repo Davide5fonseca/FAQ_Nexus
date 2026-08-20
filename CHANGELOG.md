@@ -11,6 +11,16 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Adicionado
+- **Separação por área**: cada procedimento pertence à *Área técnica* ou à
+  *Produção*. Cada pessoa só vê, pesquisa, imprime e edita os da sua área; os
+  administradores vêem todas. O bloqueio é feito no servidor — o acesso directo
+  ao endereço de um procedimento de outra área devolve 403.
+- Todo o conteúdo já existente ficou na **Área técnica**.
+- No formulário, o administrador escolhe a área; quem não é administrador cria
+  sempre na sua. A lista de administração mostra a coluna "Área" ao administrador.
+- Na consulta, o filtro de categorias só mostra as que têm procedimentos visíveis.
+
 ### Removido
 - Filtro **"Estado"** na lista de administração. A lista passa a mostrar activos e
   arquivados em conjunto, com os arquivados marcados por etiqueta — assim

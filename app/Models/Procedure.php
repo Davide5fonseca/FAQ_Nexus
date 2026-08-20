@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class Procedure extends Model
 {
     protected $fillable = [
-        'reference_number', 'title', 'problem', 'category_id',
+        'reference_number', 'title', 'problem', 'category_id', 'area',
         'ticket_notes', 'escalation', 'archived_at', 'created_by', 'updated_by',
     ];
 
@@ -46,6 +46,31 @@ class Procedure extends Model
     public function getIsArchivedAttribute(): bool
     {
         return $this->archived_at !== null;
+    }
+
+    /** Ex.: "Área técnica" */
+    public function getAreaLabelAttribute(): ?string
+    {
+        return $this->area ? (User::AREAS[$this->area] ?? $this->area) : null;
+    }
+
+    /**
+     * Cada pessoa só vê os procedimentos da sua área.
+     * Os administradores vêem os de todas as áreas.
+     */
+    public function scopeVisivelPara(Builder $query, ?User $user): Builder
+    {
+        if ($user?->is_admin) {
+            return $query;
+        }
+
+        return $query->where('area', $user?->area ?? '');
+    }
+
+    /** O utilizador pode ver/editar este procedimento? */
+    public function visivelPor(?User $user): bool
+    {
+        return (bool) $user && ($user->is_admin || $user->area === $this->area);
     }
 
     // --- Filtros (scopes) ---
