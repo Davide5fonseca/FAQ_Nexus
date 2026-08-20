@@ -15,12 +15,12 @@
                     @if($rules->isNotEmpty())<span class="hero__stat"><strong>{{ $rules->count() }}</strong> {{ $rules->count() === 1 ? 'regra de segurança' : 'regras de segurança' }}</span>@endif
                 </div>
             </div>
-            @auth
+            @can('editar')
                 <a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
                     Novo procedimento
                 </a>
-            @endauth
+            @endcan
         </div>
     </div>
 </div>
@@ -35,8 +35,12 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M10 12h4M10 16h4M10 8h4"/></svg>
             </div>
             <h2>Ainda não há procedimentos.</h2>
-            <p>Comece por criar o primeiro procedimento: o problema, a solução passo a passo e o que registar no ticket.</p>
-            <div class="accoes"><a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a></div>
+            @can('editar')
+                <p>Comece por criar o primeiro procedimento: o problema, a solução passo a passo e o que registar no ticket.</p>
+                <div class="accoes"><a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a></div>
+            @else
+                <p>Assim que a área técnica ou a produção inserir procedimentos, aparecem aqui.</p>
+            @endcan
         </div>
     @else
         <form class="filtros no-print" method="get" action="{{ route('consulta') }}" role="search" aria-label="Filtrar procedimentos">
@@ -169,9 +173,9 @@
                         <span class="meta">Última alteração: {{ $p->updated_at->format('d/m/Y H:i') }}@if($p->updated_by) por {{ $p->updated_by }}@endif</span>
                         <span class="accoes no-print">
                             <a class="btn btn--secundario btn--pequeno" href="{{ route('imprimir.um', $p) }}">Imprimir</a>
-                            @auth
+                            @can('editar')
                                 <a class="btn btn--secundario btn--pequeno" href="{{ route('admin.procedimentos.edit', $p) }}">Editar</a>
-                            @endauth
+                            @endcan
                         </span>
                     </div>
                 </div>

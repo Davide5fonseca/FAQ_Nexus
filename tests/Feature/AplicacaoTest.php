@@ -32,6 +32,11 @@ class AplicacaoTest extends TestCase
         return Category::create(['name' => $nome]);
     }
 
+    private function leitor(): User
+    {
+        return User::create(['name' => 'Leitor Teste', 'email' => 'leitor@teste.pt', 'password' => 'palavrapasse123', 'role' => 'leitor', 'area' => 'producao', 'active' => true]);
+    }
+
     /** Termina a sessão do teste, para os pedidos seguintes serem anónimos. */
     private function comoVisitante(): static
     {
@@ -397,6 +402,59 @@ class AplicacaoTest extends TestCase
 
         $this->actingAs($admin)->delete(route('admin.utilizadores.destroy', $rita))->assertRedirect();
         $this->assertDatabaseMissing('users', ['id' => $rita->id]);
+    }
+
+    public function test_leitor_so_consulta_e_nao_entra_na_administracao(): void
+    {
+        $admin = $this->admin();
+        $p = $this->criarProcedimento($admin);
+        $leitor = $this->leitor();
+
+        // Consulta e impressão: pode
+        $this->actingAs($leitor)->get('/')
+            ->assertOk()
+            ->assertSee('Substituir toner')
+            ->assertDontSee('Novo procedimento')
+            ->assertDontSee('>Editar</a>', false)
+            ->assertDontSee('Administração');
+        $this->actingAs($leitor)->get(route('imprimir'))->assertOk();
+        $this->actingAs($leitor)->get(route('imprimir.um', $p))->assertOk();
+
+        // Administração: nada
+        foreach ([
+            route('admin.procedimentos.index'),
+            route('admin.procedimentos.create'),
+            route('admin.procedimentos.edit', $p),
+            route('admin.categorias.index'),
+            route('admin.regras.index'),
+            route('admin.utilizadores.index'),
+        ] as $url) {
+            $this->actingAs($leitor)->get($url)->assertForbidden();
+        }
+
+        // E também não consegue gravar nada
+        $this->actingAs($leitor)->post(route('admin.procedimentos.store'), [
+            'title' => 'Tentativa', 'category_id' => $p->category_id, 'steps' => ['x'],
+        ])->assertForbidden();
+        $this->actingAs($leitor)->post(route('admin.procedimentos.archive', $p))->assertForbidden();
+        $this->actingAs($leitor)->delete(route('admin.procedimentos.destroy', $p))->assertForbidden();
+        $this->assertDatabaseHas('procedures', ['id' => $p->id, 'archived_at' => null]);
+    }
+
+    public function test_admin_pode_criar_conta_de_leitor(): void
+    {
+        Notification::fake();
+        $admin = $this->admin();
+
+        $this->actingAs($admin)->post(route('admin.utilizadores.store'), [
+            'name' => 'Ana Leitora', 'email' => 'ana@teste.pt', 'role' => 'leitor', 'area' => 'producao',
+        ])->assertRedirect(route('admin.utilizadores.index'));
+
+        $ana = User::where('email', 'ana@teste.pt')->first();
+        $this->assertSame('leitor', $ana->role);
+        $this->assertFalse($ana->pode_editar);
+        $this->assertSame('Leitor', $ana->role_label);
+        Notification::assertSentTo($ana, DefinirPalavraPasse::class);
     }
 
     // ---------------- Convite e recuperação de palavra-passe ----------------

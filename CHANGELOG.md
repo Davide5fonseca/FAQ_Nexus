@@ -12,6 +12,9 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Adicionado
+- **Perfil "Leitor"**: só consulta e imprime procedimentos. Não vê a área de
+  administração (o link nem aparece) nem os botões de criar/editar, e qualquer
+  tentativa de aceder a `/admin` devolve 403.
 - **Login obrigatório em toda a aplicação**: a consulta deixou de ser aberta;
   qualquer página exige sessão iniciada (é conteúdo interno num servidor acessível
   pela internet).

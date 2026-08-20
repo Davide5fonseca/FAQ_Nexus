@@ -59,6 +59,9 @@ class AppServiceProvider extends ServiceProvider
         // Só administradores gerem utilizadores, categorias, regras e apagam procedimentos.
         Gate::define('admin', fn ($user) => $user->role === 'admin');
 
+        // Leitores só consultam: não entram em nenhuma página de administração.
+        Gate::define('editar', fn ($user) => $user->pode_editar);
+
         // Máximo de 5 tentativas de entrada por minuto, por email + IP.
         RateLimiter::for('login', function (Request $request) {
             $key = mb_strtolower((string) $request->input('email')).'|'.$request->ip();

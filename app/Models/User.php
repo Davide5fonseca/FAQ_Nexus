@@ -10,7 +10,18 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    public const ROLES = ['admin' => 'Administrador', 'editor' => 'Editor'];
+    public const ROLES = [
+        'admin' => 'Administrador',
+        'editor' => 'Editor',
+        'leitor' => 'Leitor',
+    ];
+
+    /** Descrição de cada perfil, mostrada nos formulários. */
+    public const ROLES_DESCRICAO = [
+        'admin' => 'Faz tudo: procedimentos, categorias, regras de segurança, contas e apagar.',
+        'editor' => 'Cria, edita, duplica e arquiva procedimentos.',
+        'leitor' => 'Só consulta e imprime. Não altera nada.',
+    ];
 
     public const AREAS = ['tecnica' => 'Área técnica', 'producao' => 'Produção'];
 
@@ -30,6 +41,12 @@ class User extends Authenticatable
     public function getIsAdminAttribute(): bool
     {
         return $this->role === 'admin';
+    }
+
+    /** Administradores e editores podem alterar procedimentos; leitores não. */
+    public function getPodeEditarAttribute(): bool
+    {
+        return in_array($this->role, ['admin', 'editor'], true);
     }
 
     public function getRoleLabelAttribute(): string

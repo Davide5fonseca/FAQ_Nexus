@@ -47,7 +47,11 @@
             @endforeach
         </div>
         @error('role')<p class="erro">{{ $message }}</p>@enderror
-        <p class="ajuda">Editor: cria, edita, duplica e arquiva procedimentos. Administrador: tudo, incluindo contas, categorias, regras e apagar.</p>
+        <ul class="ajuda" style="margin:.4rem 0 0;padding-left:1.1rem">
+            @foreach(\App\Models\User::ROLES as $key => $label)
+                <li><strong>{{ $label }}</strong> — {{ \App\Models\User::ROLES_DESCRICAO[$key] }}</li>
+            @endforeach
+        </ul>
     </fieldset>
 
     @if($editing)

@@ -26,7 +26,9 @@
         <nav class="barra__nav" aria-label="Navegação principal">
             <a href="{{ route('consulta') }}" @if(request()->routeIs('consulta')) aria-current="page" @endif>Consulta</a>
             @auth
-                <a href="{{ route('admin.procedimentos.index') }}" @if(request()->is('admin*')) aria-current="page" @endif>Administração</a>
+                @can('editar')
+                    <a href="{{ route('admin.procedimentos.index') }}" @if(request()->is('admin*')) aria-current="page" @endif>Administração</a>
+                @endcan
                 <span class="barra__user">{{ auth()->user()->name }}@if(auth()->user()->area_label) · {{ auth()->user()->area_label }}@endif</span>
                 <form method="post" action="{{ route('logout') }}" class="inline">
                     @csrf

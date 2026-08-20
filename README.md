@@ -6,11 +6,14 @@ responsáveis os inserem e editam numa área de administração.
 - **Consulta** (`/`): pesquisa por texto, filtro por categoria, regras de segurança
   no topo, impressão em A4 (um procedimento por página). **Requer sessão iniciada** —
   toda a aplicação é de acesso interno.
-- **Administração** (`/admin`): dois perfis:
+- **Administração** (`/admin`): três perfis:
   - **Editor** — é quem, na **área técnica** ou na **produção**, carrega problemas e
     soluções: cria, edita, duplica e arquiva procedimentos.
   - **Administrador** — tudo isso mais: gerir contas, categorias, regras de
     segurança e apagar definitivamente.
+  - **Leitor** — só consulta e imprime. Não altera nada e não tem acesso à área
+    de administração. É o perfil para quem apenas precisa de seguir procedimentos
+    na bancada.
   Cada conta tem uma área (Área técnica / Produção); quem criou ou alterou cada
   procedimento fica registado com nome e área (ex.: "Rita Silva (Produção)").
 

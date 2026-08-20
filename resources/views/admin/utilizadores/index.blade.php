@@ -12,6 +12,7 @@
 <p class="meta">
     <strong>Administrador</strong>: gere tudo (procedimentos, categorias, regras, contas).
     <strong>Editor</strong>: cria, edita, duplica e arquiva procedimentos — é o perfil para quem, na área técnica ou na produção, carrega problemas e soluções.
+    <strong>Leitor</strong>: só consulta e imprime; não altera nada nem vê a administração.
 </p>
 
 <div class="tabela-wrap">

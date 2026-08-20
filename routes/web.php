@@ -35,8 +35,8 @@ Route::middleware('guest')->group(function () {
 });
 Route::post('/admin/sair', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-// ---------- Administração (requer sessão) ----------
-Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+// ---------- Administração (requer sessão e permissão de edição) ----------
+Route::middleware(['auth', 'can:editar'])->prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/procedimentos');
 
     // Procedimentos
