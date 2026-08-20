@@ -462,6 +462,24 @@ body.pagina-entrar .conteudo { padding-top: 2rem; padding-bottom: 2rem; }
 
 .btn--bloco { width: 100%; min-height: 48px; font-size: 1rem; }
 
+/* Caixa de selecção (ex.: Manter sessão iniciada) */
+.caixa { display: flex; align-items: center; gap: .6rem; margin: 0 0 1.25rem; cursor: pointer; font-weight: 500; }
+.caixa input {
+  appearance: none; -webkit-appearance: none; margin: 0; flex-shrink: 0;
+  width: 1.15rem; height: 1.15rem;
+  border: 1px solid var(--linha-forte); border-radius: 5px; background: var(--branco);
+  cursor: pointer; position: relative; transition: background .15s, border-color .15s;
+}
+.caixa input:hover { border-color: #A7B3C2; }
+.caixa input:checked { background: var(--verde); border-color: var(--verde); }
+.caixa input:checked::after {
+  content: ""; position: absolute; left: 5px; top: 1px;
+  width: 5px; height: 10px; border: solid var(--verde-muito-escuro);
+  border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+.caixa input:focus-visible { box-shadow: var(--foco); }
+.caixa span { font-size: .93rem; color: var(--texto-suave); }
+
 .entrar__ajuda {
   margin: 1.25rem 0 0; padding-top: 1.1rem; border-top: 1px solid var(--linha);
   text-align: center; font-size: .9rem; color: var(--texto-suave);

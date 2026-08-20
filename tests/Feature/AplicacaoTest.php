@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\DefinirPalavraPasse;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
@@ -446,6 +447,62 @@ class AplicacaoTest extends TestCase
         $this->assertFalse($ana->pode_editar);
         $this->assertSame('Leitor', $ana->role_label);
         Notification::assertSentTo($ana, DefinirPalavraPasse::class);
+    }
+
+    // ---------------- Manter sessão iniciada ----------------
+
+    public function test_manter_sessao_iniciada_cria_cookie_de_memoria(): void
+    {
+        $user = $this->admin();
+
+        // Sem a caixa marcada: não há cookie de memória
+        $this->post(route('login.submit'), [
+            'email' => $user->email, 'password' => 'palavrapasse123',
+        ])->assertCookieMissing(Auth::guard('web')->getRecallerName());
+        $this->post(route('logout'));
+
+        // Com a caixa marcada: fica cookie e o utilizador guarda o token
+        $this->post(route('login.submit'), [
+            'email' => $user->email, 'password' => 'palavrapasse123', 'remember' => '1',
+        ])->assertRedirect(route('consulta'))
+          ->assertCookie(Auth::guard('web')->getRecallerName());
+
+        $this->assertNotNull($user->fresh()->remember_token);
+    }
+
+    public function test_conta_desactivada_perde_a_sessao_no_pedido_seguinte(): void
+    {
+        $admin = $this->admin();
+        $editor = $this->editor('tecnica');
+
+        // Com sessão iniciada, consegue consultar
+        $this->actingAs($editor)->get('/')->assertOk();
+
+        // O administrador desactiva-lhe a conta
+        $this->actingAs($admin)->put(route('admin.utilizadores.update', $editor), [
+            'name' => $editor->name, 'email' => $editor->email,
+            'role' => 'editor', 'area' => 'tecnica', 'password' => '', 'active' => '0',
+        ])->assertRedirect();
+
+        // Mesmo já autenticado, é posto fora no pedido seguinte
+        $this->actingAs($editor->fresh())->get('/')->assertRedirect(route('login'));
+        $this->assertGuest();
+    }
+
+    public function test_mudar_a_palavra_passe_invalida_o_manter_sessao(): void
+    {
+        $user = $this->admin();
+        $tokenAntigo = 'token-antigo-de-memoria';
+        $user->forceFill(['remember_token' => $tokenAntigo])->save();
+
+        $token = Password::createToken($user);
+        $this->post(route('password.update'), [
+            'token' => $token, 'email' => $user->email,
+            'password' => 'outra-palavra-passe-1', 'password_confirmation' => 'outra-palavra-passe-1',
+        ])->assertRedirect(route('login'));
+
+        // O token de memória mudou: o cookie antigo deixa de servir
+        $this->assertNotSame($tokenAntigo, $user->fresh()->remember_token);
     }
 
     // ---------------- Separação por área ----------------

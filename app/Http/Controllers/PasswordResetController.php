@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
@@ -56,8 +57,12 @@ class PasswordResetController extends Controller
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, string $password) {
-                $user->forceFill(['password' => $password])->save();
-                // Termina sessões antigas desta conta.
+                // Trocar o remember_token invalida também o "manter sessão iniciada".
+                $user->forceFill([
+                    'password' => $password,
+                    'remember_token' => Str::random(60),
+                ])->save();
+
                 DB::table('sessions')->where('user_id', $user->id)->delete();
             }
         );

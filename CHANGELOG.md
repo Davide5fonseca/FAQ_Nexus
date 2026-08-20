@@ -11,6 +11,17 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Adicionado
+- Caixa **"Manter sessão iniciada"** na entrada, válida 30 dias (o Laravel usa
+  400 por omissão, o que era demasiado para conteúdo interno).
+
+### Segurança
+- Quem ficar com a **conta desactivada** perde a sessão no pedido seguinte, mesmo
+  tendo marcado "manter sessão iniciada" — esse caminho não passava pela
+  validação do login e deixava entrar contas já desactivadas.
+- Mudar a palavra-passe (na recuperação ou pela administração) passa também a
+  invalidar o "manter sessão iniciada" em todos os dispositivos.
+
 ### Alterado
 - **Página de entrada refeita**: cartão centrado no ecrã (deixa de ficar encostado
   ao topo), marca por cima do cartão, e sem a barra de navegação — os links

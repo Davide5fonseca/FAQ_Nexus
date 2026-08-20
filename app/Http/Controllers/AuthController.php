@@ -21,7 +21,10 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt(array_merge($credentials, ['active' => true]), false)) {
+        // "Manter sessão iniciada" dura 30 dias (por omissão o Laravel usa 400).
+        Auth::guard('web')->setRememberDuration(60 * 24 * 30);
+
+        if (! Auth::attempt(array_merge($credentials, ['active' => true]), $request->boolean('remember'))) {
             return back()
                 ->withInput($request->only('email'))
                 ->withErrors(['email' => 'Email ou palavra-passe incorrectos, ou conta desactivada.']);

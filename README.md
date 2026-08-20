@@ -128,6 +128,8 @@ e `APP_URL`/`SESSION_PATH` no `.env`.
 A partir do seu PC (na pasta da aplicação), depois de `git pull` ou das alterações:
 ```bash
 tar --exclude=vendor --exclude=.env --exclude=.git --exclude=composer.phar --exclude='bootstrap/cache/*' --exclude='storage/logs/*' --exclude='storage/framework/*' -czf /tmp/p.tgz . && scp /tmp/p.tgz dev@192.168.1.69:/tmp/
+# (a exclusão de bootstrap/cache é obrigatória: essa cache aponta para pacotes
+#  de desenvolvimento que não existem no servidor e parte a aplicação)
 ssh dev@192.168.1.69
 sudo backup-procedimentos
 sudo tar -xzf /tmp/p.tgz -C /var/www/procedimentos

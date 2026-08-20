@@ -94,8 +94,10 @@ class UserController extends Controller
 
         $user->save();
 
-        // Se a conta foi desactivada ou a palavra-passe mudou, termina as sessões dessa pessoa.
+        // Se a conta foi desactivada ou a palavra-passe mudou, termina as sessões
+        // dessa pessoa e invalida o "manter sessão iniciada".
         if (! $user->active || filled($data['password'] ?? null)) {
+            $user->forceFill(['remember_token' => Str::random(60)])->save();
             DB::table('sessions')->where('user_id', $user->id)->delete();
         }
 

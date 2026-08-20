@@ -29,6 +29,11 @@
             'autocomplete' => 'current-password',
         ])
 
+        <label class="caixa">
+            <input type="checkbox" name="remember" value="1" @checked(old('remember'))>
+            <span>Manter sessão iniciada</span>
+        </label>
+
         <button type="submit" class="btn btn--primario btn--bloco">Entrar</button>
     </form>
 
