@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Cópia de segurança da base de dados (PostgreSQL) da Base de Procedimentos.
+# Cópia de segurança da base de dados (PostgreSQL) da Knowledgebase Nexus.
 #
 # O que faz:
 #   1. Exporta toda a base de dados para um ficheiro comprimido com a data.

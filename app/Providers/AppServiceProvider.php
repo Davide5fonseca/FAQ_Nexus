@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
             ]);
 
             return (new MailMessage)
-                ->subject('Recuperação de palavra-passe — Base de Procedimentos Técnicos')
+                ->subject('Recuperação de palavra-passe — '.config('app.name'))
                 ->greeting('Olá, '.$notifiable->name.',')
                 ->line('Recebemos um pedido para definir uma nova palavra-passe para a sua conta.')
                 ->action('Definir nova palavra-passe', $url)

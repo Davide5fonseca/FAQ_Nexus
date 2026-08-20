@@ -1,4 +1,4 @@
-# Base de Procedimentos Técnicos — Nexus Solutions
+# Knowledgebase Nexus — Nexus Solutions
 
 Aplicação web interna onde os técnicos consultam procedimentos de reparação e os
 responsáveis os inserem e editam numa área de administração.

@@ -12,7 +12,7 @@
 @if($rules->isNotEmpty())
     <article class="pag-imp">
         <div class="imp-cab">
-            <span>Nexus Solutions · Base de Procedimentos Técnicos</span>
+            <span>Nexus Solutions · {{ config('app.name') }}</span>
             <span>Impresso em {{ now()->format('d/m/Y') }}</span>
         </div>
         <section class="regras" aria-labelledby="regras-imp">
@@ -29,7 +29,7 @@
 @forelse($procedures as $p)
     <article class="pag-imp" aria-labelledby="imp-{{ $p->id }}">
         <div class="imp-cab">
-            <span>Nexus Solutions · Base de Procedimentos Técnicos</span>
+            <span>Nexus Solutions · {{ config('app.name') }}</span>
             <span>{{ $p->reference }}</span>
         </div>
         <h1 class="imp-titulo" id="imp-{{ $p->id }}">{{ $p->title }}</h1>

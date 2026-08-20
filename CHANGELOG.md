@@ -11,6 +11,11 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Alterado
+- A aplicação passa a chamar-se **Knowledgebase Nexus** (separador do browser,
+  assunto dos emails e cabeçalho das folhas impressas). O nome vem de `APP_NAME`
+  no `.env`, por isso muda-se num único sítio.
+
 ### Adicionado
 - **Separação por área**: cada procedimento pertence à *Área técnica* ou à
   *Produção*. Cada pessoa só vê, pesquisa, imprime e edita os da sua área; os
