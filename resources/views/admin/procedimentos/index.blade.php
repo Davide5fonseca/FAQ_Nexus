@@ -94,10 +94,6 @@
                         <td>{{ $p->steps_count }}</td>
                         <td class="meta" title="{{ $p->updated_at->format('d/m/Y H:i') }}@if($p->updated_by) · {{ $p->updated_by }}@endif">{{ $p->updated_at->format('d/m/Y') }}</td>
                         <td class="accoes">
-                            <form method="post" action="{{ route('admin.procedimentos.duplicate', $p) }}">
-                                @csrf
-                                <button type="submit" class="btn btn--secundario btn--pequeno">Duplicar</button>
-                            </form>
                             @if($p->is_archived)
                                 <form method="post" action="{{ route('admin.procedimentos.unarchive', $p) }}">
                                     @csrf

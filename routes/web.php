@@ -45,7 +45,6 @@ Route::middleware(['auth', 'can:editar'])->prefix('admin')->name('admin.')->grou
     Route::post('procedimentos', [AdminProcedureController::class, 'store'])->name('procedimentos.store');
     Route::get('procedimentos/{procedure}/editar', [AdminProcedureController::class, 'edit'])->name('procedimentos.edit');
     Route::put('procedimentos/{procedure}', [AdminProcedureController::class, 'update'])->name('procedimentos.update');
-    Route::post('procedimentos/{procedure}/duplicar', [AdminProcedureController::class, 'duplicate'])->name('procedimentos.duplicate');
     Route::post('procedimentos/{procedure}/arquivar', [AdminProcedureController::class, 'archive'])->name('procedimentos.archive');
     Route::post('procedimentos/{procedure}/desarquivar', [AdminProcedureController::class, 'unarchive'])->name('procedimentos.unarchive');
     Route::delete('procedimentos/{procedure}', [AdminProcedureController::class, 'destroy'])->middleware('can:admin')->name('procedimentos.destroy');

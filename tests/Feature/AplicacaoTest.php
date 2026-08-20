@@ -244,20 +244,6 @@ class AplicacaoTest extends TestCase
         $this->assertNull($p->ticket_notes);
     }
 
-    public function test_duplicar_procedimento(): void
-    {
-        $admin = $this->admin();
-        $p = $this->criarProcedimento($admin);
-
-        $resp = $this->actingAs($admin)->post(route('admin.procedimentos.duplicate', $p));
-        $copia = Procedure::latest('id')->first();
-
-        $resp->assertRedirect(route('admin.procedimentos.edit', $copia));
-        $this->assertSame('PROC-02', $copia->reference);
-        $this->assertSame('Cópia de Substituir toner', $copia->title);
-        $this->assertSame($p->steps->pluck('content')->all(), $copia->steps->pluck('content')->all());
-    }
-
     public function test_lista_admin_mostra_arquivados_com_filtro(): void
     {
         $admin = $this->admin();
@@ -341,7 +327,6 @@ class AplicacaoTest extends TestCase
 
         $this->actingAs($editor)->get(route('admin.procedimentos.index'))->assertOk()->assertDontSee('>Apagar<', false)->assertDontSee('Utilizadores');
         $this->actingAs($editor)->post(route('admin.procedimentos.archive', $p))->assertRedirect();
-        $this->actingAs($editor)->post(route('admin.procedimentos.duplicate', $p))->assertRedirect();
 
         $this->actingAs($editor)->delete(route('admin.procedimentos.destroy', $p))->assertForbidden();
         $this->actingAs($editor)->get(route('admin.categorias.index'))->assertForbidden();

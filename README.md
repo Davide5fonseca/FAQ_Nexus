@@ -8,7 +8,7 @@ responsáveis os inserem e editam numa área de administração.
   toda a aplicação é de acesso interno.
 - **Administração** (`/admin`): três perfis:
   - **Editor** — é quem, na **área técnica** ou na **produção**, carrega problemas e
-    soluções: cria, edita, duplica e arquiva procedimentos.
+    soluções: cria, edita e arquiva procedimentos.
   - **Administrador** — tudo isso mais: gerir contas, categorias, regras de
     segurança e apagar definitivamente.
   - **Leitor** — só consulta e imprime. Não altera nada e não tem acesso à área

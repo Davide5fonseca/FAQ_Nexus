@@ -107,30 +107,6 @@ class ProcedureController extends Controller
             ->with('status', "Procedimento {$procedure->reference} guardado.");
     }
 
-    public function duplicate(Request $request, Procedure $procedure): RedirectResponse
-    {
-        $procedure->load('steps');
-
-        $copy = DB::transaction(function () use ($procedure, $request) {
-            $copy = Procedure::create([
-                'reference_number' => Procedure::nextReferenceNumber(),
-                'title' => mb_substr('Cópia de '.$procedure->title, 0, 200),
-                'problem' => $procedure->problem,
-                'category_id' => $procedure->category_id,
-                'ticket_notes' => $procedure->ticket_notes,
-                'escalation' => $procedure->escalation,
-                'created_by' => $request->user()->signature,
-                'updated_by' => $request->user()->signature,
-            ]);
-            $copy->syncSteps($procedure->steps->pluck('content')->all());
-
-            return $copy;
-        });
-
-        return redirect()->route('admin.procedimentos.edit', $copy)
-            ->with('status', "Procedimento duplicado como {$copy->reference}. Pode agora editá-lo.");
-    }
-
     public function archive(Request $request, Procedure $procedure): RedirectResponse
     {
         $procedure->update(['archived_at' => now(), 'updated_by' => $request->user()->signature]);

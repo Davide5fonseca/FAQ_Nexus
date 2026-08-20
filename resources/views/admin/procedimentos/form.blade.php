@@ -145,10 +145,6 @@
     <div class="cartao">
         <h2>Outras acções</h2>
         <div class="accoes-form" style="border:0;padding:0;margin:0">
-            <form method="post" action="{{ route('admin.procedimentos.duplicate', $procedure) }}">
-                @csrf
-                <button type="submit" class="btn btn--secundario">Duplicar</button>
-            </form>
             @if($procedure->is_archived)
                 <form method="post" action="{{ route('admin.procedimentos.unarchive', $procedure) }}">
                     @csrf

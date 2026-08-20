@@ -11,6 +11,10 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Removido
+- Função **"Duplicar"** procedimento: botões, rota e código. Deixou de fazer
+  sentido no fluxo de trabalho.
+
 ### Alterado
 - **Logótipo oficial**: passa a usar o mesmo ficheiro da Nexus Ops
   (`public/img/nexus-1.png`), em vez da reprodução em SVG feita à mão. O ícone do
