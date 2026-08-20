@@ -57,7 +57,7 @@ serviços externos. As páginas são geradas no servidor; há uma folha de estil
 Cada procedimento tem: referência automática (`PROC-01`, `PROC-02`… nunca reutilizada),
 título, **problema / sintomas**, categoria, nível 1/2/3, passos ordenados (a solução), "o que registar no ticket",
 "quando escalar", data de criação e de última alteração, quem alterou, e estado
-activo/arquivado. Arquivados não aparecem na consulta.
+e a que área pertence.
 
 Segurança: palavras-passe com *hash* (bcrypt), sessão expira após **8 horas** sem
 uso (`SESSION_LIFETIME` no `.env`, em minutos), máximo de 5 tentativas de login por
