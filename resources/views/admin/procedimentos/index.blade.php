@@ -88,18 +88,7 @@
                         <td>{{ $p->steps_count }}</td>
                         <td class="meta" title="{{ $p->updated_at->format('d/m/Y H:i') }}@if($p->updated_by) · {{ $p->updated_by }}@endif">{{ $p->updated_at->format('d/m/Y') }}</td>
                         <td class="accoes">
-                            @if($p->is_archived)
-                                <form method="post" action="{{ route('admin.procedimentos.unarchive', $p) }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn--secundario btn--pequeno">Desarquivar</button>
-                                </form>
-                            @else
-                                <form method="post" action="{{ route('admin.procedimentos.archive', $p) }}"
-                                      data-confirm="Arquivar «{{ $p->reference }} — {{ $p->title }}»? Deixa de aparecer na consulta, mas pode ser recuperado.">
-                                    @csrf
-                                    <button type="submit" class="btn btn--secundario btn--pequeno">Arquivar</button>
-                                </form>
-                            @endif
+                            <a class="btn btn--secundario btn--pequeno" href="{{ route('admin.procedimentos.edit', $p) }}">Editar</a>
                             @can('admin')
                             <form method="post" action="{{ route('admin.procedimentos.destroy', $p) }}"
                                   data-confirm="Apagar definitivamente «{{ $p->reference }} — {{ $p->title }}»? Esta acção não pode ser anulada.">

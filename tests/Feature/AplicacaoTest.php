@@ -254,8 +254,10 @@ class AplicacaoTest extends TestCase
         $this->actingAs($admin)->get('/')->assertDontSee('Substituir toner');
         $this->actingAs($admin)->get(route('admin.procedimentos.index'))
             ->assertSee('Substituir toner')
-            ->assertSee('Arquivado')
-            ->assertSee('Desarquivar');
+            ->assertSee('Arquivado');
+
+        // Desarquivar faz-se na página de edição
+        $this->actingAs($admin)->get(route('admin.procedimentos.edit', $p))->assertSee('Desarquivar');
 
         $this->actingAs($admin)->post(route('admin.procedimentos.unarchive', $p))->assertRedirect();
         $this->actingAs($admin)->get('/')->assertSee('Substituir toner');
