@@ -136,7 +136,23 @@
   }
 
   /* ------------------------------------------------------------------
-     3. Consulta: filtro instantâneo + expandir/recolher todos
+     3. Mostrar / ocultar a palavra-passe
+     ------------------------------------------------------------------ */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ver-password]'), function (btn) {
+    var campo = document.getElementById(btn.getAttribute('data-ver-password'));
+    if (!campo) return;
+
+    btn.addEventListener('click', function () {
+      var aMostrar = campo.type === 'password';
+      campo.type = aMostrar ? 'text' : 'password';
+      btn.textContent = aMostrar ? 'Ocultar' : 'Mostrar';
+      btn.setAttribute('aria-pressed', aMostrar ? 'true' : 'false');
+      campo.focus();
+    });
+  });
+
+  /* ------------------------------------------------------------------
+     4. Consulta: filtro instantâneo + expandir/recolher todos
      ------------------------------------------------------------------ */
   var consulta = document.querySelector('[data-consulta]');
   if (consulta) {
@@ -219,7 +235,7 @@
   }
 
   /* ------------------------------------------------------------------
-     4. Impressão automática quando a página de impressão é aberta com ?auto=1
+     5. Impressão automática quando a página de impressão é aberta com ?auto=1
      ------------------------------------------------------------------ */
   if (document.body.dataset.autoImprimir === '1') {
     window.addEventListener('load', function () { setTimeout(function () { window.print(); }, 200); });

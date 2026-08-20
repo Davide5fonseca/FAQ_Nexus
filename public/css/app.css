@@ -424,13 +424,43 @@ td.accoes .btn { margin-left: .25rem; }
 /* --------------------------------------------------------------------------
    Página de entrada
    -------------------------------------------------------------------------- */
-body.pagina-entrar { background: linear-gradient(135deg, var(--verde-muito-escuro) 0%, var(--verde-escuro) 100%); }
-body.pagina-entrar .barra, body.pagina-entrar .rodape { background: transparent; border: 0; }
-.entrar { margin-top: 1.5rem; }
-.entrar .cartao { padding: 2rem 2rem 1.5rem; box-shadow: var(--sombra-g); border: 0; }
-.entrar h1 { margin-bottom: .25rem; font-size: 1.5rem; }
-.entrar .intro { color: var(--texto-suave); margin-bottom: 1.5rem; }
-.entrar .btn { min-height: 46px; }
+body.pagina-entrar {
+  background:
+    radial-gradient(760px 420px at 50% -8%, rgba(47,188,94,.22), transparent 62%),
+    linear-gradient(165deg, #0B2A18 0%, var(--verde-muito-escuro) 58%, #06170C 100%);
+}
+/* O cartão fica centrado no ecrã, na vertical e na horizontal. */
+body.pagina-entrar main { display: flex; align-items: center; justify-content: center; }
+body.pagina-entrar .conteudo { padding-top: 2rem; padding-bottom: 2rem; }
+
+.entrar__marca { text-align: center; margin-bottom: 1.5rem; }
+.entrar__marca img { height: 30px; width: auto; display: inline-block; }
+.entrar__marca span {
+  display: block; margin-top: 6px;
+  font-size: .55rem; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; color: #8FB3A0;
+}
+
+.entrar .cartao { padding: 2rem 2rem 1.5rem; box-shadow: var(--sombra-g); border: 0; border-radius: 16px; margin-bottom: 0; }
+.entrar h1 { margin-bottom: 1.25rem; font-size: 1.4rem; }
+.entrar .intro { color: var(--texto-suave); margin: -.85rem 0 1.5rem; font-size: .93rem; }
+.entrar .campo:last-of-type { margin-bottom: 1.4rem; }
+
+/* Rótulo com acção à direita (ex.: Mostrar palavra-passe) */
+.campo__topo { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.campo__topo label { margin-bottom: .35rem; }
+.campo__topo .btn--ligacao { font-size: .82rem; }
+
+.btn--bloco { width: 100%; min-height: 48px; font-size: 1rem; }
+
+.entrar__ajuda {
+  margin: 1.25rem 0 0; padding-top: 1.1rem; border-top: 1px solid var(--linha);
+  text-align: center; font-size: .9rem; color: var(--texto-suave);
+}
+.entrar__rodape { margin: 1.5rem 0 0; text-align: center; font-size: .78rem; color: #7FA98F; }
+
+@media (max-width: 480px) {
+  .entrar .cartao { padding: 1.5rem 1.25rem 1.25rem; }
+}
 
 /* --------------------------------------------------------------------------
    Listas editáveis (categorias / regras)

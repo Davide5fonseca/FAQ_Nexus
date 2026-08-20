@@ -18,6 +18,9 @@
 <body class="@yield('body-class')" @yield('body-attrs')>
 <a class="skip-link" href="#conteudo">Saltar para o conteúdo</a>
 
+@php $paginaAutenticacao = request()->routeIs('login', 'password.*'); @endphp
+
+@unless($paginaAutenticacao)
 <header class="barra no-print">
     <div class="barra__inner">
         <a class="barra__marca" href="{{ route('consulta') }}">
@@ -43,6 +46,7 @@
         </nav>
     </div>
 </header>
+@endunless
 
 @auth
     @if(request()->is('admin*'))
@@ -88,9 +92,11 @@
     </div>
 </main>
 
+@unless($paginaAutenticacao)
 <footer class="rodape no-print">
     Nexus Solutions · Uso interno
 </footer>
+@endunless
 
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 </body>

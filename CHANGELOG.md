@@ -12,6 +12,11 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- **Página de entrada refeita**: cartão centrado no ecrã (deixa de ficar encostado
+  ao topo), marca por cima do cartão, e sem a barra de navegação — os links
+  "Consulta" e "Entrar" não faziam sentido aqui, já que a consulta exige sessão.
+  Botão "Entrar" a toda a largura e novo botão **Mostrar/Ocultar** a palavra-passe.
+  As páginas de recuperar e definir palavra-passe seguem o mesmo aspecto.
 - O botão **"Apagar"** passa a chamar-se **"Eliminar"** em toda a aplicação
   (procedimentos, categorias, regras e contas), com as mensagens a condizer.
 - Na lista de administração, o botão **"Arquivar"** dá lugar a **"Editar"**.
