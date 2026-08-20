@@ -1,71 +1,124 @@
 {{--
   Modelo único dos emails da aplicação (convite e recuperação de palavra-passe).
   HTML em tabelas e estilos em linha, que é o que os clientes de email entendem.
+
+  Nota sobre o botão: o Outlook (motor do Word) ignora "padding" dentro de <a>,
+  por isso o espaçamento vai na célula <td>. Para os cantos arredondados usa-se
+  VML, que só o Outlook lê; os restantes clientes usam o botão normal.
+
   Variáveis: $saudacao, $linhas[], $botaoTexto, $url, $notas[]
 --}}
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ config('app.name') }}</title>
+    <!--[if mso]>
+    <style type="text/css">
+        body, table, td, a { font-family: Arial, Helvetica, sans-serif !important; }
+    </style>
+    <![endif]-->
 </head>
-<body style="margin:0; padding:0; background-color:#f1f5f9; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;">
-        <tr>
-            <td align="center" style="padding:32px 16px;">
-                <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background-color:#ffffff; border:1px solid #e3e8ef; border-radius:14px; overflow:hidden;">
+<body style="margin:0; padding:0; background-color:#f1f5f9; -webkit-font-smoothing:antialiased;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f1f5f9;">
+    <tr>
+        <td align="center" style="padding:32px 16px;">
 
-                    {{-- Faixa verde no topo --}}
-                    <tr><td style="height:6px; line-height:6px; font-size:0; background-color:#2FBC5E;">&nbsp;</td></tr>
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%; background-color:#ffffff; border-radius:14px; overflow:hidden;">
 
-                    {{-- Marca --}}
+                {{-- Faixa verde no topo --}}
+                <tr>
+                    <td height="6" style="height:6px; line-height:6px; font-size:0; background-color:#2FBC5E;">&nbsp;</td>
+                </tr>
+
+                {{-- Marca --}}
+                <tr>
+                    <td style="padding:30px 40px 0;">
+                        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:22px; font-weight:bold; color:#0F3D24; line-height:1.2;">{{ config('app.name') }}</div>
+                        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:2px; color:#8FB3A0; padding-top:5px;">NEXUS TECHNICAL SUITE</div>
+                    </td>
+                </tr>
+
+                {{-- Saudação --}}
+                <tr>
+                    <td style="padding:26px 40px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:19px; font-weight:bold; color:#0F172A;">
+                        {{ $saudacao }}
+                    </td>
+                </tr>
+
+                {{-- Texto --}}
+                @foreach($linhas as $linha)
                     <tr>
-                        <td style="padding:28px 36px 6px;">
-                            <div style="font-size:22px; font-weight:800; color:#0F3D24; line-height:1;">{{ config('app.name') }}</div>
-                            <div style="font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#8FB3A0; margin-top:4px;">Nexus Technical Suite</div>
+                        <td style="padding:14px 40px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#374151;">
+                            {!! $linha !!}
                         </td>
                     </tr>
+                @endforeach
 
-                    {{-- Corpo --}}
+                {{-- Botão --}}
+                <tr>
+                    <td align="center" style="padding:30px 40px 6px;">
+                        <!--[if mso]>
+                        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+                                     href="{{ $url }}" style="height:48px; v-text-anchor:middle; width:300px;"
+                                     arcsize="21%" stroke="f" fillcolor="#2FBC5E">
+                            <w:anchorlock/>
+                            <center style="color:#081D10; font-family:Arial,sans-serif; font-size:15px; font-weight:bold;">{{ $botaoTexto }}</center>
+                        </v:roundrect>
+                        <![endif]-->
+                        <!--[if !mso]><!-- -->
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+                            <tr>
+                                <td align="center" bgcolor="#2FBC5E" style="background-color:#2FBC5E; border-radius:10px; padding:15px 34px;">
+                                    <a href="{{ $url }}" target="_blank" rel="noopener noreferrer"
+                                       style="display:block; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; font-weight:bold; line-height:18px; color:#081D10; text-decoration:none; white-space:nowrap;">{{ $botaoTexto }}</a>
+                                </td>
+                            </tr>
+                        </table>
+                        <!--<![endif]-->
+                    </td>
+                </tr>
+
+                {{-- Notas --}}
+                @foreach($notas as $nota)
                     <tr>
-                        <td style="padding:14px 36px 4px;">
-                            <h1 style="margin:0 0 14px; font-size:20px; font-weight:600; color:#0F172A;">{{ $saudacao }}</h1>
-
-                            @foreach($linhas as $linha)
-                                <p style="margin:0 0 12px; font-size:15px; line-height:1.6; color:#374151;">{!! $linha !!}</p>
-                            @endforeach
-
-                            {{-- Botão --}}
-                            <table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0 0;">
-                                <tr>
-                                    <td align="center" bgcolor="#2FBC5E" style="border-radius:10px;">
-                                        <a href="{{ $url }}" target="_blank" rel="noopener noreferrer"
-                                           style="display:inline-block; padding:14px 30px; font-size:15px; font-weight:700; color:#081D10; text-decoration:none; border-radius:10px;">{{ $botaoTexto }}</a>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            @foreach($notas as $nota)
-                                <p style="margin:{{ $loop->first ? '26px' : '0' }} 0 6px; font-size:13px; line-height:1.6; color:#6b7280;">{{ $nota }}</p>
-                            @endforeach
+                        <td style="padding:{{ $loop->first ? '18px' : '6px' }} 40px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; line-height:20px; color:#6b7280;">
+                            {{ $nota }}
                         </td>
                     </tr>
+                @endforeach
 
-                    {{-- Separador + endereço de recurso --}}
-                    <tr>
-                        <td style="padding:22px 36px 30px;">
-                            <div style="border-top:1px solid #e3e8ef; padding-top:16px;">
-                                <p style="margin:0 0 6px; font-size:12px; line-height:1.5; color:#9ca3af;">Se o botão não funcionar, copie e cole este endereço no seu browser:</p>
-                                <a href="{{ $url }}" style="font-size:12px; color:#0F3D24; word-break:break-all;">{{ $url }}</a>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+                {{-- Separador + endereço de recurso --}}
+                <tr>
+                    <td style="padding:26px 40px 34px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td height="1" style="height:1px; line-height:1px; font-size:0; background-color:#e3e8ef;">&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td style="padding-top:16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:12px; line-height:18px; color:#9ca3af;">
+                                    Se o botão não funcionar, copie e cole este endereço no seu browser:<br>
+                                    <a href="{{ $url }}" style="color:#0F3D24; word-break:break-all;">{{ $url }}</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
 
-                <p style="margin:18px 0 0; font-size:11px; letter-spacing:1px; color:#9ca3af;">NEXUS SOLUTIONS · USO INTERNO</p>
-            </td>
-        </tr>
-    </table>
+            {{-- Rodapé --}}
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px; width:100%;">
+                <tr>
+                    <td align="center" style="padding:18px 16px 0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:1px; color:#9ca3af;">
+                        NEXUS SOLUTIONS · USO INTERNO
+                    </td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>
 </body>
 </html>

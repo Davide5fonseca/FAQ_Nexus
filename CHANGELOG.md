@@ -17,6 +17,9 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 - Na lista de administração, o botão **"Arquivar"** dá lugar a **"Editar"**.
   Arquivar, desarquivar e apagar continuam disponíveis dentro da página de
   edição, em "Outras acções".
+- Botão dos emails corrigido para o **Outlook**, que ignora o espaçamento dentro
+  de links: o espaçamento passou para a célula da tabela e os cantos arredondados
+  são feitos com VML. Antes aparecia um rectângulo com o texto encostado.
 - **Emails com a identidade da Nexus**, no mesmo formato da Nexus Ops: cartão
   branco com faixa verde no topo, marca, botão verde legível e endereço de
   recurso em baixo. Substitui o modelo genérico do Laravel, em que o botão
