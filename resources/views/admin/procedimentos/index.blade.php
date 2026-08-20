@@ -4,10 +4,7 @@
 @section('hero')
 <div class="hero hero--compacto">
     <div class="hero__inner hero__topo">
-        <div>
-            <h1>Procedimentos</h1>
-            <p>Crie, edite, duplique e arquive. O que guardar aqui fica imediatamente visível na consulta.</p>
-        </div>
+        <h1>Procedimentos</h1>
         <a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
             Novo procedimento
@@ -29,7 +26,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M10 12h4M10 16h4M10 8h4"/></svg>
         </div>
         <h2>Ainda não há procedimentos.</h2>
-        <p>Crie o primeiro.@can('admin') Se ainda não tiver categorias, pode criá-las em <a href="{{ route('admin.categorias.index') }}">Categorias</a>.@endcan</p>
+        @can('admin')<p>Precisa de pelo menos uma <a href="{{ route('admin.categorias.index') }}">categoria</a>.</p>@endcan
         <div class="accoes"><a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a></div>
     </div>
 @else
@@ -66,11 +63,13 @@
 
     @if($procedures->isEmpty())
         <div class="vazio">
-            <h2>Nenhum procedimento corresponde aos filtros.</h2>
+            <h2>Sem resultados</h2>
             <p><a href="{{ route('admin.procedimentos.index') }}">Limpar filtros</a></p>
         </div>
     @else
-        <p class="meta">{{ $procedures->count() }} {{ $procedures->count() === 1 ? 'procedimento' : 'procedimentos' }}</p>
+        @if($filters['q'] || $filters['categoria'] || $filters['estado'] !== 'activos')
+            <p class="meta">{{ $procedures->count() }} {{ $procedures->count() === 1 ? 'resultado' : 'resultados' }}</p>
+        @endif
         <div class="tabela-wrap">
             <table>
                 <thead>
@@ -93,9 +92,8 @@
                         </td>
                         <td>{{ $p->category->name }}</td>
                         <td>{{ $p->steps_count }}</td>
-                        <td class="meta">{{ $p->updated_at->format('d/m/Y H:i') }}<br>{{ $p->updated_by }}</td>
+                        <td class="meta" title="{{ $p->updated_at->format('d/m/Y H:i') }}@if($p->updated_by) · {{ $p->updated_by }}@endif">{{ $p->updated_at->format('d/m/Y') }}</td>
                         <td class="accoes">
-                            <a class="btn btn--secundario btn--pequeno" href="{{ route('admin.procedimentos.edit', $p) }}">Editar</a>
                             <form method="post" action="{{ route('admin.procedimentos.duplicate', $p) }}">
                                 @csrf
                                 <button type="submit" class="btn btn--secundario btn--pequeno">Duplicar</button>

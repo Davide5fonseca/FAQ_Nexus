@@ -5,9 +5,7 @@
 @section('content')
 <div class="imp-barra no-print">
     <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('consulta') }}" class="btn btn--secundario">← Voltar</a>
-    <span class="meta">
-        {{ $procedures->count() }} {{ $procedures->count() === 1 ? 'procedimento' : 'procedimentos' }} · formato A4, um por página
-    </span>
+    <span class="meta">{{ $procedures->count() }} {{ $procedures->count() === 1 ? 'página' : 'páginas' }} A4</span>
     <button type="button" class="btn btn--primario" onclick="window.print()">Imprimir</button>
 </div>
 

@@ -86,7 +86,7 @@
 </main>
 
 <footer class="rodape no-print">
-    Nexus Solutions · Base de Procedimentos Técnicos · Uso interno
+    Nexus Solutions · Uso interno
 </footer>
 
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>

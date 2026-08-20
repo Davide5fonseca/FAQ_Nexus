@@ -6,7 +6,7 @@
     <h1>Regras de segurança</h1>
 </div>
 
-<p class="meta">Estas regras aparecem no topo da página de consulta, pela ordem indicada aqui, e na primeira página ao imprimir a lista.</p>
+<p class="meta">Aparecem no topo da consulta e na impressão, por esta ordem.</p>
 
 <div class="cartao">
     <h2>Nova regra</h2>
@@ -26,7 +26,7 @@
     <div class="vazio">
         <div class="vazio__icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></svg></div>
         <h2>Ainda não há regras de segurança.</h2>
-        <p>Adicione a primeira no campo acima. Enquanto não houver regras, a secção não aparece na consulta.</p>
+        <p>Adicione a primeira no campo acima.</p>
     </div>
 @else
     <h2>{{ $rules->count() }} {{ $rules->count() === 1 ? 'regra' : 'regras' }}</h2>

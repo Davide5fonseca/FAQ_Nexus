@@ -51,7 +51,6 @@
         <textarea id="problem" name="problem" rows="3" maxlength="5000" placeholder="O que se observa: erro, comportamento, em que equipamento…"
                   @error('problem') aria-invalid="true" aria-describedby="problem-erro" @enderror>{{ old('problem', $procedure->problem) }}</textarea>
         @error('problem')<p class="erro" id="problem-erro">{{ $message }}</p>@enderror
-        <p class="ajuda">Descreva o problema tal como aparece a quem o encontra. Os passos abaixo são a solução.</p>
     </div>
 
     <div class="campo">
@@ -64,7 +63,7 @@
                 @endforeach
             </select>
             @error('category_id')<p class="erro" id="category-erro">{{ $message }}</p>@enderror
-            @can('admin')<p class="ajuda">Falta alguma? <a href="{{ route('admin.categorias.index') }}">Gerir categorias</a>.</p>@endcan
+            @can('admin')<p class="ajuda"><a href="{{ route('admin.categorias.index') }}">Gerir categorias</a></p>@endcan
         </div>
 
     </div>
@@ -72,7 +71,7 @@
     <fieldset class="campo" data-passos>
         <legend class="legenda">Passos, por ordem</legend>
         @error('steps')<p class="erro">{{ $message }}</p>@enderror
-        <p class="ajuda" style="margin-bottom:.5rem">Use os botões ↑ ↓ (ou Alt+↑ / Alt+↓ dentro do texto) para reordenar, ou arraste pela pega ⠿. Passos em branco são ignorados.</p>
+        <p class="ajuda" style="margin-bottom:.5rem">Arraste ⠿ ou use ↑ ↓ para reordenar.</p>
         <p class="visually-hidden" aria-live="polite" data-aviso-passos></p>
 
         <ol class="passos">

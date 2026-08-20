@@ -7,7 +7,6 @@
 @section('content')
 <div class="cartao">
     <h1>Entrar</h1>
-    <p class="intro">Acesso reservado aos colaboradores da Nexus Solutions.</p>
 
     <form method="post" action="{{ route('login.submit') }}" novalidate>
         @csrf

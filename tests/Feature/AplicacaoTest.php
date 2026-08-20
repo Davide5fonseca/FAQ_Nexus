@@ -141,7 +141,7 @@ class AplicacaoTest extends TestCase
     {
         $this->admin();
 
-        $this->get(route('login'))->assertOk()->assertSee('Acesso reservado aos colaboradores');
+        $this->get(route('login'))->assertOk()->assertSee('Esqueci-me da palavra-passe');
 
         $this->post(route('login.submit'), ['email' => 'admin@teste.pt', 'password' => 'palavrapasse123'])
             ->assertRedirect(route('consulta'));

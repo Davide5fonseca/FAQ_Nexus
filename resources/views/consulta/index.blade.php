@@ -6,15 +6,7 @@
 <div class="hero no-print">
     <div class="hero__inner">
         <div class="hero__topo">
-            <div>
-                <h1>Procedimentos técnicos</h1>
-                <p>Problemas e soluções de reparação, passo a passo, alimentados pela área técnica e pela produção. Pesquise por sintoma, equipamento ou título.</p>
-                <div class="hero__stats" aria-label="Resumo">
-                    <span class="hero__stat"><strong>{{ $procedures->count() }}</strong> {{ $procedures->count() === 1 ? 'procedimento' : 'procedimentos' }}</span>
-                    <span class="hero__stat"><strong>{{ $categories->count() }}</strong> {{ $categories->count() === 1 ? 'categoria' : 'categorias' }}</span>
-                    @if($rules->isNotEmpty())<span class="hero__stat"><strong>{{ $rules->count() }}</strong> {{ $rules->count() === 1 ? 'regra de segurança' : 'regras de segurança' }}</span>@endif
-                </div>
-            </div>
+            <h1>Procedimentos técnicos</h1>
             @can('editar')
                 <a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -36,10 +28,7 @@
             </div>
             <h2>Ainda não há procedimentos.</h2>
             @can('editar')
-                <p>Comece por criar o primeiro procedimento: o problema, a solução passo a passo e o que registar no ticket.</p>
                 <div class="accoes"><a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a></div>
-            @else
-                <p>Assim que a área técnica ou a produção inserir procedimentos, aparecem aqui.</p>
             @endcan
         </div>
     @else
@@ -109,8 +98,8 @@
             <div class="vazio__icone" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8.5 11h5"/></svg>
             </div>
-            <h2>Nenhum procedimento corresponde aos filtros.</h2>
-            <p>Experimente outro termo ou <a href="{{ route('consulta') }}">limpe os filtros</a>.</p>
+            <h2>Sem resultados</h2>
+            <p><a href="{{ route('consulta') }}">Limpar filtros</a></p>
         </div>
 
         @foreach($procedures as $p)
@@ -126,7 +115,8 @@
                     </span>
                 </summary>
                 <div class="proc__corpo">
-                    <div class="proc__grelha">
+                    @php $temLateral = filled($p->ticket_notes) || filled($p->escalation); @endphp
+                    <div class="proc__grelha @unless($temLateral) proc__grelha--simples @endunless">
                         <div>
                             @if(filled($p->problem))
                                 <h3>Problema / sintomas</h3>
@@ -144,6 +134,7 @@
                                 </ol>
                             @endif
                         </div>
+                        @if($temLateral)
                         <aside class="proc__lateral">
                             @if(filled($p->ticket_notes))
                                 <div class="caixa-info caixa-info--ticket">
@@ -157,20 +148,12 @@
                                     <p>{{ $p->escalation }}</p>
                                 </div>
                             @endif
-                            <div class="caixa-info caixa-info--ficha">
-                                <h3>Ficha</h3>
-                                <p class="meta">
-                                    Referência <strong>{{ $p->reference }}</strong><br>
-                                    Categoria {{ $p->category->name }}<br>
-                                    Criado em {{ $p->created_at->format('d/m/Y') }}@if($p->created_by) por {{ $p->created_by }}@endif<br>
-                                    Última alteração {{ $p->updated_at->format('d/m/Y H:i') }}@if($p->updated_by) por {{ $p->updated_by }}@endif
-                                </p>
-                            </div>
                         </aside>
+                        @endif
                     </div>
 
                     <div class="proc__rodape">
-                        <span class="meta">Última alteração: {{ $p->updated_at->format('d/m/Y H:i') }}@if($p->updated_by) por {{ $p->updated_by }}@endif</span>
+                        <span class="meta">Actualizado a {{ $p->updated_at->format('d/m/Y') }}@if($p->updated_by) · {{ $p->updated_by }}@endif</span>
                         <span class="accoes no-print">
                             <a class="btn btn--secundario btn--pequeno" href="{{ route('imprimir.um', $p) }}">Imprimir</a>
                             @can('editar')

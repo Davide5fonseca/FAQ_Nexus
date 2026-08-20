@@ -60,12 +60,12 @@
             <input type="password" id="password" name="password" minlength="10" autocomplete="new-password"
                    @error('password') aria-invalid="true" aria-describedby="password-erro" @enderror>
             @error('password')<p class="erro" id="password-erro">{{ $message }}</p>@enderror
-            <p class="ajuda">Normalmente não é preciso: a pessoa pode pedir uma nova em "Esqueci-me da palavra-passe", ou pode reenviar-lhe o email de definição na lista de utilizadores.</p>
+            <p class="ajuda">Normalmente não é preciso: a pessoa pode usar "Esqueci-me da palavra-passe".</p>
         </div>
     @else
         <div class="alerta alerta--ok" role="note" style="margin-bottom:1.1rem">
             <svg class="alerta__icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>
-            <div>Não define a palavra-passe aqui: a pessoa recebe um <strong>email com um link</strong> para a definir (válido 3 dias).</div>
+            <div>A pessoa recebe um <strong>email</strong> para definir a palavra-passe (válido 3 dias).</div>
         </div>
     @endif
 
@@ -75,7 +75,7 @@
                 <input type="hidden" name="active" value="0">
                 <input type="checkbox" name="active" value="1" @checked(old('active', $user->active))> Conta activa
             </label>
-            <p class="ajuda">Uma conta desactivada não consegue entrar, mas o histórico do que fez mantém-se.</p>
+            <p class="ajuda">Uma conta desactivada não consegue entrar.</p>
         </div>
     @endif
 

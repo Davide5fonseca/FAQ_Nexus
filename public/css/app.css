@@ -395,6 +395,7 @@ td.accoes .btn { margin-left: .25rem; }
 .proc__corpo { padding: 0 1.25rem 1.25rem; border-top: 1px solid var(--linha); background: #FCFDFE; }
 .proc__grelha { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 1.5rem; margin-top: 1rem; }
 @media (max-width: 860px) { .proc__grelha { grid-template-columns: 1fr; } }
+.proc__grelha--simples { grid-template-columns: 1fr; }
 .proc__corpo h3 { margin: 1rem 0 .5rem; font-size: .76rem; text-transform: uppercase; letter-spacing: .08em; color: var(--verde-escuro); font-weight: 700; }
 .proc__corpo h3:first-child { margin-top: 0; }
 .proc__problema { background: #FFF8E6; border: 1px solid #F2D78B; border-radius: var(--raio); padding: .75rem .9rem; margin: 0 0 .25rem; white-space: pre-wrap; }
@@ -500,7 +501,6 @@ body.pagina-entrar .barra__titulo { display: none; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } html { scroll-behavior: auto; } }
 
 /* Ajustes finais */
-.caixa-info--ficha p { white-space: normal; line-height: 1.6; }
 @media (max-width: 600px) {
   .hero { padding: 1.5rem 0 3.5rem; }
   .hero h1 { font-size: 1.5rem; }

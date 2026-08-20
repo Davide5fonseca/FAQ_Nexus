@@ -11,6 +11,14 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Alterado
+- **Limpeza de texto em todas as páginas**: retirados subtítulos explicativos,
+  legendas de perfis, textos de ajuda redundantes e informação repetida (a caixa
+  "Ficha" na consulta repetia referência, categoria e data já visíveis; o botão
+  "Editar" na lista de administração repetia a ligação do título). A coluna
+  "Alterado" mostra só a data, com o detalhe na dica do rato, e a contagem de
+  resultados só aparece quando há um filtro activo.
+
 ### Adicionado
 - **Perfil "Leitor"**: só consulta e imprime procedimentos. Não vê a área de
   administração (o link nem aparece) nem os botões de criar/editar, e qualquer
