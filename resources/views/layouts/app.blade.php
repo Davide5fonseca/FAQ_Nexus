@@ -12,7 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23081D10'/><path d='M8 25V7l16 18V7' fill='none' stroke='%232FBC5E' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+    <link rel="icon" href="{{ asset('img/icon-192.png') }}" sizes="192x192">
+    <link rel="apple-touch-icon" href="{{ asset('img/apple-touch-icon.png') }}">
 </head>
 <body class="@yield('body-class')" @yield('body-attrs')>
 <a class="skip-link" href="#conteudo">Saltar para o conteúdo</a>
@@ -20,7 +21,10 @@
 <header class="barra no-print">
     <div class="barra__inner">
         <a class="barra__marca" href="{{ route('consulta') }}">
-            <img class="barra__logo" src="{{ asset('img/logo.svg') }}" alt="Nexus Technical Suite" width="150" height="58">
+            <span class="barra__marca-logo">
+                <img class="barra__logo" src="{{ asset('img/nexus-1.png') }}" alt="Nexus" width="150" height="28">
+                <span class="barra__marca-sub">Technical Suite</span>
+            </span>
             <span class="barra__titulo">Base de Procedimentos Técnicos</span>
         </a>
         <nav class="barra__nav" aria-label="Navegação principal">

@@ -12,6 +12,10 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- **Logótipo oficial**: passa a usar o mesmo ficheiro da Nexus Ops
+  (`public/img/nexus-1.png`), em vez da reprodução em SVG feita à mão. O ícone do
+  separador do browser passa também a ser o oficial. "Technical Suite" fica como
+  subtítulo por baixo da marca.
 - **Limpeza de texto em todas as páginas**: retirados subtítulos explicativos,
   legendas de perfis, textos de ajuda redundantes e informação repetida (a caixa
   "Ficha" na consulta repetia referência, categoria e data já visíveis; o botão
