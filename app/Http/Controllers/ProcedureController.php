@@ -19,7 +19,7 @@ class ProcedureController extends Controller
 
         $procedures = Procedure::query()
             ->visivelPara($utilizador)
-            ->with(['category', 'steps'])
+            ->with(['category', 'steps', 'anexos'])
             ->filter($filters)
             ->orderBy('reference_number')
             ->get();
@@ -44,7 +44,7 @@ class ProcedureController extends Controller
 
         $procedures = Procedure::query()
             ->visivelPara($request->user())
-            ->with(['category', 'steps'])
+            ->with(['category', 'steps', 'anexos'])
             ->filter($filters)
             ->orderBy('reference_number')
             ->get();

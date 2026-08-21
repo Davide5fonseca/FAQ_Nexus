@@ -30,6 +30,20 @@ return [
 
     'disks' => [
 
+        /*
+         * Anexos dos procedimentos: imagens de ecrã, fotografias, PDFs.
+         *
+         * Fica FORA da pasta pública de propósito. Quem quer ver um anexo
+         * passa pela rota que confirma a sessão e a área — se estes ficheiros
+         * estivessem em `public/`, bastava saber o endereço para ver o anexo
+         * de um procedimento de outra área.
+         */
+        'anexos' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/anexos'),
+            'throw' => false,
+        ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),

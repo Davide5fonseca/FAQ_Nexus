@@ -34,6 +34,30 @@ class Procedure extends Model
         return $this->hasMany(ProcedureStep::class)->orderBy('position');
     }
 
+    /** Imagens de ecrã, fotografias e PDFs agarrados a este procedimento. */
+    public function anexos(): HasMany
+    {
+        return $this->hasMany(Anexo::class)->orderBy('ordem')->orderBy('id');
+    }
+
+    /** Só as imagens — são as que se mostram na consulta e saem no papel. */
+    public function imagens(): HasMany
+    {
+        return $this->anexos()->where('tipo', 'like', 'image/%');
+    }
+
+    /**
+     * Ao apagar um procedimento, os ficheiros dos anexos saem também do disco.
+     * A base de dados apaga as linhas em cascata, mas essa cascata não passa
+     * pelo modelo — e os ficheiros ficariam para sempre no servidor.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (self $procedimento) {
+            $procedimento->anexos->each->delete();
+        });
+    }
+
     // --- Atributos derivados ---
 
     /** Referência legível, ex.: PROC-01 */

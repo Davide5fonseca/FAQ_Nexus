@@ -33,7 +33,7 @@
     </div>
 @endif
 
-<form method="post" action="{{ $editing ? route('admin.procedimentos.update', $procedure) : route('admin.procedimentos.store') }}" class="cartao" novalidate>
+<form method="post" action="{{ $editing ? route('admin.procedimentos.update', $procedure) : route('admin.procedimentos.store') }}" class="cartao" enctype="multipart/form-data" novalidate>
     @csrf
     @if($editing) @method('PUT') @endif
 
@@ -147,6 +147,27 @@
         @error('escalation')<p class="erro" id="escalation-erro">{{ $message }}</p>@enderror
     </div>
 
+    @php $jaTem = $editing ? $procedure->anexos->count() : 0; @endphp
+
+    <div class="campo">
+        <label for="anexos">Anexos</label>
+        <p class="ajuda" style="margin:0 0 .5rem">
+            Imagens de ecrã, fotografias do equipamento ou folhas em PDF.
+            Aceita JPG, PNG, GIF, WEBP e PDF, até 10 MB cada.
+            @if($jaTem)
+                Este procedimento já tem {{ $jaTem }} {{ $jaTem === 1 ? 'anexo' : 'anexos' }};
+                cabem mais {{ \App\Models\Anexo::MAXIMO_POR_PROCEDIMENTO - $jaTem }}.
+            @endif
+        </p>
+        <input type="file" id="anexos" name="anexos[]" multiple
+               accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,image/*,application/pdf"
+               @error('anexos') aria-invalid="true" @enderror>
+        @error('anexos')<p class="erro">{{ $message }}</p>@enderror
+        @foreach($errors->get('anexos.*') as $mensagens)
+            @foreach($mensagens as $mensagem)<p class="erro">{{ $mensagem }}</p>@endforeach
+        @endforeach
+    </div>
+
     @if($editing)
         <p class="meta">
             Criado em {{ $procedure->created_at->format('d/m/Y H:i') }}@if($procedure->created_by) por {{ $procedure->created_by }}@endif
@@ -159,6 +180,39 @@
         <a class="btn btn--secundario" href="{{ route('admin.procedimentos.index') }}">Cancelar</a>
     </div>
 </form>
+
+@if($editing && $procedure->anexos->isNotEmpty())
+    <div class="cartao">
+        <h2>Anexos deste procedimento</h2>
+        <p class="ajuda">Clique numa imagem para a ver em tamanho real.</p>
+
+        <ul class="anexos">
+            @foreach($procedure->anexos as $anexo)
+                <li class="anexo">
+                    <a class="anexo__ver" href="{{ route('anexo', [$procedure, $anexo]) }}" target="_blank" rel="noopener">
+                        @if($anexo->ehImagem())
+                            <img src="{{ route('anexo', [$procedure, $anexo]) }}" alt="{{ $anexo->rotulo }}" loading="lazy">
+                        @else
+                            <span class="anexo__pdf" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                PDF
+                            </span>
+                        @endif
+                    </a>
+                    <div class="anexo__info">
+                        <span class="anexo__nome">{{ $anexo->rotulo }}</span>
+                        <span class="anexo__meta">{{ $anexo->tamanho_legivel }}</span>
+                    </div>
+                    <form method="post" action="{{ route('admin.procedimentos.anexos.destroy', [$procedure, $anexo]) }}"
+                          data-confirm="Remover o anexo «{{ $anexo->rotulo }}»? Não pode ser anulado.">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn btn--perigo btn--pequeno">Remover</button>
+                    </form>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
 @if($editing)
     <div class="cartao">

@@ -74,6 +74,39 @@
             <p>{{ filled($p->escalation) ? $p->escalation : '—' }}</p>
         </section>
 
+        {{-- Só as imagens saem no papel. Um PDF anexo fica registado pelo nome:
+             imprimi-lo aqui dentro obrigaria a converter páginas e partiria a
+             regra de um procedimento por folha. --}}
+        @php
+            $imagens = $p->anexos->filter->ehImagem();
+            $outros = $p->anexos->reject->ehImagem();
+        @endphp
+
+        @if($imagens->isNotEmpty())
+            <section class="imp-sec">
+                <h3>Imagens</h3>
+                <div class="imp-imagens">
+                    @foreach($imagens as $anexo)
+                        <figure>
+                            <img src="{{ route('anexo', [$p, $anexo]) }}" alt="{{ $anexo->rotulo }}">
+                            <figcaption>{{ $anexo->rotulo }}</figcaption>
+                        </figure>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if($outros->isNotEmpty())
+            <section class="imp-sec">
+                <h3>Outros anexos</h3>
+                <ul>
+                    @foreach($outros as $anexo)
+                        <li>{{ $anexo->rotulo }} ({{ $anexo->tamanho_legivel }})</li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+
         <div class="imp-rodape">
             Última alteração: {{ $p->updated_at->format('d/m/Y H:i') }}@if($p->updated_by) por {{ $p->updated_by }}@endif
             · Criado em {{ $p->created_at->format('d/m/Y') }}

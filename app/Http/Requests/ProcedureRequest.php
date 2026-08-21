@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Anexo;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -25,6 +26,17 @@ class ProcedureRequest extends FormRequest
             'steps.*' => ['nullable', 'string', 'max:5000'],
             'ticket_notes' => ['nullable', 'string', 'max:5000'],
             'escalation' => ['nullable', 'string', 'max:5000'],
+
+            // Anexos: imagens e PDFs. O `mimes` valida pelo conteúdo do
+            // ficheiro, não pelo nome — mudar a extensão não engana.
+            'anexos' => ['nullable', 'array', 'max:'.Anexo::MAXIMO_POR_PROCEDIMENTO],
+            'anexos.*' => [
+                'file',
+                'mimes:'.implode(',', Anexo::EXTENSOES),
+                'max:'.Anexo::TAMANHO_MAXIMO_KB,
+            ],
+            'legendas' => ['nullable', 'array'],
+            'legendas.*' => ['nullable', 'string', 'max:200'],
         ];
     }
 
@@ -39,6 +51,9 @@ class ProcedureRequest extends FormRequest
             'steps.*' => 'passo',
             'ticket_notes' => 'o que registar no ticket',
             'escalation' => 'quando escalar',
+            'anexos' => 'anexos',
+            'anexos.*' => 'anexo',
+            'legendas.*' => 'legenda',
         ];
     }
 
@@ -50,6 +65,9 @@ class ProcedureRequest extends FormRequest
             'category_id.required' => 'Escolha uma categoria.',
             'category_id.exists' => 'A categoria escolhida já não existe.',
             'area.in' => 'Escolha uma área válida.',
+            'anexos.max' => 'Não é possível juntar mais de :max anexos de cada vez.',
+            'anexos.*.mimes' => 'Só são aceites imagens (JPG, PNG, GIF, WEBP) e ficheiros PDF.',
+            'anexos.*.max' => 'Cada anexo tem de ter menos de 10 MB.',
         ];
     }
 

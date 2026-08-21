@@ -11,6 +11,29 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 
 ## [Por lançar]
 
+### Adicionado
+- **Anexos nos procedimentos**: imagens de ecrã, fotografias do equipamento e
+  folhas em PDF. Juntam-se no formulário (até 12 por procedimento, 10 MB cada),
+  aparecem na consulta em miniatura e **saem no papel** — é meio caminho andado
+  para quem está à frente de um BIOS ou de uma placa.
+- Foram juntas **8 imagens do documento de origem** («Abrir Secções») aos sete
+  procedimentos que as tinham: PROC-11, 12, 13, 14 (duas), 21, 25 e 32.
+
+### Segurança
+- Os ficheiros dos anexos **não ficam na pasta pública**. Vivem em
+  `storage/app/private/anexos` e são servidos por uma rota que confirma, a cada
+  pedido, a sessão e a área de quem pede. Se ficassem em `public/`, bastaria
+  saber o endereço de uma imagem para ver conteúdo de uma área alheia — a
+  separação por áreas passaria a valer só para o texto.
+- O nome com que o ficheiro fica no disco é **gerado pela aplicação**, nunca o
+  que vem de fora: um nome de ficheiro é texto escolhido por quem envia, e
+  serviria para escrever fora da pasta.
+- Só são aceites imagens (JPG, PNG, GIF, WEBP) e PDF, validados pelo conteúdo e
+  não pela extensão. SVG fica de fora de propósito: pode trazer código lá dentro.
+- Ao apagar um procedimento, os ficheiros dos anexos saem também do disco.
+
+## [Por lançar]
+
 ### Alterado
 - **O botão de sair desta aplicação deixou de terminar a sessão**: passa a
   devolver à escolha de módulos, no portal, com a sessão intacta. Numa suite

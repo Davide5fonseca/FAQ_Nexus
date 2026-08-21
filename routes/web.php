@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProcedureController as AdminProcedureController;
 use App\Http\Controllers\Admin\SafetyRuleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AnexoController;
 use App\Http\Controllers\ProcedureController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,10 @@ Route::middleware(['auth', 'acesso'])->group(function () {
     Route::get('/', [ProcedureController::class, 'index'])->name('consulta');
     Route::get('/imprimir', [ProcedureController::class, 'printAll'])->name('imprimir');
     Route::get('/procedimentos/{procedure}/imprimir', [ProcedureController::class, 'printOne'])->name('imprimir.um');
+
+    // Os anexos não estão na pasta pública: passam por aqui, onde se confirma
+    // a sessão e a área de quem pede (ver o AnexoController).
+    Route::get('/procedimentos/{procedure}/anexos/{anexo}', [AnexoController::class, 'mostrar'])->name('anexo');
 });
 
 // ---------- Administração (requer permissão de edição) ----------
@@ -30,6 +35,7 @@ Route::middleware(['auth', 'acesso', 'can:editar'])->prefix('admin')->name('admi
     Route::get('procedimentos/{procedure}/editar', [AdminProcedureController::class, 'edit'])->name('procedimentos.edit');
     Route::put('procedimentos/{procedure}', [AdminProcedureController::class, 'update'])->name('procedimentos.update');
     Route::delete('procedimentos/{procedure}', [AdminProcedureController::class, 'destroy'])->middleware('can:admin')->name('procedimentos.destroy');
+    Route::delete('procedimentos/{procedure}/anexos/{anexo}', [AdminProcedureController::class, 'destroyAnexo'])->name('procedimentos.anexos.destroy');
 
     // ---- Só administradores a partir daqui ----
     Route::middleware('can:admin')->group(function () {

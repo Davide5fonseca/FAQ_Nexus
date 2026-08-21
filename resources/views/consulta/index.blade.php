@@ -134,6 +134,31 @@
                                     @endforeach
                                 </ol>
                             @endif
+
+                            @if($p->anexos->isNotEmpty())
+                                <h3>Anexos</h3>
+                                <ul class="anexos anexos--consulta">
+                                    @foreach($p->anexos as $anexo)
+                                        <li class="anexo">
+                                            <a class="anexo__ver" href="{{ route('anexo', [$p, $anexo]) }}" target="_blank" rel="noopener"
+                                               title="Abrir «{{ $anexo->rotulo }}» em tamanho real">
+                                                @if($anexo->ehImagem())
+                                                    <img src="{{ route('anexo', [$p, $anexo]) }}" alt="{{ $anexo->rotulo }}" loading="lazy">
+                                                @else
+                                                    <span class="anexo__pdf" aria-hidden="true">
+                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                        PDF
+                                                    </span>
+                                                @endif
+                                            </a>
+                                            <div class="anexo__info">
+                                                <span class="anexo__nome">{{ $anexo->rotulo }}</span>
+                                                <span class="anexo__meta">{{ $anexo->tamanho_legivel }}</span>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
                         </div>
                         @if($temLateral)
                         <aside class="proc__lateral">

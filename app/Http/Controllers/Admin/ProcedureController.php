@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProcedureRequest;
+use App\Models\Anexo;
 use App\Models\Category;
 use App\Models\Procedure;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ProcedureController extends Controller
@@ -69,6 +72,7 @@ class ProcedureController extends Controller
                 'updated_by' => $request->user()->signature,
             ]);
             $procedure->syncSteps($data['steps']);
+            $this->guardarAnexos($request, $procedure);
 
             return $procedure;
         });
@@ -80,7 +84,7 @@ class ProcedureController extends Controller
     public function edit(Request $request, Procedure $procedure): View
     {
         $this->autorizar($request, $procedure);
-        $procedure->load('steps');
+        $procedure->load('steps', 'anexos');
 
         return view('admin.procedimentos.form', [
             'procedure' => $procedure,
@@ -105,6 +109,7 @@ class ProcedureController extends Controller
                 'updated_by' => $request->user()->signature,
             ]);
             $procedure->syncSteps($data['steps']);
+            $this->guardarAnexos($request, $procedure);
         });
 
         return redirect()->route('admin.procedimentos.index')
@@ -119,6 +124,60 @@ class ProcedureController extends Controller
 
         return redirect()->route('admin.procedimentos.index')
             ->with('status', "Procedimento {$ref} eliminado.");
+    }
+
+    /** Retirar um anexo. O ficheiro sai do disco com o registo (ver o modelo). */
+    public function destroyAnexo(Request $request, Procedure $procedure, Anexo $anexo): RedirectResponse
+    {
+        $this->autorizar($request, $procedure);
+        abort_unless($anexo->procedure_id === $procedure->id, 404);
+
+        $nome = $anexo->rotulo;
+        $anexo->delete();
+
+        return back()->with('status', "Anexo «{$nome}» removido.");
+    }
+
+    /**
+     * Grava os ficheiros que vieram no formulário.
+     *
+     * O nome com que ficam no disco é gerado aqui e nunca vem do que a pessoa
+     * carregou: um nome de ficheiro é texto escolhido por quem envia, e serviria
+     * para escrever fora da pasta. O nome original guarda-se à parte, só para
+     * ser mostrado e usado no download.
+     */
+    private function guardarAnexos(Request $request, Procedure $procedure): void
+    {
+        $ficheiros = array_filter((array) $request->file('anexos'));
+
+        if ($ficheiros === []) {
+            return;
+        }
+
+        $jaTem = $procedure->anexos()->count();
+        $cabem = max(0, Anexo::MAXIMO_POR_PROCEDIMENTO - $jaTem);
+        $ficheiros = array_slice($ficheiros, 0, $cabem);
+
+        $legendas = (array) $request->input('legendas', []);
+        $ordem = (int) $procedure->anexos()->max('ordem');
+
+        foreach ($ficheiros as $i => $ficheiro) {
+            /** @var UploadedFile $ficheiro */
+            $extensao = strtolower($ficheiro->extension() ?: $ficheiro->getClientOriginalExtension());
+            $nomeNoDisco = Str::uuid()->toString().'.'.$extensao;
+
+            $ficheiro->storeAs((string) $procedure->id, $nomeNoDisco, Anexo::DISCO);
+
+            $procedure->anexos()->create([
+                'ficheiro' => $nomeNoDisco,
+                'nome_original' => mb_substr($ficheiro->getClientOriginalName(), 0, 255),
+                'tipo' => $ficheiro->getMimeType() ?: 'application/octet-stream',
+                'tamanho' => $ficheiro->getSize(),
+                'legenda' => trim((string) ($legendas[$i] ?? '')) ?: null,
+                'ordem' => ++$ordem,
+                'criado_por' => $request->user()->signature,
+            ]);
+        }
     }
 
     /** Ninguém mexe em procedimentos de outra área (excepto administradores). */
