@@ -426,4 +426,32 @@ class AplicacaoTest extends TestCase
         $this->actingAs($admin)->delete(route('admin.regras.destroy', $b))->assertRedirect();
         $this->assertSame([1], SafetyRule::pluck('position')->all());
     }
+
+    // ---------------- Perfis órfãos ----------------
+
+    public function test_o_comando_varre_perfis_de_gente_que_ja_nao_existe(): void
+    {
+        // O perfil vive nesta base de dados e a conta na do portal: são bases
+        // diferentes, por isso quem for eliminado lá deixa cá o perfil. É
+        // inofensivo (ninguém o lê), mas é lixo.
+        $pessoa = $this->pessoa();
+        $orfao = Perfil::create(['utilizador_id' => 99999, 'papel' => 'editor', 'area' => 'tecnica']);
+
+        $this->artisan('perfis:limpar')->assertSuccessful();
+
+        $this->assertNull(Perfil::find($orfao->id), 'o perfil órfão devia ter sido apagado');
+        $this->assertNotNull(
+            Perfil::where('utilizador_id', $pessoa->id)->first(),
+            'o perfil de quem existe tem de ficar'
+        );
+    }
+
+    public function test_o_comando_com_mostrar_nao_apaga_nada(): void
+    {
+        $orfao = Perfil::create(['utilizador_id' => 99998, 'papel' => 'leitor', 'area' => 'producao']);
+
+        $this->artisan('perfis:limpar --mostrar')->assertSuccessful();
+
+        $this->assertNotNull(Perfil::find($orfao->id));
+    }
 }

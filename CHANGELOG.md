@@ -12,6 +12,23 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Adicionado
+- **PROC-39 — Supermicro AIO: jumpers do painel e configuração LVDS no BIOS**,
+  com as duas imagens do documento de origem. A página de origem só tinha as
+  imagens, sem texto: a ficha descreve o que se vê nelas e diz, no próprio
+  texto, que precisa de ser revista por quem faz este trabalho.
+- Comando **`php artisan perfis:limpar`**: varre os perfis de pessoas que já
+  não existem. O perfil vive nesta base de dados e a conta na do portal — são
+  bases diferentes, e a base de dados não consegue apagar um quando o outro
+  desaparece. Com `--mostrar` só lista, sem apagar.
+
+### Removido
+- Varridos do servidor os ficheiros que já ninguém usava desde que a entrada
+  passou para o portal: os dois controladores de autenticação, o email de
+  convite antigo, os dois comandos de consola e as cinco vistas de `auth/`.
+  Já tinham sido apagados no repositório; o servidor é que ficara para trás,
+  porque a instalação por tarball não apaga o que lá está.
+
+### Adicionado
 - As imagens anexas **abrem na própria página**, numa camada por cima, em vez
   de um separador novo. Fecha-se com Esc, com o botão ou clicando fora, e as
   setas do teclado percorrem as imagens do mesmo procedimento. Sem JavaScript,
