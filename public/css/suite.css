@@ -111,6 +111,12 @@ body {
 }
 
 h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -.01em; line-height: 1.25; }
+
+/* Rede de segurança para os ícones. Sem isto, um SVG posto numa página sem
+   regra própria fica do tamanho natural do desenho — foi o que aconteceu com
+   a lupa da pesquisa, que apareceu enorme. Qualquer regra mais específica
+   (.btn svg, .nav-item svg, ...) continua a mandar sobre esta. */
+svg { width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
 p { margin: 0 0 1rem; }
 a { color: var(--verde-600); }
 img { max-width: 100%; height: auto; }
@@ -603,7 +609,19 @@ table.tabela tbody tr:hover { background: var(--fundo); }
 }
 .filtros .campo { margin: 0; }
 .filtros__accoes { display: flex; gap: .5rem; margin-left: auto; }
-.pesquisa { flex: 1 1 16rem; min-width: 0; }
+
+/* Campo de pesquisa com a lupa lá dentro. */
+.pesquisa { position: relative; flex: 1 1 16rem; min-width: 0; }
+.pesquisa svg {
+  position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
+  width: 1.125rem; height: 1.125rem;
+  color: var(--texto-fraco); pointer-events: none;
+}
+.pesquisa input { padding-left: 2.75rem; }
+
+/* Pesquisa sozinha, sem cartão à volta: uma linha e nada mais. */
+.procura { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.5rem; }
+.procura .pesquisa { flex: 1 1 24rem; max-width: 32rem; }
 
 /* Tabelas escritas sem classe */
 .tabela-wrap, .tabela-envolve { overflow-x: auto; }
