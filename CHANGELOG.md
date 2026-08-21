@@ -12,6 +12,16 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- **Deixou de ser pedido o código de verificação por email** ao entrar. Passa a
+  bastar o email e a palavra-passe, aqui e nas outras aplicações da suite —
+  a decisão foi tomada com o Davide a 21/08/2026, ciente de que retira a
+  segunda barreira a um servidor exposto à internet.
+
+  O código não foi apagado: ficou atrás de um interruptor (`MFA_ACTIVA` no
+  `.env`), desligado em produção e ligado nos testes. Voltar a exigi-lo é
+  mudar uma linha e limpar a cache de configuração.
+
+### Alterado
 - **Quem escreve apenas o endereço do servidor passa a cair no portal**, onde
   escolhe a aplicação. A Nexus Infra continua exactamente onde estava: só o
   endereço-raiz (`/`) mudou de destino, e é uma linha de configuração no
