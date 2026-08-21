@@ -140,8 +140,16 @@
                                 <ul class="anexos anexos--consulta">
                                     @foreach($p->anexos as $anexo)
                                         <li class="anexo">
-                                            <a class="anexo__ver" href="{{ route('anexo', [$p, $anexo]) }}" target="_blank" rel="noopener"
-                                               title="Abrir «{{ $anexo->rotulo }}» em tamanho real">
+                                            {{-- Imagens abrem aqui mesmo, numa camada por cima da página.
+                                                 Sem JavaScript, o link continua a levar à imagem. --}}
+                                            <a class="anexo__ver" href="{{ route('anexo', [$p, $anexo]) }}"
+                                               @if($anexo->ehImagem())
+                                                   data-ampliar data-legenda="{{ $anexo->rotulo }}"
+                                                   title="Ver «{{ $anexo->rotulo }}» em tamanho real"
+                                               @else
+                                                   target="_blank" rel="noopener"
+                                                   title="Abrir «{{ $anexo->rotulo }}»"
+                                               @endif>
                                                 @if($anexo->ehImagem())
                                                     <img src="{{ route('anexo', [$p, $anexo]) }}" alt="{{ $anexo->rotulo }}" loading="lazy">
                                                 @else

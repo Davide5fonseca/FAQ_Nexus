@@ -189,7 +189,12 @@
         <ul class="anexos">
             @foreach($procedure->anexos as $anexo)
                 <li class="anexo">
-                    <a class="anexo__ver" href="{{ route('anexo', [$procedure, $anexo]) }}" target="_blank" rel="noopener">
+                    <a class="anexo__ver" href="{{ route('anexo', [$procedure, $anexo]) }}"
+                       @if($anexo->ehImagem())
+                           data-ampliar data-legenda="{{ $anexo->rotulo }}"
+                       @else
+                           target="_blank" rel="noopener"
+                       @endif>
                         @if($anexo->ehImagem())
                             <img src="{{ route('anexo', [$procedure, $anexo]) }}" alt="{{ $anexo->rotulo }}" loading="lazy">
                         @else

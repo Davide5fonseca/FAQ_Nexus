@@ -171,6 +171,55 @@
 .anexo .btn { width: 100%; }
 
 /* --------------------------------------------------------------------------
+   Ver uma imagem em grande, sem sair da página
+   -------------------------------------------------------------------------- */
+.ampliada {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1rem; padding: 2rem 1.5rem;
+  background: rgba(2, 5, 3, .88);
+}
+.ampliada[hidden] { display: none; }
+
+.ampliada__imagem {
+  max-width: min(100%, 1400px); max-height: calc(100vh - 10rem);
+  object-fit: contain;
+  border-radius: 6px; background: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+}
+
+.ampliada__legenda {
+  margin: 0; max-width: 60ch; text-align: center;
+  font-size: .875rem; color: rgba(255, 255, 255, .75);
+}
+.ampliada__contagem { display: block; margin-top: .25rem; font-size: .75rem; color: rgba(255, 255, 255, .45); }
+
+/* Botões: fechar em cima, setas nos lados. */
+.ampliada button {
+  position: absolute; display: grid; place-items: center;
+  width: 2.75rem; height: 2.75rem; padding: 0;
+  background: rgba(255, 255, 255, .08); color: #fff;
+  border: 1px solid rgba(255, 255, 255, .18); border-radius: 50%;
+  cursor: pointer; transition: background .15s;
+}
+.ampliada button:hover { background: rgba(255, 255, 255, .18); }
+.ampliada button svg { width: 1.25rem; height: 1.25rem; }
+
+.ampliada__fechar { top: 1.25rem; right: 1.25rem; }
+.ampliada__anterior { left: 1.25rem; top: 50%; transform: translateY(-50%); }
+.ampliada__seguinte { right: 1.25rem; top: 50%; transform: translateY(-50%); }
+.ampliada__anterior[hidden], .ampliada__seguinte[hidden] { display: none; }
+
+/* Com a camada aberta, a página por baixo não faz scroll. */
+body.tem-ampliada { overflow: hidden; }
+
+@media (max-width: 640px) {
+  .ampliada { padding: 1rem .75rem; }
+  .ampliada__anterior { left: .5rem; }
+  .ampliada__seguinte { right: .5rem; }
+}
+
+/* --------------------------------------------------------------------------
    Impressão (A4, um procedimento por página)
    -------------------------------------------------------------------------- */
 @page { size: A4; margin: 15mm 15mm 18mm; }
@@ -181,7 +230,7 @@
   /* Fora do papel: a barra lateral, as barras de topo e tudo o que é ecrã. */
   .no-print, .lateral, .lateral__veu, .topo, .topo-movel,
   .hero, .filtros, .rodape, .skip-link, .alerta, .resumo-lista,
-  .proc__rodape .accoes { display: none !important; }
+  .proc__rodape .accoes, .ampliada { display: none !important; }
 
   /* Sem a barra lateral, o conteúdo ocupa a folha toda. */
   .app, .trabalho { display: block; }

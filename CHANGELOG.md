@@ -12,6 +12,12 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Adicionado
+- As imagens anexas **abrem na própria página**, numa camada por cima, em vez
+  de um separador novo. Fecha-se com Esc, com o botão ou clicando fora, e as
+  setas do teclado percorrem as imagens do mesmo procedimento. Sem JavaScript,
+  o link continua a levar à imagem; com Ctrl-clique abre noutro separador, como
+  qualquer link. Os PDF continuam a abrir em separador, que é onde o leitor de
+  PDF do browser funciona.
 - **Anexos nos procedimentos**: imagens de ecrã, fotografias do equipamento e
   folhas em PDF. Juntam-se no formulário (até 12 por procedimento, 10 MB cada),
   aparecem na consulta em miniatura e **saem no papel** — é meio caminho andado

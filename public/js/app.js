@@ -283,4 +283,104 @@
     if (e.key === 'Escape' && lateral && lateral.classList.contains('aberta')) fecharLateral();
   });
 
+
+  /* ------------------------------------------------------------------
+     Ver uma imagem em grande sem sair da página.
+
+     Os links continuam a apontar para a imagem: sem JavaScript, clicar
+     leva lá na mesma. Aqui apanha-se o clique e mostra-se por cima.
+     ------------------------------------------------------------------ */
+  var ampliaveis = Array.prototype.slice.call(document.querySelectorAll('[data-ampliar]'));
+
+  if (ampliaveis.length) {
+    var camada = document.createElement('div');
+    camada.className = 'ampliada';
+    camada.setAttribute('role', 'dialog');
+    camada.setAttribute('aria-modal', 'true');
+    camada.setAttribute('aria-label', 'Imagem em tamanho real');
+    camada.hidden = true;
+    camada.innerHTML =
+      '<button type="button" class="ampliada__anterior" aria-label="Imagem anterior">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>' +
+      '</button>' +
+      '<img class="ampliada__imagem" alt="">' +
+      '<p class="ampliada__legenda"><span data-legenda></span><span class="ampliada__contagem" data-contagem></span></p>' +
+      '<button type="button" class="ampliada__seguinte" aria-label="Imagem seguinte">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>' +
+      '</button>' +
+      '<button type="button" class="ampliada__fechar" aria-label="Fechar">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18L18 6M6 6l12 12"/></svg>' +
+      '</button>';
+    document.body.appendChild(camada);
+
+    var imagem = camada.querySelector('.ampliada__imagem');
+    var legenda = camada.querySelector('[data-legenda]');
+    var contagem = camada.querySelector('[data-contagem]');
+    var botaoAnterior = camada.querySelector('.ampliada__anterior');
+    var botaoSeguinte = camada.querySelector('.ampliada__seguinte');
+    var actual = 0;
+    var quemAbriu = null;
+
+    // As imagens do mesmo procedimento andam juntas: as setas percorrem-nas.
+    function grupoDe(ligacao) {
+      var caixa = ligacao.closest('.anexos') || document;
+      return Array.prototype.slice.call(caixa.querySelectorAll('[data-ampliar]'));
+    }
+
+    var grupo = [];
+
+    function mostrar(i) {
+      actual = (i + grupo.length) % grupo.length;
+      var ligacao = grupo[actual];
+      imagem.src = ligacao.getAttribute('href');
+      imagem.alt = ligacao.getAttribute('data-legenda') || '';
+      legenda.textContent = ligacao.getAttribute('data-legenda') || '';
+      contagem.textContent = grupo.length > 1 ? (actual + 1) + ' de ' + grupo.length : '';
+      botaoAnterior.hidden = botaoSeguinte.hidden = grupo.length < 2;
+    }
+
+    function abrir(ligacao) {
+      quemAbriu = ligacao;
+      grupo = grupoDe(ligacao);
+      mostrar(grupo.indexOf(ligacao));
+      camada.hidden = false;
+      document.body.classList.add('tem-ampliada');
+      camada.querySelector('.ampliada__fechar').focus();
+    }
+
+    function fechar() {
+      camada.hidden = true;
+      imagem.removeAttribute('src');
+      document.body.classList.remove('tem-ampliada');
+      // O foco volta para onde estava, senão perdia-se no topo da página.
+      if (quemAbriu) { quemAbriu.focus(); quemAbriu = null; }
+    }
+
+    ampliaveis.forEach(function (ligacao) {
+      ligacao.addEventListener('click', function (e) {
+        // Ctrl/cmd-clique e botão do meio continuam a abrir noutro separador,
+        // como em qualquer link — quem quiser isso não fica sem ele.
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+        abrir(ligacao);
+      });
+    });
+
+    camada.querySelector('.ampliada__fechar').addEventListener('click', fechar);
+    botaoAnterior.addEventListener('click', function () { mostrar(actual - 1); });
+    botaoSeguinte.addEventListener('click', function () { mostrar(actual + 1); });
+
+    // Clicar no fundo escuro fecha; clicar na imagem, não.
+    camada.addEventListener('click', function (e) {
+      if (e.target === camada) fechar();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (camada.hidden) return;
+      if (e.key === 'Escape') fechar();
+      else if (e.key === 'ArrowLeft') mostrar(actual - 1);
+      else if (e.key === 'ArrowRight') mostrar(actual + 1);
+    });
+  }
+
 })();
