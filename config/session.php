@@ -228,6 +228,9 @@ return [
     |
     */
 
-    'serialization' => 'json',
+    // 'php' para a sessão ser legível pelas outras aplicações da suite, que
+    // correm numa versão do Laravel anterior ao formato JSON. Quando todas
+    // estiverem actualizadas, passar em conjunto para 'json'.
+    'serialization' => env('SESSION_SERIALIZATION', 'php'),
 
 ];

@@ -39,6 +39,22 @@ serviços externos. As páginas são geradas no servidor; há uma folha de estil
 
 ---
 
+## 0. Faz parte de uma suite
+
+A entrada é feita no **Nexus Portal** (`/portal`), que trata do login (com
+verificação em duas etapas) e decide quem pode abrir cada aplicação. Esta
+aplicação já não tem login próprio.
+
+As pessoas vêm da tabela `utilizadores`, partilhada com a Nexus Infra. O que
+cada uma **faz aqui dentro** — administrador, editor ou leitor, e a área —
+continua a ser decidido aqui, em Administração → Perfis.
+
+Para a sessão ser partilhada, quatro definições do `.env` têm de coincidir com
+as das outras aplicações: `APP_KEY`, `SESSION_COOKIE`, `REDIS_PREFIX` e o
+espaço de sessão (`SESSION_STORE=sessao`, ver `config/cache.php`). O
+`SESSION_SERIALIZATION=php` existe porque as outras correm numa versão do
+Laravel anterior ao formato JSON.
+
 ## 1. Como está organizada a aplicação
 
 | Onde | O que é |

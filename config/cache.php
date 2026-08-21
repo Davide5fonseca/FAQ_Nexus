@@ -78,6 +78,15 @@ return [
             ],
         ],
 
+        // Espaço só para as SESSÕES, com o mesmo prefixo das restantes aplicações
+        // da suite. É isto que faz a sessão iniciada no portal valer aqui. A
+        // cache normal desta aplicação fica no seu próprio espaço.
+        'sessao' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
+            'prefix' => env('SESSION_CACHE_PREFIX', 'nexus-infra-cache-'),
+        ],
+
         'redis' => [
             'driver' => 'redis',
             'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),

@@ -12,6 +12,21 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- **A entrada passa a ser feita no portal.** Esta aplicação deixa de ter login,
+  recuperação de palavra-passe e criação de contas: as pessoas vêm da lista
+  partilhada e só entram se o portal lhes tiver dado acesso a esta aplicação.
+- Os perfis (administrador/editor/leitor) e a área continuam a ser decididos
+  aqui, agora na tabela `perfis`. As propriedades `role` e `area` mantiveram o
+  nome, para os dez pontos que impõem a separação por área não serem tocados.
+- A sessão é partilhada com as restantes aplicações da suite: mesma chave,
+  mesmo cookie, mesmo espaço em Redis e o mesmo formato de gravação.
+
+### Removido
+- Login, "esqueci-me da palavra-passe", convites por email e gestão de contas —
+  tudo isso vive agora no portal. A tabela `users` antiga **não foi apagada**,
+  fica como rede de segurança.
+
+### Alterado
 - O endereço passa a ser **`/knowledgebase-nexus`** em vez de `/procedimentos`,
   para condizer com o nome do projeto. O endereço antigo redirecciona para o novo,
   preservando caminho e parâmetros, para não partir favoritos nem os links dos
