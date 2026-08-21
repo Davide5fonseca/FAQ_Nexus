@@ -12,6 +12,21 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- **Passou a existir uma só entrada em toda a suite: o portal.** A Nexus Infra
+  tinha a sua própria página de entrada; deixou de a mostrar. Quem lá chegar
+  por um endereço antigo — `/login`, `/esqueci-password`, um link de convite
+  no email — é encaminhado para o portal, com o token e o email preservados.
+- Os quatro ecrãs de entrada (entrar, esqueci-me, definir palavra-passe e
+  aceitar convite) vivem agora no portal, **com o aspecto que a Nexus Infra já
+  tinha**: painel escuro com a marca à esquerda, formulário à direita. Foi
+  reescrito no CSS do portal, sem lhe acrescentar Tailwind nem compilação.
+- O portal **não tinha recuperação de palavra-passe nenhuma**. Passou a ter,
+  a par de aceitar convites — sem isso, tirar a entrada da Nexus Infra deixaria
+  quem se esquecesse da palavra-passe sem forma de a repor.
+- Os componentes de autenticação da Nexus Infra **não foram apagados**: as
+  rotas encaminham, o código fica. Voltar atrás é repor um ficheiro.
+
+### Alterado
 - **Deixou de ser pedido o código de verificação por email** ao entrar. Passa a
   bastar o email e a palavra-passe, aqui e nas outras aplicações da suite —
   a decisão foi tomada com o Davide a 21/08/2026, ciente de que retira a
