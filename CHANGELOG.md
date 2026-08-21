@@ -12,6 +12,21 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- **Quem escreve apenas o endereço do servidor passa a cair no portal**, onde
+  escolhe a aplicação. A Nexus Infra continua exactamente onde estava: só o
+  endereço-raiz (`/`) mudou de destino, e é uma linha de configuração no
+  Apache (`raiz-portal.conf`), não uma alteração dentro das aplicações.
+
+  Chegou-se aqui depois de testar: a Nexus Infra foi montada numa sub-pasta
+  temporária e **não funcionou** (404 nas páginas, 405 na raiz). Duas razões,
+  ambas herdadas de como foi construída — o Livewire aponta para `/livewire/...`
+  a contar da raiz, e os endereços dela estão em cache já a contar com a raiz.
+  Mudá-la de sítio implicaria mexer-lhe por dentro, com risco de a deixar em
+  baixo; esta solução dá o mesmo resultado a quem a usa, sem lhe tocar.
+- O cartão da Nexus Infra no portal aponta agora para `/dashboard` e já não
+  para `/`, que passaria a devolver a pessoa ao portal, em ciclo.
+
+### Alterado
 - **A entrada passa a ser feita no portal.** Esta aplicação deixa de ter login,
   recuperação de palavra-passe e criação de contas: as pessoas vêm da lista
   partilhada e só entram se o portal lhes tiver dado acesso a esta aplicação.
