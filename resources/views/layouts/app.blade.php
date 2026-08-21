@@ -68,12 +68,6 @@
                         <span>Perfis</span>
                     </a>
                 @endcan
-
-                <p class="lateral__grupo">Suite</p>
-                <a class="nav-item" href="{{ config('app.portal_url') }}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-                    <span>Todos os módulos</span>
-                </a>
             @endauth
         </nav>
 
@@ -91,12 +85,12 @@
                     <span class="lateral__nome">{{ $pessoa->name }}</span>
                     <span class="lateral__papel">{{ $pessoa->area_label ?? $pessoa->role_label }}</span>
                 </span>
-                <form method="post" action="{{ config('app.portal_url') }}/sair">
-                    @csrf
-                    <button type="submit" class="lateral__sair" title="Sair" aria-label="Sair">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    </button>
-                </form>
+                {{-- Sair daqui é voltar à escolha de módulos, não terminar a sessão.
+                     A sessão termina no portal, que é onde ela começa. --}}
+                <a href="{{ rtrim(config('app.portal_url'), '/') }}/" class="lateral__sair"
+                   title="Voltar aos módulos" aria-label="Voltar aos módulos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 16l-4-4m0 0l4-4m-4 4h14M9 4H7a3 3 0 00-3 3v10a3 3 0 003 3h2"/></svg>
+                </a>
             </div>
         @endauth
     </aside>

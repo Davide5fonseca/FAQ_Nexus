@@ -12,6 +12,14 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- **O botão de sair desta aplicação deixou de terminar a sessão**: passa a
+  devolver à escolha de módulos, no portal, com a sessão intacta. Numa suite
+  onde se entra uma só vez, sair de um módulo é voltar ao início, não ir para
+  a rua. Quem quiser mesmo terminar a sessão fá-lo no portal.
+- Saiu da barra lateral o item "Todos os módulos", que passou a ser o que o
+  botão em baixo faz.
+
+### Alterado
 - **A Knowledgebase passou a ter o aspecto da Nexus Infra**, para as três
   aplicações parecerem uma só. A barra que estava no topo deu lugar à barra
   lateral escura com a marca, a navegação, o botão "Novo procedimento" e o

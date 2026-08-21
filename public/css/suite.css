@@ -219,11 +219,14 @@ img { max-width: 100%; height: auto; }
   font-size: .75rem; color: rgba(255,255,255,.45);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+/* Serve de botão (terminar sessão, no portal) e de link (voltar aos
+   módulos, dentro de cada módulo) — daí o text-decoration. */
 .lateral__sair {
   display: grid; place-items: center;
   width: 2rem; height: 2rem; padding: 0;
   background: none; border: 0; border-radius: var(--raio);
   color: rgba(255,255,255,.45); cursor: pointer;
+  text-decoration: none;
   transition: background .15s, color .15s;
 }
 .lateral__sair:hover { background: rgba(255,255,255,.05); color: #fff; }
