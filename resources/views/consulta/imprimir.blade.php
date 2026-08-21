@@ -2,6 +2,12 @@
 @section('title', 'Imprimir')
 @section('body-attrs', request()->query('auto') === '1' ? 'data-auto-imprimir="1"' : '')
 
+@section('caminho')
+    <a href="{{ route('consulta') }}">Consulta</a>
+    <span class="topo__sep">/</span>
+    <span class="actual">Imprimir</span>
+@endsection
+
 @section('content')
 <div class="imp-barra no-print">
     <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('consulta') }}" class="btn btn--secundario">← Voltar</a>

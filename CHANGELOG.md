@@ -12,6 +12,23 @@ Como usar: sempre que se altere a aplicação, acrescentar uma linha em
 ## [Por lançar]
 
 ### Alterado
+- **A Knowledgebase passou a ter o aspecto da Nexus Infra**, para as três
+  aplicações parecerem uma só. A barra que estava no topo deu lugar à barra
+  lateral escura com a marca, a navegação, o botão "Novo procedimento" e o
+  bloco da pessoa; por cima do conteúdo passou a haver a barra com o caminho
+  (Início / Knowledgebase / …) e as acções da página.
+- Nasceu o **`suite.css`**, um sistema de desenho partilhado e igual nas
+  aplicações: as cores e medidas do `tailwind.config.js` da Nexus Infra,
+  escritas à mão, sem Tailwind nem compilação. Ao mudar algo lá, muda nas três.
+- As páginas **não foram reescritas**. O vocabulário que já usavam (`.btn`,
+  `.cabecalho-pagina`, `.filtros`, …) passou a apontar para o desenho novo —
+  é por isso que a mudança é grande e o risco pequeno. O `app.css` daqui
+  encolheu de 572 para 214 linhas: ficou só o que é mesmo desta aplicação,
+  a consulta, as listas editáveis e a impressão em A4.
+- A impressão foi acertada à estrutura nova: a barra lateral e as barras de
+  topo saem da folha, e o conteúdo volta a ocupar o A4 todo.
+
+### Alterado
 - **Passou a existir uma só entrada em toda a suite: o portal.** A Nexus Infra
   tinha a sua própria página de entrada; deixou de a mostrar. Quem lá chegar
   por um endereço antigo — `/login`, `/esqueci-password`, um link de convite

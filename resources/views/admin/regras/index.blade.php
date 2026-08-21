@@ -1,6 +1,10 @@
 @extends('layouts.app')
 @section('title', 'Administração · Regras de segurança')
 
+@section('caminho')
+    <span class="actual">Regras de segurança</span>
+@endsection
+
 @section('content')
 <div class="cabecalho-pagina">
     <h1>Regras de segurança</h1>

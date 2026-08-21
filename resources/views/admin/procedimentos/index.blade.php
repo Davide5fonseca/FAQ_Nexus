@@ -1,15 +1,21 @@
 @extends('layouts.app')
 @section('title', 'Administração · Procedimentos')
 
+@section('caminho')
+    <span class="actual">Procedimentos</span>
+@endsection
+
+@section('accoes')
+    <a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Novo procedimento
+    </a>
+@endsection
+
 @section('hero')
-<div class="hero hero--compacto">
-    <div class="hero__inner hero__topo">
-        <h1>Procedimentos</h1>
-        <a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-            Novo procedimento
-        </a>
-    </div>
+<div class="hero">
+    <h1>Procedimentos</h1>
+    <p>Criar, editar e arquivar os procedimentos da Knowledgebase.</p>
 </div>
 @endsection
 

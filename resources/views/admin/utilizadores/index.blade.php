@@ -1,6 +1,10 @@
 @extends('layouts.app')
 @section('title', 'Perfis')
 
+@section('caminho')
+    <span class="actual">Perfis</span>
+@endsection
+
 @section('content')
 <div class="cabecalho-pagina">
     <h1>Perfis</h1>

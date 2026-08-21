@@ -1,6 +1,10 @@
 @extends('layouts.app')
 @section('title', 'Administração · Categorias')
 
+@section('caminho')
+    <span class="actual">Categorias</span>
+@endsection
+
 @section('content')
 <div class="cabecalho-pagina">
     <h1>Categorias</h1>

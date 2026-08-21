@@ -249,4 +249,38 @@
   if (document.body.dataset.autoImprimir === '1') {
     window.addEventListener('load', function () { setTimeout(function () { window.print(); }, 200); });
   }
+
+  /* ------------------------------------------------------------------
+     Barra lateral no telemóvel: abrir, fechar e devolver o foco.
+     Em ecrãs largos a barra está sempre visível e isto não faz nada.
+     ------------------------------------------------------------------ */
+  var lateral = document.querySelector('[data-lateral]');
+  var veu = document.querySelector('.lateral__veu');
+
+  function abrirLateral() {
+    if (!lateral) return;
+    lateral.classList.add('aberta');
+    if (veu) veu.hidden = false;
+    var primeiro = lateral.querySelector('a, button');
+    if (primeiro) primeiro.focus();
+  }
+
+  function fecharLateral() {
+    if (!lateral) return;
+    lateral.classList.remove('aberta');
+    if (veu) veu.hidden = true;
+    var abrir = document.querySelector('[data-abrir-lateral]');
+    if (abrir) abrir.focus();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-abrir-lateral]'), function (b) {
+    b.addEventListener('click', abrirLateral);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-fechar-lateral]'), function (b) {
+    b.addEventListener('click', fecharLateral);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && lateral && lateral.classList.contains('aberta')) fecharLateral();
+  });
+
 })();

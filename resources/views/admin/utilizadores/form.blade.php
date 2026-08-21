@@ -1,5 +1,11 @@
 @extends('layouts.app')
 @section('title', 'Perfil de '.$utilizador->name)
+
+@section('caminho')
+    <a href="{{ route('admin.utilizadores.index') }}">Perfis</a>
+    <span class="topo__sep">/</span>
+    <span class="actual">{{ $utilizador->name }}</span>
+@endsection
 @section('conteudo-class', 'conteudo--estreito')
 
 @section('content')

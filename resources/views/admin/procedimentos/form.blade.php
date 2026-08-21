@@ -2,6 +2,12 @@
 @php $editing = $procedure->exists; @endphp
 @section('title', $editing ? 'Editar '.$procedure->reference : 'Novo procedimento')
 
+@section('caminho')
+    <a href="{{ route('admin.procedimentos.index') }}">Procedimentos</a>
+    <span class="topo__sep">/</span>
+    <span class="actual">{{ $editing ? $procedure->reference : 'Novo' }}</span>
+@endsection
+
 @section('content')
 <div class="cabecalho-pagina">
     <h1>
