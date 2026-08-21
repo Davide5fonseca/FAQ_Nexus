@@ -18,9 +18,6 @@
 <body class="@yield('body-class')" @yield('body-attrs')>
 <a class="skip-link" href="#conteudo">Saltar para o conteúdo</a>
 
-@php $paginaAutenticacao = request()->routeIs('login', 'password.*'); @endphp
-
-@unless($paginaAutenticacao)
 <header class="barra no-print">
     <div class="barra__inner">
         <a class="barra__marca" href="{{ route('consulta') }}">
@@ -30,23 +27,21 @@
             </span>
         </a>
         <nav class="barra__nav" aria-label="Navegação principal">
+            <a href="{{ config('app.portal_url') }}">← Aplicações</a>
             <a href="{{ route('consulta') }}" @if(request()->routeIs('consulta')) aria-current="page" @endif>Consulta</a>
             @auth
                 @can('editar')
                     <a href="{{ route('admin.procedimentos.index') }}" @if(request()->is('admin*')) aria-current="page" @endif>Administração</a>
                 @endcan
                 <span class="barra__user">{{ auth()->user()->name }}@if(auth()->user()->area_label) · {{ auth()->user()->area_label }}@endif</span>
-                <form method="post" action="{{ route('logout') }}" class="inline">
+                <form method="post" action="{{ config('app.portal_url') }}/sair" class="inline">
                     @csrf
                     <button type="submit">Sair</button>
                 </form>
-            @else
-                <a href="{{ route('login') }}" @if(request()->routeIs('login')) aria-current="page" @endif>Entrar</a>
             @endauth
         </nav>
     </div>
 </header>
-@endunless
 
 @auth
     @if(request()->is('admin*'))
@@ -92,11 +87,9 @@
     </div>
 </main>
 
-@unless($paginaAutenticacao)
 <footer class="rodape no-print">
     Nexus Solutions · Uso interno
 </footer>
-@endunless
 
 <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}" defer></script>
 </body>

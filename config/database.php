@@ -30,6 +30,11 @@ return [
     |
     */
 
+    // Qual a ligação onde vivem as tabelas da suite (utilizadores, acessos).
+    // Em produção é a ligação 'nexus'; em testes é a mesma do resto, para tudo
+    // correr numa só ligação e as transacções dos testes cobrirem tudo.
+    'suite' => env('SUITE_CONNECTION', 'nexus'),
+
     'connections' => [
 
         'sqlite' => [
@@ -82,6 +87,23 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+        ],
+
+        // Ligação de leitura à base da suite (Nexus Infra/Portal): é de lá que
+        // vêm as pessoas (`utilizadores`) e quem tem acesso a esta aplicação
+        // (`acessos`). Os perfis desta aplicação ficam na base própria.
+        'nexus' => [
+            // Em testes aponta para a mesma base do resto (ver phpunit.xml).
+            'driver' => env('NEXUS_DB_DRIVER', 'pgsql'),
+            'host' => env('NEXUS_DB_HOST', env('DB_HOST', '127.0.0.1')),
+            'port' => env('NEXUS_DB_PORT', env('DB_PORT', '5432')),
+            'database' => env('NEXUS_DB_DATABASE', 'nexus_ops'),
+            'username' => env('NEXUS_DB_USERNAME', env('DB_USERNAME')),
+            'password' => env('NEXUS_DB_PASSWORD', env('DB_PASSWORD')),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'search_path' => 'public',
+            'sslmode' => 'prefer',
         ],
 
         'pgsql' => [

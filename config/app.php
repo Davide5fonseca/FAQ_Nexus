@@ -15,6 +15,13 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    // Nome curto com que esta aplicação se identifica no portal, ao perguntar
+    // se a pessoa tem acesso. Tem de bater certo com a chave lá registada.
+    'chave' => env('APP_CHAVE', 'knowledgebase'),
+
+    // Para onde se manda quem não tem acesso, e onde se faz o login.
+    'portal_url' => env('PORTAL_URL', 'https://infra.nexus-solutions.pt:9443/portal'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

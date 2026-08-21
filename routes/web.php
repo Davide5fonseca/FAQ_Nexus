@@ -4,39 +4,23 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProcedureController as AdminProcedureController;
 use App\Http\Controllers\Admin\SafetyRuleController;
 use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProcedureController;
 use Illuminate\Support\Facades\Route;
 
-// ---------- Consulta (requer sessão: toda a aplicação é interna) ----------
-Route::middleware('auth')->group(function () {
+// A entrada é feita no portal, que é quem trata do login e da verificação em
+// duas etapas. Aqui só se recebe quem já vem autenticado e com acesso a esta
+// aplicação (ver o middleware ExigeAcessoAplicacao, no grupo de baixo).
+Route::get('/entrar', fn () => redirect()->away(config('app.portal_url')))->name('login');
+
+// ---------- Consulta ----------
+Route::middleware(['auth', 'acesso'])->group(function () {
     Route::get('/', [ProcedureController::class, 'index'])->name('consulta');
     Route::get('/imprimir', [ProcedureController::class, 'printAll'])->name('imprimir');
     Route::get('/procedimentos/{procedure}/imprimir', [ProcedureController::class, 'printOne'])->name('imprimir.um');
 });
 
-// ---------- Autenticação ----------
-Route::middleware('guest')->group(function () {
-    Route::get('/admin/entrar', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/admin/entrar', [AuthController::class, 'login'])
-        ->middleware('throttle:login')
-        ->name('login.submit');
-
-    // Recuperação / definição de palavra-passe (também usada pelo email de convite)
-    Route::get('/admin/recuperar', [PasswordResetController::class, 'pedirForm'])->name('password.request');
-    Route::post('/admin/recuperar', [PasswordResetController::class, 'enviar'])
-        ->middleware('throttle:6,1')
-        ->name('password.email');
-    Route::get('/admin/repor/{token}', [PasswordResetController::class, 'reporForm'])->name('password.reset');
-    Route::post('/admin/repor', [PasswordResetController::class, 'repor'])
-        ->middleware('throttle:6,1')
-        ->name('password.update');
-});
-Route::post('/admin/sair', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
-
-// ---------- Administração (requer sessão e permissão de edição) ----------
-Route::middleware(['auth', 'can:editar'])->prefix('admin')->name('admin.')->group(function () {
+// ---------- Administração (requer permissão de edição) ----------
+Route::middleware(['auth', 'acesso', 'can:editar'])->prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/procedimentos');
 
     // Procedimentos
@@ -50,14 +34,10 @@ Route::middleware(['auth', 'can:editar'])->prefix('admin')->name('admin.')->grou
     // ---- Só administradores a partir daqui ----
     Route::middleware('can:admin')->group(function () {
 
-    // Utilizadores
+    // Perfis de quem tem acesso a esta aplicação
     Route::get('utilizadores', [UserController::class, 'index'])->name('utilizadores.index');
-    Route::get('utilizadores/novo', [UserController::class, 'create'])->name('utilizadores.create');
-    Route::post('utilizadores', [UserController::class, 'store'])->name('utilizadores.store');
-    Route::get('utilizadores/{user}/editar', [UserController::class, 'edit'])->name('utilizadores.edit');
-    Route::put('utilizadores/{user}', [UserController::class, 'update'])->name('utilizadores.update');
-    Route::delete('utilizadores/{user}', [UserController::class, 'destroy'])->name('utilizadores.destroy');
-    Route::post('utilizadores/{user}/convite', [UserController::class, 'convite'])->name('utilizadores.convite');
+    Route::get('utilizadores/{utilizador}/editar', [UserController::class, 'edit'])->name('utilizadores.edit');
+    Route::put('utilizadores/{utilizador}', [UserController::class, 'update'])->name('utilizadores.update');
 
     // Categorias
     Route::get('categorias', [CategoryController::class, 'index'])->name('categorias.index');

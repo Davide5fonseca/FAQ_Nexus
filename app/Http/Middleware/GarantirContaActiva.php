@@ -20,13 +20,12 @@ class GarantirContaActiva
     {
         $utilizador = $request->user();
 
-        if ($utilizador && ! $utilizador->active) {
+        if ($utilizador && ! $utilizador->active) {  // `active` lê a coluna `ativo`
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')
-                ->withErrors(['email' => 'A sua conta foi desactivada. Contacte um administrador.']);
+            return redirect()->away(config('app.portal_url'));
         }
 
         return $next($request);

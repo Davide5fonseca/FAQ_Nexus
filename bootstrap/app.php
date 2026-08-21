@@ -12,13 +12,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'acesso' => \App\Http\Middleware\ExigeAcessoAplicacao::class,
+        ]);
+
         // Quem ficar com a conta desactivada é posto fora no pedido seguinte,
         // mesmo que tenha entrado pelo "manter sessão iniciada".
         $middleware->web(append: [\App\Http\Middleware\GarantirContaActiva::class]);
 
-        // Quem não tem sessão é enviado para a página de entrada.
-        $middleware->redirectGuestsTo(fn () => route('login'));
-        // Quem já tem sessão não precisa de ver a página de entrada.
+        // Sem sessão, vai-se ao portal fazer o login.
+        $middleware->redirectGuestsTo(fn () => config('app.portal_url'));
         $middleware->redirectUsersTo(fn () => route('consulta'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {

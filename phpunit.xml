@@ -24,6 +24,9 @@
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="sqlite"/>
+        <!-- Em testes a base da suite é a mesma do resto: uma só ligação, para
+             as transacções dos testes cobrirem tudo e não haver bloqueios. -->
+        <env name="SUITE_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
