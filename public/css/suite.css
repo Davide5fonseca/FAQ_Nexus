@@ -443,11 +443,17 @@ legend { padding: 0; }
 
 /* --- Cartões --- */
 .cartao {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
   background: var(--superficie);
   border: 1px solid var(--borda); border-radius: var(--raio-g);
   box-shadow: var(--sombra-cartao);
 }
-.cartao + .cartao { margin-top: 1.5rem; }
+.cartao > :last-child { margin-bottom: 0; }
+
+/* Quando o cartão tem cabeçalho próprio, o espaçamento vive nas partes de
+   dentro (é assim que a Nexus Infra os faz) e o de fora sai da frente. */
+.cartao:has(> .cartao__cabecalho) { padding: 0; }
 
 .cartao__cabecalho {
   display: flex; align-items: center; gap: .75rem;

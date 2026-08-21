@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @php $editing = $procedure->exists; @endphp
 @section('title', $editing ? 'Editar '.$procedure->reference : 'Novo procedimento')
+@section('largura', 'largura--media')
 
 @section('caminho')
     <a href="{{ route('admin.procedimentos.index') }}">Procedimentos</a>
@@ -53,18 +54,15 @@
     </div>
 
     <div class="campo">
-        <div>
-            <label for="category_id">Categoria</label>
-            <select id="category_id" name="category_id" required @error('category_id') aria-invalid="true" aria-describedby="category-erro" @enderror>
-                <option value="">— Escolher —</option>
-                @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}" @selected((int) old('category_id', $procedure->category_id) === $cat->id)>{{ $cat->name }}</option>
-                @endforeach
-            </select>
-            @error('category_id')<p class="erro" id="category-erro">{{ $message }}</p>@enderror
-            @can('admin')<p class="ajuda"><a href="{{ route('admin.categorias.index') }}">Gerir categorias</a></p>@endcan
-        </div>
-
+        <label for="category_id">Categoria</label>
+        <select id="category_id" name="category_id" required @error('category_id') aria-invalid="true" aria-describedby="category-erro" @enderror>
+            <option value="">— Escolher —</option>
+            @foreach($categories as $cat)
+                <option value="{{ $cat->id }}" @selected((int) old('category_id', $procedure->category_id) === $cat->id)>{{ $cat->name }}</option>
+            @endforeach
+        </select>
+        @error('category_id')<p class="erro" id="category-erro">{{ $message }}</p>@enderror
+        @can('admin')<p class="ajuda"><a href="{{ route('admin.categorias.index') }}">Gerir categorias</a></p>@endcan
     </div>
 
     @can('admin')

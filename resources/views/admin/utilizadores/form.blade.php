@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Perfil de '.$utilizador->name)
+@section('largura', 'largura--media')
 
 @section('caminho')
     <a href="{{ route('admin.utilizadores.index') }}">Perfis</a>
