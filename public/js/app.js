@@ -315,7 +315,7 @@
 
     var imagem = camada.querySelector('.ampliada__imagem');
     var legenda = camada.querySelector('[data-legenda]');
-    var contagem = camada.querySelector('[data-contagem]');
+    var contadorImagens = camada.querySelector('[data-contagem]');
     var botaoAnterior = camada.querySelector('.ampliada__anterior');
     var botaoSeguinte = camada.querySelector('.ampliada__seguinte');
     var actual = 0;
@@ -335,7 +335,7 @@
       imagem.src = ligacao.getAttribute('href');
       imagem.alt = ligacao.getAttribute('data-legenda') || '';
       legenda.textContent = ligacao.getAttribute('data-legenda') || '';
-      contagem.textContent = grupo.length > 1 ? (actual + 1) + ' de ' + grupo.length : '';
+      contadorImagens.textContent = grupo.length > 1 ? (actual + 1) + ' de ' + grupo.length : '';
       botaoAnterior.hidden = botaoSeguinte.hidden = grupo.length < 2;
     }
 
@@ -386,14 +386,14 @@
 
   /* ------------------------------------------------------------------
      Zona de largar ficheiros: arrastar para cima, e ver o que se escolheu
-     antes de guardar. Sem JavaScript, o campo do browser continua lá e
+     antes de guardar. Sem JavaScript, o campoFicheiros do browser continua lá e
      funciona — isto só melhora o que se vê.
      ------------------------------------------------------------------ */
   var zona = document.querySelector('[data-largar]');
 
   if (zona) {
-    var campo = zona.querySelector('input[type="file"]');
-    var lista = zona.querySelector('[data-largar-lista]');
+    var campoFicheiros = zona.querySelector('input[type="file"]');
+    var listaFicheiros = zona.querySelector('[data-largar-lista]');
     var MAXIMO_MB = 10;
 
     function legivel(bytes) {
@@ -404,11 +404,11 @@
     }
 
     function mostrarEscolhidos() {
-      var ficheiros = campo.files;
-      lista.innerHTML = '';
+      var ficheiros = campoFicheiros.files;
+      listaFicheiros.innerHTML = '';
 
       if (!ficheiros || !ficheiros.length) {
-        lista.hidden = true;
+        listaFicheiros.hidden = true;
         return;
       }
 
@@ -427,13 +427,13 @@
         li.querySelector('.tamanho').textContent = grande
           ? legivel(f.size) + ' — grande de mais'
           : legivel(f.size);
-        lista.appendChild(li);
+        listaFicheiros.appendChild(li);
       }
 
-      lista.hidden = false;
+      listaFicheiros.hidden = false;
     }
 
-    campo.addEventListener('change', mostrarEscolhidos);
+    campoFicheiros.addEventListener('change', mostrarEscolhidos);
 
     ['dragenter', 'dragover'].forEach(function (evento) {
       zona.addEventListener(evento, function (e) {
@@ -454,7 +454,7 @@
 
     zona.addEventListener('drop', function (e) {
       if (!e.dataTransfer || !e.dataTransfer.files.length) return;
-      campo.files = e.dataTransfer.files;
+      campoFicheiros.files = e.dataTransfer.files;
       mostrarEscolhidos();
     });
 

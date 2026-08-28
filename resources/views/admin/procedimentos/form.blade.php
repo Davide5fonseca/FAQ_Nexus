@@ -22,6 +22,16 @@
         <a class="btn btn--secundario" href="{{ route('admin.procedimentos.index') }}">← Voltar à lista</a>
         @if($editing)
             <a class="btn btn--secundario" href="{{ route('consulta') }}#proc-{{ $procedure->reference_number }}">Ver na consulta</a>
+            @can('admin')
+                {{-- Vivia num cartão "Outras acções" no fundo da página, que para
+                     quem não é administrador ficava vazio. Aqui está à vista e
+                     junto das outras acções da página. --}}
+                <form method="post" action="{{ route('admin.procedimentos.destroy', $procedure) }}" class="inline"
+                      data-confirm="Eliminar «{{ $procedure->reference }} — {{ $procedure->title }}»? Esta acção não pode ser anulada.">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="btn btn--perigo">Eliminar</button>
+                </form>
+            @endcan
         @endif
     </div>
 </div>
@@ -240,18 +250,4 @@
     </div>
 @endif
 
-@if($editing)
-    <div class="cartao">
-        <h2>Outras acções</h2>
-        <div class="accoes-form" style="border:0;padding:0;margin:0">
-            @can('admin')
-            <form method="post" action="{{ route('admin.procedimentos.destroy', $procedure) }}"
-                  data-confirm="Eliminar «{{ $procedure->reference }} — {{ $procedure->title }}»? Esta acção não pode ser anulada.">
-                @csrf @method('DELETE')
-                <button type="submit" class="btn btn--perigo">Eliminar</button>
-            </form>
-            @endcan
-        </div>
-    </div>
-@endif
 @endsection
