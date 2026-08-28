@@ -151,17 +151,38 @@
 
     <div class="campo">
         <label for="anexos">Anexos</label>
-        <p class="ajuda" style="margin:0 0 .5rem">
-            Imagens de ecrã, fotografias do equipamento ou folhas em PDF.
-            Aceita JPG, PNG, GIF, WEBP e PDF, até 10 MB cada.
-            @if($jaTem)
-                Este procedimento já tem {{ $jaTem }} {{ $jaTem === 1 ? 'anexo' : 'anexos' }};
-                cabem mais {{ \App\Models\Anexo::MAXIMO_POR_PROCEDIMENTO - $jaTem }}.
-            @endif
-        </p>
-        <input type="file" id="anexos" name="anexos[]" multiple
-               accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,image/*,application/pdf"
-               @error('anexos') aria-invalid="true" @enderror>
+
+        {{-- O campo de ficheiros do browser é feio e diz pouco. Fica escondido
+             mas inteiro (continua a receber foco e a ser lido em voz alta); o
+             que se vê é esta zona, que também aceita ficheiros largados em cima. --}}
+        <div class="largar" data-largar>
+            <input type="file" id="anexos" name="anexos[]" multiple class="visually-hidden"
+                   accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,image/*,application/pdf"
+                   @error('anexos') aria-invalid="true" @enderror>
+
+            <label for="anexos" class="largar__area">
+                <span class="largar__icone" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L8 8m4-4 4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+                </span>
+                <span class="largar__texto">
+                    <strong>Arraste os ficheiros para aqui</strong>
+                    <span>ou clique para os escolher no computador</span>
+                </span>
+            </label>
+
+            <p class="largar__regras">
+                Imagens de ecrã, fotografias do equipamento ou folhas em PDF —
+                JPG, PNG, GIF, WEBP e PDF, até 10 MB cada.
+                @if($jaTem)
+                    Já tem {{ $jaTem }} {{ $jaTem === 1 ? 'anexo' : 'anexos' }};
+                    cabem mais {{ \App\Models\Anexo::MAXIMO_POR_PROCEDIMENTO - $jaTem }}.
+                @endif
+            </p>
+
+            {{-- Preenchido pelo JavaScript com o que a pessoa escolheu. --}}
+            <ul class="largar__lista" data-largar-lista hidden></ul>
+        </div>
+
         @error('anexos')<p class="erro">{{ $message }}</p>@enderror
         @foreach($errors->get('anexos.*') as $mensagens)
             @foreach($mensagens as $mensagem)<p class="erro">{{ $mensagem }}</p>@endforeach

@@ -383,4 +383,83 @@
     });
   }
 
+
+  /* ------------------------------------------------------------------
+     Zona de largar ficheiros: arrastar para cima, e ver o que se escolheu
+     antes de guardar. Sem JavaScript, o campo do browser continua lá e
+     funciona — isto só melhora o que se vê.
+     ------------------------------------------------------------------ */
+  var zona = document.querySelector('[data-largar]');
+
+  if (zona) {
+    var campo = zona.querySelector('input[type="file"]');
+    var lista = zona.querySelector('[data-largar-lista]');
+    var MAXIMO_MB = 10;
+
+    function legivel(bytes) {
+      var kb = bytes / 1024;
+      return kb < 1024
+        ? Math.round(kb) + ' KB'
+        : (Math.round(kb / 1024 * 10) / 10).toString().replace('.', ',') + ' MB';
+    }
+
+    function mostrarEscolhidos() {
+      var ficheiros = campo.files;
+      lista.innerHTML = '';
+
+      if (!ficheiros || !ficheiros.length) {
+        lista.hidden = true;
+        return;
+      }
+
+      for (var i = 0; i < ficheiros.length; i++) {
+        var f = ficheiros[i];
+        var grande = f.size > MAXIMO_MB * 1024 * 1024;
+
+        var li = document.createElement('li');
+        li.innerHTML =
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>' +
+          '<span class="nome"></span>' +
+          '<span class="tamanho' + (grande ? ' grande' : '') + '"></span>';
+        li.querySelector('.nome').textContent = f.name;
+        // Avisa já, em vez de deixar o servidor recusar depois de esperar
+        // pelo carregamento.
+        li.querySelector('.tamanho').textContent = grande
+          ? legivel(f.size) + ' — grande de mais'
+          : legivel(f.size);
+        lista.appendChild(li);
+      }
+
+      lista.hidden = false;
+    }
+
+    campo.addEventListener('change', mostrarEscolhidos);
+
+    ['dragenter', 'dragover'].forEach(function (evento) {
+      zona.addEventListener(evento, function (e) {
+        e.preventDefault();
+        zona.classList.add('por-cima');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(function (evento) {
+      zona.addEventListener(evento, function (e) {
+        e.preventDefault();
+        // O dragleave também dispara ao passar por cima dos filhos: só se
+        // apaga o destaque quando o rato sai mesmo da zona.
+        if (evento === 'dragleave' && zona.contains(e.relatedTarget)) return;
+        zona.classList.remove('por-cima');
+      });
+    });
+
+    zona.addEventListener('drop', function (e) {
+      if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+      campo.files = e.dataTransfer.files;
+      mostrarEscolhidos();
+    });
+
+    // A página pode voltar com ficheiros já escolhidos (ex.: botão "Voltar").
+    mostrarEscolhidos();
+  }
+
 })();
