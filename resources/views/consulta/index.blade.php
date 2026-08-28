@@ -22,7 +22,7 @@
             </div>
             <h2>Ainda não há procedimentos.</h2>
             @can('editar')
-                <div class="accoes"><a class="btn btn--primario" href="{{ route('admin.procedimentos.create') }}">Criar o primeiro</a></div>
+                <div class="accoes"><a class="btn btn--primario" href="{{ route('gerir.procedimentos.create') }}">Criar o primeiro</a></div>
             @endcan
         </div>
     @else
@@ -184,7 +184,7 @@
                         <span class="accoes no-print">
                             <a class="btn btn--secundario btn--pequeno" href="{{ route('imprimir.um', $p) }}">Imprimir</a>
                             @can('editar')
-                                <a class="btn btn--secundario btn--pequeno" href="{{ route('admin.procedimentos.edit', $p) }}">Editar</a>
+                                <a class="btn btn--secundario btn--pequeno" href="{{ route('gerir.procedimentos.edit', $p) }}">Editar</a>
                             @endcan
                         </span>
                     </div>

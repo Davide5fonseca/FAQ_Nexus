@@ -4,7 +4,7 @@
 @section('largura', 'largura--media')
 
 @section('caminho')
-    <a href="{{ route('admin.procedimentos.index') }}">Procedimentos</a>
+    <a href="{{ route('gerir.procedimentos.index') }}">Procedimentos</a>
     <span class="topo__sep">/</span>
     <span class="actual">{{ $editing ? $procedure->reference : 'Novo' }}</span>
 @endsection
@@ -19,14 +19,14 @@
         @endif
     </h1>
     <div class="accoes">
-        <a class="btn btn--secundario" href="{{ route('admin.procedimentos.index') }}">← Voltar à lista</a>
+        <a class="btn btn--secundario" href="{{ route('gerir.procedimentos.index') }}">← Voltar à lista</a>
         @if($editing)
             <a class="btn btn--secundario" href="{{ route('consulta') }}#proc-{{ $procedure->reference_number }}">Ver na consulta</a>
             @can('admin')
                 {{-- Vivia num cartão "Outras acções" no fundo da página, que para
                      quem não é administrador ficava vazio. Aqui está à vista e
                      junto das outras acções da página. --}}
-                <form method="post" action="{{ route('admin.procedimentos.destroy', $procedure) }}" class="inline"
+                <form method="post" action="{{ route('gerir.procedimentos.destroy', $procedure) }}" class="inline"
                       data-confirm="Eliminar «{{ $procedure->reference }} — {{ $procedure->title }}»? Esta acção não pode ser anulada.">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn btn--perigo">Eliminar</button>
@@ -39,11 +39,11 @@
 @if($categories->isEmpty())
     <div class="alerta alerta--aviso" role="alert">
         <span aria-hidden="true">!</span>
-        <div>Ainda não existem categorias. @can('admin')<a href="{{ route('admin.categorias.index') }}">Crie pelo menos uma categoria</a> antes de guardar o procedimento.@else Peça a um administrador para criar categorias antes de guardar o procedimento.@endcan</div>
+        <div>Ainda não existem categorias. @can('admin')<a href="{{ route('gerir.categorias.index') }}">Crie pelo menos uma categoria</a> antes de guardar o procedimento.@else Peça a um administrador para criar categorias antes de guardar o procedimento.@endcan</div>
     </div>
 @endif
 
-<form method="post" action="{{ $editing ? route('admin.procedimentos.update', $procedure) : route('admin.procedimentos.store') }}" class="cartao" enctype="multipart/form-data" novalidate>
+<form method="post" action="{{ $editing ? route('gerir.procedimentos.update', $procedure) : route('gerir.procedimentos.store') }}" class="cartao" enctype="multipart/form-data" novalidate>
     @csrf
     @if($editing) @method('PUT') @endif
 
@@ -72,7 +72,7 @@
             @endforeach
         </select>
         @error('category_id')<p class="erro" id="category-erro">{{ $message }}</p>@enderror
-        @can('admin')<p class="ajuda"><a href="{{ route('admin.categorias.index') }}">Gerir categorias</a></p>@endcan
+        @can('admin')<p class="ajuda"><a href="{{ route('gerir.categorias.index') }}">Gerir categorias</a></p>@endcan
     </div>
 
     @can('admin')
@@ -208,7 +208,7 @@
 
     <div class="accoes-form">
         <button type="submit" class="btn btn--primario">{{ $editing ? 'Guardar alterações' : 'Criar procedimento' }}</button>
-        <a class="btn btn--secundario" href="{{ route('admin.procedimentos.index') }}">Cancelar</a>
+        <a class="btn btn--secundario" href="{{ route('gerir.procedimentos.index') }}">Cancelar</a>
     </div>
 </form>
 
@@ -239,7 +239,7 @@
                         <span class="anexo__nome">{{ $anexo->rotulo }}</span>
                         <span class="anexo__meta">{{ $anexo->tamanho_legivel }}</span>
                     </div>
-                    <form method="post" action="{{ route('admin.procedimentos.anexos.destroy', [$procedure, $anexo]) }}"
+                    <form method="post" action="{{ route('gerir.procedimentos.anexos.destroy', [$procedure, $anexo]) }}"
                           data-confirm="Remover o anexo «{{ $anexo->rotulo }}»? Não pode ser anulado.">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn btn--perigo btn--pequeno">Remover</button>

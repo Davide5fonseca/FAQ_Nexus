@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Gerir;
 
 use App\Http\Controllers\Controller;
 use App\Models\SafetyRule;
@@ -13,7 +13,7 @@ class SafetyRuleController extends Controller
 {
     public function index(): View
     {
-        return view('admin.regras.index', [
+        return view('gerir.regras.index', [
             'rules' => SafetyRule::orderBy('position')->get(),
         ]);
     }
@@ -32,7 +32,7 @@ class SafetyRuleController extends Controller
             'updated_by' => $request->user()->signature,
         ]);
 
-        return redirect()->route('admin.regras.index')->with('status', 'Regra adicionada.');
+        return redirect()->route('gerir.regras.index')->with('status', 'Regra adicionada.');
     }
 
     public function update(Request $request, SafetyRule $rule): RedirectResponse
@@ -45,7 +45,7 @@ class SafetyRuleController extends Controller
 
         $rule->update(['content' => trim($data['content']), 'updated_by' => $request->user()->signature]);
 
-        return redirect()->route('admin.regras.index')->with('status', 'Regra guardada.');
+        return redirect()->route('gerir.regras.index')->with('status', 'Regra guardada.');
     }
 
     /** Move a regra uma posição para cima ou para baixo. */
@@ -65,7 +65,7 @@ class SafetyRuleController extends Controller
             }
         });
 
-        return redirect()->route('admin.regras.index');
+        return redirect()->route('gerir.regras.index');
     }
 
     public function destroy(SafetyRule $rule): RedirectResponse
@@ -75,6 +75,6 @@ class SafetyRuleController extends Controller
         // Renumera para manter as posições seguidas (1, 2, 3...).
         SafetyRule::orderBy('position')->get()->each(fn ($r, $i) => $r->update(['position' => $i + 1]));
 
-        return redirect()->route('admin.regras.index')->with('status', 'Regra eliminada.');
+        return redirect()->route('gerir.regras.index')->with('status', 'Regra eliminada.');
     }
 }

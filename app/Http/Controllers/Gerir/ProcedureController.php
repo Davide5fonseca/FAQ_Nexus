@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Gerir;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProcedureRequest;
@@ -34,7 +34,7 @@ class ProcedureController extends Controller
             ->orderBy('reference_number')
             ->get();
 
-        return view('admin.procedimentos.index', [
+        return view('gerir.procedimentos.index', [
             'procedures' => $procedures,
             'categories' => Category::orderBy('name')->get(),
             'filters' => $filters,
@@ -48,7 +48,7 @@ class ProcedureController extends Controller
 
     public function create(Request $request): View
     {
-        return view('admin.procedimentos.form', [
+        return view('gerir.procedimentos.form', [
             'procedure' => new Procedure(['area' => $request->user()->area]),
             'steps' => [''],
             'categories' => Category::orderBy('name')->get(),
@@ -77,7 +77,7 @@ class ProcedureController extends Controller
             return $procedure;
         });
 
-        return redirect()->route('admin.procedimentos.index')
+        return redirect()->route('gerir.procedimentos.index')
             ->with('status', "Procedimento {$procedure->reference} criado.");
     }
 
@@ -86,7 +86,7 @@ class ProcedureController extends Controller
         $this->autorizar($request, $procedure);
         $procedure->load('steps', 'anexos');
 
-        return view('admin.procedimentos.form', [
+        return view('gerir.procedimentos.form', [
             'procedure' => $procedure,
             'steps' => $procedure->steps->pluck('content')->all() ?: [''],
             'categories' => Category::orderBy('name')->get(),
@@ -112,7 +112,7 @@ class ProcedureController extends Controller
             $this->guardarAnexos($request, $procedure);
         });
 
-        return redirect()->route('admin.procedimentos.index')
+        return redirect()->route('gerir.procedimentos.index')
             ->with('status', "Procedimento {$procedure->reference} guardado.");
     }
 
@@ -122,7 +122,7 @@ class ProcedureController extends Controller
         $ref = $procedure->reference;
         $procedure->delete();
 
-        return redirect()->route('admin.procedimentos.index')
+        return redirect()->route('gerir.procedimentos.index')
             ->with('status', "Procedimento {$ref} eliminado.");
     }
 

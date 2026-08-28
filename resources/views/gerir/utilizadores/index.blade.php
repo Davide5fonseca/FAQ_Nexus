@@ -38,7 +38,7 @@
                 @php $perfil = $perfis->get($u->id); @endphp
                 <tr>
                     <td>
-                        <a href="{{ route('admin.utilizadores.edit', $u->id) }}"><strong>{{ $u->name }}</strong></a>
+                        <a href="{{ route('gerir.utilizadores.edit', $u->id) }}"><strong>{{ $u->name }}</strong></a>
                         @if(auth()->id() === $u->id) <span class="meta">(eu)</span>@endif
                         @unless($u->active) <span class="etiqueta etiqueta--inactiva">Desactivada</span> @endunless
                     </td>
@@ -50,7 +50,7 @@
                         </span>
                     </td>
                     <td class="accoes">
-                        <a class="btn btn--secundario btn--pequeno" href="{{ route('admin.utilizadores.edit', $u->id) }}">Editar perfil</a>
+                        <a class="btn btn--secundario btn--pequeno" href="{{ route('gerir.utilizadores.edit', $u->id) }}">Editar perfil</a>
                     </td>
                 </tr>
             @endforeach

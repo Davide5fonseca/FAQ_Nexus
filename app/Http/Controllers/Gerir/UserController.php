@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Gerir;
 
 use App\Http\Controllers\Controller;
 use App\Models\Perfil;
@@ -25,7 +25,7 @@ class UserController extends Controller
         $pessoas = $this->comAcessoAEstaAplicacao();
         $perfis = Perfil::whereIn('utilizador_id', $pessoas->pluck('id'))->get()->keyBy('utilizador_id');
 
-        return view('admin.utilizadores.index', [
+        return view('gerir.utilizadores.index', [
             'utilizadores' => $pessoas,
             'perfis' => $perfis,
         ]);
@@ -35,7 +35,7 @@ class UserController extends Controller
     {
         $pessoa = $this->encontrar($utilizador);
 
-        return view('admin.utilizadores.form', [
+        return view('gerir.utilizadores.form', [
             'utilizador' => $pessoa,
             'perfil' => Perfil::where('utilizador_id', $pessoa->id)->first(),
         ]);
@@ -62,7 +62,7 @@ class UserController extends Controller
 
         Perfil::updateOrCreate(['utilizador_id' => $pessoa->id], $dados);
 
-        return redirect()->route('admin.utilizadores.index')
+        return redirect()->route('gerir.utilizadores.index')
             ->with('status', "Perfil de {$pessoa->name} guardado.");
     }
 

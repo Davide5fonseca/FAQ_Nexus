@@ -66,11 +66,11 @@ class AnexoTest extends TestCase
     {
         $cat = Category::firstOrCreate(['name' => 'Impressoras']);
 
-        $this->actingAs($user)->post(route('admin.procedimentos.store'), array_merge([
+        $this->actingAs($user)->post(route('gerir.procedimentos.store'), array_merge([
             'title' => 'Substituir toner',
             'category_id' => $cat->id,
             'steps' => ['Desligar', 'Trocar'],
-        ], $dados))->assertRedirect(route('admin.procedimentos.index'));
+        ], $dados))->assertRedirect(route('gerir.procedimentos.index'));
 
         return Procedure::latest('id')->first();
     }
@@ -105,13 +105,13 @@ class AnexoTest extends TestCase
         $procedimento = $this->criar($admin);
         $cat = Category::first();
 
-        $this->actingAs($admin)->put(route('admin.procedimentos.update', $procedimento), [
+        $this->actingAs($admin)->put(route('gerir.procedimentos.update', $procedimento), [
             'title' => $procedimento->title,
             'category_id' => $cat->id,
             'steps' => ['Desligar'],
             'anexos' => [$this->imagem('placa.jpg')],
             'legendas' => ['Vista da placa'],
-        ])->assertRedirect(route('admin.procedimentos.index'));
+        ])->assertRedirect(route('gerir.procedimentos.index'));
 
         $anexo = $procedimento->fresh()->anexos->first();
         $this->assertSame('Vista da placa', $anexo->legenda);
@@ -123,7 +123,7 @@ class AnexoTest extends TestCase
         $admin = $this->pessoa();
         $cat = Category::firstOrCreate(['name' => 'Impressoras']);
 
-        $this->actingAs($admin)->post(route('admin.procedimentos.store'), [
+        $this->actingAs($admin)->post(route('gerir.procedimentos.store'), [
             'title' => 'Com ficheiro estranho',
             'category_id' => $cat->id,
             'steps' => ['Um passo'],
@@ -138,7 +138,7 @@ class AnexoTest extends TestCase
         $admin = $this->pessoa();
         $cat = Category::firstOrCreate(['name' => 'Impressoras']);
 
-        $this->actingAs($admin)->post(route('admin.procedimentos.store'), [
+        $this->actingAs($admin)->post(route('gerir.procedimentos.store'), [
             'title' => 'Com ficheiro enorme',
             'category_id' => $cat->id,
             'steps' => ['Um passo'],
@@ -158,14 +158,14 @@ class AnexoTest extends TestCase
             $muitos[] = $this->imagem("ecra{$i}.png");
         }
 
-        $this->actingAs($admin)->put(route('admin.procedimentos.update', $procedimento), [
+        $this->actingAs($admin)->put(route('gerir.procedimentos.update', $procedimento), [
             'title' => $procedimento->title,
             'category_id' => $cat->id,
             'steps' => ['Desligar'],
             'anexos' => $muitos,
         ]);
 
-        $this->actingAs($admin)->put(route('admin.procedimentos.update', $procedimento), [
+        $this->actingAs($admin)->put(route('gerir.procedimentos.update', $procedimento), [
             'title' => $procedimento->title,
             'category_id' => $cat->id,
             'steps' => ['Desligar'],
@@ -245,7 +245,7 @@ class AnexoTest extends TestCase
         Storage::disk(Anexo::DISCO)->assertExists($caminho);
 
         $this->actingAs($admin)
-            ->delete(route('admin.procedimentos.anexos.destroy', [$procedimento, $anexo]))
+            ->delete(route('gerir.procedimentos.anexos.destroy', [$procedimento, $anexo]))
             ->assertRedirect();
 
         $this->assertSame(0, Anexo::count());
@@ -259,8 +259,8 @@ class AnexoTest extends TestCase
         $caminhos = $procedimento->anexos->map->caminho();
 
         $this->actingAs($admin)
-            ->delete(route('admin.procedimentos.destroy', $procedimento))
-            ->assertRedirect(route('admin.procedimentos.index'));
+            ->delete(route('gerir.procedimentos.destroy', $procedimento))
+            ->assertRedirect(route('gerir.procedimentos.index'));
 
         $this->assertSame(0, Anexo::count());
         foreach ($caminhos as $caminho) {
@@ -278,7 +278,7 @@ class AnexoTest extends TestCase
 
         // Administrador de produção: vê todas as áreas, por isso pode.
         $this->actingAs($producao)
-            ->delete(route('admin.procedimentos.anexos.destroy', [$procedimento, $anexo]))
+            ->delete(route('gerir.procedimentos.anexos.destroy', [$procedimento, $anexo]))
             ->assertRedirect();
 
         $this->assertSame(0, Anexo::count());
@@ -293,7 +293,7 @@ class AnexoTest extends TestCase
         $leitor = $this->pessoa('leitor', 'tecnica');
 
         $this->actingAs($leitor)
-            ->delete(route('admin.procedimentos.anexos.destroy', [$procedimento, $anexo]))
+            ->delete(route('gerir.procedimentos.anexos.destroy', [$procedimento, $anexo]))
             ->assertForbidden();
 
         $this->assertSame(1, Anexo::count());

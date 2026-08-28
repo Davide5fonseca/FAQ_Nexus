@@ -3,7 +3,7 @@
 @section('largura', 'largura--media')
 
 @section('caminho')
-    <a href="{{ route('admin.utilizadores.index') }}">Perfis</a>
+    <a href="{{ route('gerir.utilizadores.index') }}">Perfis</a>
     <span class="topo__sep">/</span>
     <span class="actual">{{ $utilizador->name }}</span>
 @endsection
@@ -13,13 +13,13 @@
 <div class="cabecalho-pagina">
     <h1>Perfil de {{ $utilizador->name }}</h1>
     <div class="accoes">
-        <a class="btn btn--secundario" href="{{ route('admin.utilizadores.index') }}">← Voltar</a>
+        <a class="btn btn--secundario" href="{{ route('gerir.utilizadores.index') }}">← Voltar</a>
     </div>
 </div>
 
 <p class="meta">{{ $utilizador->email }}</p>
 
-<form method="post" action="{{ route('admin.utilizadores.update', $utilizador->id) }}" class="cartao" novalidate>
+<form method="post" action="{{ route('gerir.utilizadores.update', $utilizador->id) }}" class="cartao" novalidate>
     @csrf @method('PUT')
 
     <fieldset class="campo">
@@ -58,7 +58,7 @@
 
     <div class="accoes-form">
         <button type="submit" class="btn btn--primario">Guardar perfil</button>
-        <a class="btn btn--secundario" href="{{ route('admin.utilizadores.index') }}">Cancelar</a>
+        <a class="btn btn--secundario" href="{{ route('gerir.utilizadores.index') }}">Cancelar</a>
     </div>
 </form>
 @endsection

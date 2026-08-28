@@ -48,21 +48,21 @@
 
             @auth
                 @can('editar')
-                    <a class="nav-item {{ request()->routeIs('admin.procedimentos.*') ? 'nav-item--activo' : '' }}" href="{{ route('admin.procedimentos.index') }}">
+                    <a class="nav-item {{ request()->routeIs('gerir.procedimentos.*') ? 'nav-item--activo' : '' }}" href="{{ route('gerir.procedimentos.index') }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         <span>Procedimentos</span>
                     </a>
                 @endcan
                 @can('admin')
-                    <a class="nav-item {{ request()->routeIs('admin.categorias.*') ? 'nav-item--activo' : '' }}" href="{{ route('admin.categorias.index') }}">
+                    <a class="nav-item {{ request()->routeIs('gerir.categorias.*') ? 'nav-item--activo' : '' }}" href="{{ route('gerir.categorias.index') }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
                         <span>Categorias</span>
                     </a>
-                    <a class="nav-item {{ request()->routeIs('admin.regras.*') ? 'nav-item--activo' : '' }}" href="{{ route('admin.regras.index') }}">
+                    <a class="nav-item {{ request()->routeIs('gerir.regras.*') ? 'nav-item--activo' : '' }}" href="{{ route('gerir.regras.index') }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
                         <span>Regras de segurança</span>
                     </a>
-                    <a class="nav-item {{ request()->routeIs('admin.utilizadores.*') ? 'nav-item--activo' : '' }}" href="{{ route('admin.utilizadores.index') }}">
+                    <a class="nav-item {{ request()->routeIs('gerir.utilizadores.*') ? 'nav-item--activo' : '' }}" href="{{ route('gerir.utilizadores.index') }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         <span>Perfis</span>
                     </a>
@@ -72,7 +72,7 @@
 
         @auth
             @can('editar')
-                <a href="{{ route('admin.procedimentos.create') }}" class="botao-primario">
+                <a href="{{ route('gerir.procedimentos.create') }}" class="botao-primario">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
                     Novo procedimento
                 </a>

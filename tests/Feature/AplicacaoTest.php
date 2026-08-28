@@ -69,13 +69,13 @@ class AplicacaoTest extends TestCase
     {
         $cat = $this->categoria();
 
-        $this->actingAs($user)->post(route('admin.procedimentos.store'), array_merge([
+        $this->actingAs($user)->post(route('gerir.procedimentos.store'), array_merge([
             'title' => 'Substituir toner',
             'category_id' => $cat->id,
             'steps' => ['Desligar a impressora', 'Abrir a tampa', 'Trocar o toner'],
             'ticket_notes' => 'Modelo e número de série',
             'escalation' => 'Se o erro persistir após troca',
-        ], $dados))->assertRedirect(route('admin.procedimentos.index'));
+        ], $dados))->assertRedirect(route('gerir.procedimentos.index'));
 
         return Procedure::latest('id')->first();
     }
@@ -85,7 +85,7 @@ class AplicacaoTest extends TestCase
     public function test_sem_sessao_vai_ao_portal(): void
     {
         $this->get('/')->assertRedirect(config('app.portal_url'));
-        $this->get(route('admin.procedimentos.index'))->assertRedirect(config('app.portal_url'));
+        $this->get(route('gerir.procedimentos.index'))->assertRedirect(config('app.portal_url'));
     }
 
     public function test_sem_acesso_atribuido_no_portal_e_devolvido_ao_portal(): void
@@ -93,7 +93,7 @@ class AplicacaoTest extends TestCase
         $semAcesso = $this->pessoa(comAcesso: false);
 
         $this->actingAs($semAcesso)->get('/')->assertRedirect(config('app.portal_url'));
-        $this->actingAs($semAcesso)->get(route('admin.procedimentos.index'))
+        $this->actingAs($semAcesso)->get(route('gerir.procedimentos.index'))
             ->assertRedirect(config('app.portal_url'));
     }
 
@@ -143,13 +143,13 @@ class AplicacaoTest extends TestCase
         $producao = $this->pessoa('editor', 'producao');
 
         $this->actingAs($producao)->get(route('imprimir.um', $p))->assertForbidden();
-        $this->actingAs($producao)->get(route('admin.procedimentos.edit', $p))->assertForbidden();
-        $this->actingAs($producao)->put(route('admin.procedimentos.update', $p), [
+        $this->actingAs($producao)->get(route('gerir.procedimentos.edit', $p))->assertForbidden();
+        $this->actingAs($producao)->put(route('gerir.procedimentos.update', $p), [
             'title' => 'Alterado à força', 'category_id' => $p->category_id, 'steps' => ['x'],
         ])->assertForbidden();
 
         $this->assertSame('Substituir toner', $p->fresh()->title);
-        $this->actingAs($producao)->get(route('admin.procedimentos.index'))->assertDontSee('Substituir toner');
+        $this->actingAs($producao)->get(route('gerir.procedimentos.index'))->assertDontSee('Substituir toner');
     }
 
     public function test_administrador_ve_todas_as_areas(): void
@@ -191,15 +191,15 @@ class AplicacaoTest extends TestCase
         $this->actingAs($leitor)->get(route('imprimir.um', $p))->assertOk();
 
         foreach ([
-            route('admin.procedimentos.index'),
-            route('admin.procedimentos.create'),
-            route('admin.categorias.index'),
-            route('admin.utilizadores.index'),
+            route('gerir.procedimentos.index'),
+            route('gerir.procedimentos.create'),
+            route('gerir.categorias.index'),
+            route('gerir.utilizadores.index'),
         ] as $url) {
             $this->actingAs($leitor)->get($url)->assertForbidden();
         }
 
-        $this->actingAs($leitor)->post(route('admin.procedimentos.store'), [
+        $this->actingAs($leitor)->post(route('gerir.procedimentos.store'), [
             'title' => 'Tentativa', 'category_id' => $p->category_id, 'steps' => ['x'],
         ])->assertForbidden();
     }
@@ -211,14 +211,14 @@ class AplicacaoTest extends TestCase
 
         $this->assertSame('Pessoa 1 (Produção)', $p->created_by);
 
-        $this->actingAs($editor)->get(route('admin.procedimentos.index'))->assertOk()
+        $this->actingAs($editor)->get(route('gerir.procedimentos.index'))->assertOk()
             ->assertDontSee('>Eliminar<', false);
-        $this->actingAs($editor)->get(route('admin.procedimentos.edit', $p))->assertOk();
+        $this->actingAs($editor)->get(route('gerir.procedimentos.edit', $p))->assertOk();
 
-        $this->actingAs($editor)->delete(route('admin.procedimentos.destroy', $p))->assertForbidden();
-        $this->actingAs($editor)->get(route('admin.categorias.index'))->assertForbidden();
-        $this->actingAs($editor)->get(route('admin.regras.index'))->assertForbidden();
-        $this->actingAs($editor)->get(route('admin.utilizadores.index'))->assertForbidden();
+        $this->actingAs($editor)->delete(route('gerir.procedimentos.destroy', $p))->assertForbidden();
+        $this->actingAs($editor)->get(route('gerir.categorias.index'))->assertForbidden();
+        $this->actingAs($editor)->get(route('gerir.regras.index'))->assertForbidden();
+        $this->actingAs($editor)->get(route('gerir.utilizadores.index'))->assertForbidden();
     }
 
     public function test_sem_perfil_definido_e_apenas_leitor(): void
@@ -229,7 +229,7 @@ class AplicacaoTest extends TestCase
 
         $this->assertSame('leitor', $user->role);
         $this->assertFalse($user->pode_editar);
-        $this->actingAs($user)->get(route('admin.procedimentos.index'))->assertForbidden();
+        $this->actingAs($user)->get(route('gerir.procedimentos.index'))->assertForbidden();
     }
 
     // ---------------- Gestão de perfis ----------------
@@ -239,12 +239,12 @@ class AplicacaoTest extends TestCase
         $admin = $this->pessoa('admin', 'tecnica');
         $outro = $this->pessoa('leitor', 'tecnica');
 
-        $this->actingAs($admin)->get(route('admin.utilizadores.index'))->assertOk()
+        $this->actingAs($admin)->get(route('gerir.utilizadores.index'))->assertOk()
             ->assertSee($outro->name);
 
-        $this->actingAs($admin)->put(route('admin.utilizadores.update', $outro->id), [
+        $this->actingAs($admin)->put(route('gerir.utilizadores.update', $outro->id), [
             'papel' => 'editor', 'area' => 'producao',
-        ])->assertRedirect(route('admin.utilizadores.index'));
+        ])->assertRedirect(route('gerir.utilizadores.index'));
 
         $this->assertDatabaseHas('perfis', [
             'utilizador_id' => $outro->id, 'papel' => 'editor', 'area' => 'producao',
@@ -255,7 +255,7 @@ class AplicacaoTest extends TestCase
     {
         $admin = $this->pessoa('admin', 'tecnica');
 
-        $this->actingAs($admin)->put(route('admin.utilizadores.update', $admin->id), [
+        $this->actingAs($admin)->put(route('gerir.utilizadores.update', $admin->id), [
             'papel' => 'leitor', 'area' => 'tecnica',
         ])->assertSessionHasErrors('papel');
 
@@ -267,9 +267,9 @@ class AplicacaoTest extends TestCase
         $admin = $this->pessoa('admin', 'tecnica');
         $forasteiro = $this->pessoa('editor', 'tecnica', comAcesso: false);
 
-        $this->actingAs($admin)->get(route('admin.utilizadores.index'))
+        $this->actingAs($admin)->get(route('gerir.utilizadores.index'))
             ->assertDontSee($forasteiro->email);
-        $this->actingAs($admin)->get(route('admin.utilizadores.edit', $forasteiro->id))
+        $this->actingAs($admin)->get(route('gerir.utilizadores.edit', $forasteiro->id))
             ->assertNotFound();
     }
 
@@ -293,7 +293,7 @@ class AplicacaoTest extends TestCase
         $this->criarProcedimento($admin);
         $p2 = $this->criarProcedimento($admin);
 
-        $this->actingAs($admin)->delete(route('admin.procedimentos.destroy', $p2))->assertRedirect();
+        $this->actingAs($admin)->delete(route('gerir.procedimentos.destroy', $p2))->assertRedirect();
         $this->assertSame('PROC-03', $this->criarProcedimento($admin)->reference);
     }
 
@@ -302,8 +302,8 @@ class AplicacaoTest extends TestCase
         $admin = $this->pessoa();
         $this->categoria();
 
-        $this->actingAs($admin)->from(route('admin.procedimentos.create'))
-            ->post(route('admin.procedimentos.store'), ['title' => '', 'category_id' => '', 'steps' => ['', '']])
+        $this->actingAs($admin)->from(route('gerir.procedimentos.create'))
+            ->post(route('gerir.procedimentos.store'), ['title' => '', 'category_id' => '', 'steps' => ['', '']])
             ->assertSessionHasErrors([
                 'title' => 'O campo título é obrigatório.',
                 'category_id' => 'Escolha uma categoria.',
@@ -316,12 +316,12 @@ class AplicacaoTest extends TestCase
         $admin = $this->pessoa();
         $p = $this->criarProcedimento($admin);
 
-        $this->actingAs($admin)->put(route('admin.procedimentos.update', $p), [
+        $this->actingAs($admin)->put(route('gerir.procedimentos.update', $p), [
             'title' => 'Substituir toner (rev.)',
             'category_id' => $p->category_id,
             'steps' => ['Trocar o toner', 'Abrir a tampa'],
             'ticket_notes' => '', 'escalation' => '',
-        ])->assertRedirect(route('admin.procedimentos.index'));
+        ])->assertRedirect(route('gerir.procedimentos.index'));
 
         $p->refresh();
         $this->assertSame('Substituir toner (rev.)', $p->title);
@@ -333,14 +333,14 @@ class AplicacaoTest extends TestCase
         $admin = $this->pessoa();
         $p = $this->criarProcedimento($admin);
 
-        $this->actingAs($admin)->delete(route('admin.procedimentos.destroy', $p))->assertRedirect();
+        $this->actingAs($admin)->delete(route('gerir.procedimentos.destroy', $p))->assertRedirect();
         $this->actingAs($admin)->get('/')->assertDontSee('Substituir toner');
         $this->assertDatabaseMissing('procedures', ['id' => $p->id]);
     }
 
     public function test_nao_existe_forma_de_arquivar(): void
     {
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('admin.procedimentos.archive'));
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('gerir.procedimentos.archive'));
         $this->assertFalse(\Illuminate\Support\Facades\Schema::hasColumn('procedures', 'archived_at'));
     }
 
@@ -396,18 +396,18 @@ class AplicacaoTest extends TestCase
     {
         $admin = $this->pessoa();
 
-        $this->actingAs($admin)->post(route('admin.categorias.store'), ['name' => 'Portáteis'])->assertRedirect();
-        $this->actingAs($admin)->post(route('admin.categorias.store'), ['name' => 'Portáteis'])
+        $this->actingAs($admin)->post(route('gerir.categorias.store'), ['name' => 'Portáteis'])->assertRedirect();
+        $this->actingAs($admin)->post(route('gerir.categorias.store'), ['name' => 'Portáteis'])
             ->assertSessionHasErrors(['name' => 'Já existe uma categoria com esse nome.']);
 
         $cat = Category::where('name', 'Portáteis')->first();
         $this->criarProcedimento($admin, ['category_id' => $cat->id]);
 
-        $this->actingAs($admin)->delete(route('admin.categorias.destroy', $cat))->assertSessionHasErrors('category');
+        $this->actingAs($admin)->delete(route('gerir.categorias.destroy', $cat))->assertSessionHasErrors('category');
         $this->assertDatabaseHas('categories', ['id' => $cat->id]);
 
         Procedure::query()->delete();
-        $this->actingAs($admin)->delete(route('admin.categorias.destroy', $cat))->assertRedirect();
+        $this->actingAs($admin)->delete(route('gerir.categorias.destroy', $cat))->assertRedirect();
         $this->assertDatabaseMissing('categories', ['id' => $cat->id]);
     }
 
@@ -415,15 +415,15 @@ class AplicacaoTest extends TestCase
     {
         $admin = $this->pessoa();
 
-        $this->actingAs($admin)->post(route('admin.regras.store'), ['content' => 'Regra A'])->assertRedirect();
-        $this->actingAs($admin)->post(route('admin.regras.store'), ['content' => 'Regra B'])->assertRedirect();
-        $this->actingAs($admin)->post(route('admin.regras.store'), ['content' => ''])->assertSessionHasErrors('content');
+        $this->actingAs($admin)->post(route('gerir.regras.store'), ['content' => 'Regra A'])->assertRedirect();
+        $this->actingAs($admin)->post(route('gerir.regras.store'), ['content' => 'Regra B'])->assertRedirect();
+        $this->actingAs($admin)->post(route('gerir.regras.store'), ['content' => ''])->assertSessionHasErrors('content');
 
         [$a, $b] = SafetyRule::orderBy('position')->get();
-        $this->actingAs($admin)->post(route('admin.regras.move', $b), ['direction' => 'up'])->assertRedirect();
+        $this->actingAs($admin)->post(route('gerir.regras.move', $b), ['direction' => 'up'])->assertRedirect();
         $this->assertSame(['Regra B', 'Regra A'], SafetyRule::orderBy('position')->pluck('content')->all());
 
-        $this->actingAs($admin)->delete(route('admin.regras.destroy', $b))->assertRedirect();
+        $this->actingAs($admin)->delete(route('gerir.regras.destroy', $b))->assertRedirect();
         $this->assertSame([1], SafetyRule::pluck('position')->all());
     }
 

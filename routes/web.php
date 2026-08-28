@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProcedureController as AdminProcedureController;
-use App\Http\Controllers\Admin\SafetyRuleController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Gerir\CategoryController;
+use App\Http\Controllers\Gerir\ProcedureController as GerirProcedureController;
+use App\Http\Controllers\Gerir\SafetyRuleController;
+use App\Http\Controllers\Gerir\UserController;
 use App\Http\Controllers\AnexoController;
 use App\Http\Controllers\ProcedureController;
 use Illuminate\Support\Facades\Route;
@@ -24,18 +24,29 @@ Route::middleware(['auth', 'acesso'])->group(function () {
     Route::get('/procedimentos/{procedure}/anexos/{anexo}', [AnexoController::class, 'mostrar'])->name('anexo');
 });
 
-// ---------- Administração (requer permissão de edição) ----------
-Route::middleware(['auth', 'acesso', 'can:editar'])->prefix('admin')->name('admin.')->group(function () {
-    Route::redirect('/', '/admin/procedimentos');
+// Endereços antigos: /admin/... passou a /gerir/..., mas há favoritos por aí.
+// Route::redirect() escreve o caminho a contar da raiz do domínio e perdia o
+// /knowledgebase-nexus; por isso vai por rota e por url(), que respeitam a
+// sub-pasta onde a aplicação está instalada.
+Route::get('/admin', fn () => redirect()->route('gerir.procedimentos.index'));
+Route::get('/admin/{resto}', fn (string $resto) => redirect(url('gerir/'.$resto)))
+    ->where('resto', '.*');
+
+// ---------- Gerir conteúdo (requer permissão de edição) ----------
+//
+// O endereço diz "gerir" e não "admin": quem entra aqui pode ser apenas
+// Editor, e "admin" dava a entender que era preciso ser administrador.
+Route::middleware(['auth', 'acesso', 'can:editar'])->prefix('gerir')->name('gerir.')->group(function () {
+    Route::redirect('/', '/gerir/procedimentos');
 
     // Procedimentos
-    Route::get('procedimentos', [AdminProcedureController::class, 'index'])->name('procedimentos.index');
-    Route::get('procedimentos/novo', [AdminProcedureController::class, 'create'])->name('procedimentos.create');
-    Route::post('procedimentos', [AdminProcedureController::class, 'store'])->name('procedimentos.store');
-    Route::get('procedimentos/{procedure}/editar', [AdminProcedureController::class, 'edit'])->name('procedimentos.edit');
-    Route::put('procedimentos/{procedure}', [AdminProcedureController::class, 'update'])->name('procedimentos.update');
-    Route::delete('procedimentos/{procedure}', [AdminProcedureController::class, 'destroy'])->middleware('can:admin')->name('procedimentos.destroy');
-    Route::delete('procedimentos/{procedure}/anexos/{anexo}', [AdminProcedureController::class, 'destroyAnexo'])->name('procedimentos.anexos.destroy');
+    Route::get('procedimentos', [GerirProcedureController::class, 'index'])->name('procedimentos.index');
+    Route::get('procedimentos/novo', [GerirProcedureController::class, 'create'])->name('procedimentos.create');
+    Route::post('procedimentos', [GerirProcedureController::class, 'store'])->name('procedimentos.store');
+    Route::get('procedimentos/{procedure}/editar', [GerirProcedureController::class, 'edit'])->name('procedimentos.edit');
+    Route::put('procedimentos/{procedure}', [GerirProcedureController::class, 'update'])->name('procedimentos.update');
+    Route::delete('procedimentos/{procedure}', [GerirProcedureController::class, 'destroy'])->middleware('can:admin')->name('procedimentos.destroy');
+    Route::delete('procedimentos/{procedure}/anexos/{anexo}', [GerirProcedureController::class, 'destroyAnexo'])->name('procedimentos.anexos.destroy');
 
     // ---- Só administradores a partir daqui ----
     Route::middleware('can:admin')->group(function () {

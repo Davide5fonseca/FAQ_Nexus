@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Gerir;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -13,7 +13,7 @@ class CategoryController extends Controller
 {
     public function index(): View
     {
-        return view('admin.categorias.index', [
+        return view('gerir.categorias.index', [
             'categories' => Category::withCount('procedures')->orderBy('name')->get(),
         ]);
     }
@@ -28,7 +28,7 @@ class CategoryController extends Controller
 
         Category::create(['name' => trim($data['name'])]);
 
-        return redirect()->route('admin.categorias.index')->with('status', "Categoria «{$data['name']}» criada.");
+        return redirect()->route('gerir.categorias.index')->with('status', "Categoria «{$data['name']}» criada.");
     }
 
     public function update(Request $request, Category $category): RedirectResponse
@@ -41,7 +41,7 @@ class CategoryController extends Controller
 
         $category->update(['name' => trim($data['name'])]);
 
-        return redirect()->route('admin.categorias.index')->with('status', 'Categoria guardada.');
+        return redirect()->route('gerir.categorias.index')->with('status', 'Categoria guardada.');
     }
 
     public function destroy(Category $category): RedirectResponse
@@ -59,6 +59,6 @@ class CategoryController extends Controller
         $name = $category->name;
         $category->delete();
 
-        return redirect()->route('admin.categorias.index')->with('status', "Categoria «{$name}» eliminada.");
+        return redirect()->route('gerir.categorias.index')->with('status', "Categoria «{$name}» eliminada.");
     }
 }
