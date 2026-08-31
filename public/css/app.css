@@ -118,10 +118,6 @@
 .lista-edit .contagem { color: var(--texto-suave); font-size: .85rem; align-self: center; }
 
 /* Resumo em cartões (administração) */
-.resumo { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .75rem; margin-bottom: 1.25rem; }
-.resumo__item { background: var(--branco); border: 1px solid var(--linha); border-radius: var(--raio-g); padding: .9rem 1rem; box-shadow: var(--sombra); }
-.resumo__item span { display: block; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--texto-suave); font-weight: 700; }
-.resumo__item strong { font-size: 1.5rem; color: var(--verde-escuro); }
 
 /* --------------------------------------------------------------------------
    Anexos: imagens de ecrã, fotografias e PDFs

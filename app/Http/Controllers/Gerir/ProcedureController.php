@@ -39,10 +39,6 @@ class ProcedureController extends Controller
             'categories' => Category::orderBy('name')->get(),
             'filters' => $filters,
             'hasAny' => Procedure::visivelPara($utilizador)->exists(),
-            'counts' => [
-                'procedimentos' => Procedure::visivelPara($utilizador)->count(),
-                'categorias' => Category::count(),
-            ],
         ]);
     }
 

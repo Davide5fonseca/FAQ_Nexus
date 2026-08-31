@@ -15,16 +15,11 @@
 @section('hero')
 <div class="hero">
     <h1>Procedimentos</h1>
-    <p>Criar, editar e arquivar os procedimentos da Knowledgebase.</p>
+    <p>Criar, editar e eliminar os procedimentos da Knowledgebase.</p>
 </div>
 @endsection
 
 @section('content')
-<div class="resumo" aria-label="Resumo">
-    <div class="resumo__item"><span>Procedimentos</span><strong>{{ $counts['procedimentos'] }}</strong></div>
-    <div class="resumo__item"><span>Categorias</span><strong>{{ $counts['categorias'] }}</strong></div>
-</div>
-
 @if(! $hasAny)
     <div class="vazio">
         <div class="vazio__icone" aria-hidden="true">
