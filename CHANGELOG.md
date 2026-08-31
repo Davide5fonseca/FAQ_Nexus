@@ -1,297 +1,59 @@
-# Registo de alterações
+# Changelog
 
-Todas as alterações relevantes a esta aplicação ficam registadas aqui.
-Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/);
-versões segundo [Semantic Versioning](https://semver.org/lang/pt-BR/) (MAIOR.MENOR.CORRECÇÃO).
+Registo de alterações da **Knowledgebase Nexus**. Mais recente no topo.
+Categorias: 🔒 Segurança · 🧰 Funcionalidade · 🎨 UI/Marca · 🧹 Limpeza · 🛠️ Infra · 🐛 Correcção
+_(itens de infra vivem no servidor e não têm commit)._
 
-Como usar: sempre que se altere a aplicação, acrescentar uma linha em
-**[Por lançar]**. Quando se instala uma nova versão no servidor, muda-se
-"[Por lançar]" para o número da versão e a data, e abre-se uma nova secção
-"[Por lançar]" vazia por cima.
+---
 
-## [Por lançar]
+## 2026-08-31
 
-### Adicionado
-- **PROC-39 — Supermicro AIO: jumpers do painel e configuração LVDS no BIOS**,
-  com as duas imagens do documento de origem. A página de origem só tinha as
-  imagens, sem texto: a ficha descreve o que se vê nelas e diz, no próprio
-  texto, que precisa de ser revista por quem faz este trabalho.
-- Comando **`php artisan perfis:limpar`**: varre os perfis de pessoas que já
-  não existem. O perfil vive nesta base de dados e a conta na do portal — são
-  bases diferentes, e a base de dados não consegue apagar um quando o outro
-  desaparece. Com `--mostrar` só lista, sem apagar.
+- 🐛 **"Manter sessão iniciada" nunca funcionou para quem tivesse mudado a palavra-passe** — quem volta pelo cookie de "manter" entra sem passar pelo formulário, e essa sessão nascia **sem a marca `autenticado_em`**. O `SessaoValida` lê essa marca para expulsar sessões anteriores à última mudança de palavra-passe; a zero, concluía que a sessão era antiga e mandava a pessoa de volta ao login — **sem erro nenhum**, o que explica ter passado semanas despercebido. Como praticamente toda a gente repôs a palavra-passe quando a entrada passou para o portal, a caixa não funcionava para ninguém. A marca passa a ser posta também quando a entrada vem do cookie, por um ouvinte do evento `Login` registado no `AppServiceProvider` das três aplicações. **É seguro:** ao mudar a palavra-passe o `remember_token` é trocado, portanto um cookie que ainda sirva é necessariamente posterior a essa mudança — confirmado no servidor (com o cookie antigo, depois de mudar a palavra-passe, as três voltam a pedir a entrada). Diagnóstico por reprodução: duas contas iguais em tudo menos a data de alteração da palavra-passe — a que a tinha era expulsa, a outra entrava. Requer `config:clear`; sem migração e sem build. +1 teste (42 no total). `d118f2e`
 
-### Removido
-- Varridos do servidor os ficheiros que já ninguém usava desde que a entrada
-  passou para o portal: os dois controladores de autenticação, o email de
-  convite antigo, os dois comandos de consola e as cinco vistas de `auth/`.
-  Já tinham sido apagados no repositório; o servidor é que ficara para trás,
-  porque a instalação por tarball não apaga o que lá está.
+## 2026-08-28
 
-### Adicionado
-- As imagens anexas **abrem na própria página**, numa camada por cima, em vez
-  de um separador novo. Fecha-se com Esc, com o botão ou clicando fora, e as
-  setas do teclado percorrem as imagens do mesmo procedimento. Sem JavaScript,
-  o link continua a levar à imagem; com Ctrl-clique abre noutro separador, como
-  qualquer link. Os PDF continuam a abrir em separador, que é onde o leitor de
-  PDF do browser funciona.
-- **Anexos nos procedimentos**: imagens de ecrã, fotografias do equipamento e
-  folhas em PDF. Juntam-se no formulário (até 12 por procedimento, 10 MB cada),
-  aparecem na consulta em miniatura e **saem no papel** — é meio caminho andado
-  para quem está à frente de um BIOS ou de uma placa.
-- Foram juntas **8 imagens do documento de origem** («Abrir Secções») aos sete
-  procedimentos que as tinham: PROC-11, 12, 13, 14 (duas), 21, 25 e 32.
+- 🧰 **A palavra "admin" sai do endereço de quem só edita** — o endereço dizia `/admin/procedimentos` e o separador do browser dizia "Administração · Procedimentos", mas quem entra ali pode ser apenas **Editor** — e administrador, na prática, só há um. Passa a `/gerir/...`, que descreve o que a página faz sem prometer um papel que não é preciso. **Os endereços antigos encaminham** (`/admin` e `/admin/{resto}`) porque há favoritos em circulação. Por dentro acompanharam os nomes das rotas (`gerir.*`, 115 sítios), a pasta das vistas (`resources/views/gerir/`) e a dos controladores (`App\Http\Controllers\Gerir`), para o código não dizer uma coisa e o endereço outra. Duas armadilhas apanhadas só na instalação: o `Route::redirect()` escreve o caminho a contar da raiz do domínio e **perdia o `/knowledgebase-nexus`** (passou a `redirect()->route()` e `url()`); e a primeira instalação deu 500 porque o *layout* ainda chamava os nomes antigos — a instalação por tarball não apaga o que já lá está, as pastas `admin/` tiveram de ser removidas à mão. Requer `route:clear` + `view:clear` + `composer dump-autoload`; sem migração e sem build. 42 testes. `2f2e8d7`
+- 🧹 **"Imprimir tudo" repetido fora da barra de topo** — havia dois botões a fazer o mesmo. Ficou o da lista, que é o melhor: **segue os filtros activos** em vez de imprimir sempre os 38 procedimentos. Só blade. `d1a186c`
+- 🐛 **"+ Adicionar passo" acrescentava passos à lista de anexos** — o botão funcionava; o passo é que ia para o sítio errado, e a lista de anexos está escondida quando vazia, pelo que não acontecia nada visível. Causa: ao acrescentar a camada de imagem e a zona de largar (21/08 e 28/08) reutilizei nomes de variáveis já usados noutros blocos do mesmo ficheiro — e como o `app.js` é **uma só função com `var`**, um nome repetido não é uma variável nova, é a mesma. O `lista` do editor de passos passou a apontar para a lista de anexos. A mesma colisão apanhava o `contagem`, entre a camada de imagem e o contador de resultados da consulta. **Nenhuma das duas dava erro** — encontradas a correr o `app.js` contra a página real num browser simulado (jsdom), não a ler o código. Variáveis renomeadas (`listaFicheiros`, `campoFicheiros`, `contadorImagens`); o portal foi varrido pelo mesmo critério e está limpo. Só JS. `46937b6`
+- 🎨 **Campo de anexos passa a zona de largar** — o que aparecia era o controlo em bruto do browser ("Escolher Ficheiros / Não foi escolhido nenhum ficheiro"), feio e a destoar. Passa a uma área tracejada com ícone que **também aceita ficheiros arrastados**, e que lista o escolhido com nome e tamanho — quem escolher um ficheiro acima dos 10 MB é avisado **antes** de esperar pelo carregamento. O campo do browser continua lá, inteiro e apenas escondido: recebe foco pelo teclado, é lido em voz alta, e **sem JavaScript o clique continua a abrir a janela de ficheiros** (é um `<label>` a sério, não um botão falso). A área acende também quando o campo tem foco, senão quem navega por Tab passava por ali às cegas. Sem migração e sem build. `762000f`
 
-### Segurança
-- Os ficheiros dos anexos **não ficam na pasta pública**. Vivem em
-  `storage/app/private/anexos` e são servidos por uma rota que confirma, a cada
-  pedido, a sessão e a área de quem pede. Se ficassem em `public/`, bastaria
-  saber o endereço de uma imagem para ver conteúdo de uma área alheia — a
-  separação por áreas passaria a valer só para o texto.
-- O nome com que o ficheiro fica no disco é **gerado pela aplicação**, nunca o
-  que vem de fora: um nome de ficheiro é texto escolhido por quem envia, e
-  serviria para escrever fora da pasta.
-- Só são aceites imagens (JPG, PNG, GIF, WEBP) e PDF, validados pelo conteúdo e
-  não pela extensão. SVG fica de fora de propósito: pode trazer código lá dentro.
-- Ao apagar um procedimento, os ficheiros dos anexos saem também do disco.
+## 2026-08-24
 
-## [Por lançar]
+- 🎨 **Rótulo "Administração" fora da barra lateral** — com cinco itens ao todo, o cabeçalho de grupo era ruído: os nomes já dizem o que são. Só blade. `c1a75b4`
 
-### Alterado
-- **O botão de sair desta aplicação deixou de terminar a sessão**: passa a
-  devolver à escolha de módulos, no portal, com a sessão intacta. Numa suite
-  onde se entra uma só vez, sair de um módulo é voltar ao início, não ir para
-  a rua. Quem quiser mesmo terminar a sessão fá-lo no portal.
-- Saiu da barra lateral o item "Todos os módulos", que passou a ser o que o
-  botão em baixo faz.
+## 2026-08-21
 
-### Alterado
-- **A Knowledgebase passou a ter o aspecto da Nexus Infra**, para as três
-  aplicações parecerem uma só. A barra que estava no topo deu lugar à barra
-  lateral escura com a marca, a navegação, o botão "Novo procedimento" e o
-  bloco da pessoa; por cima do conteúdo passou a haver a barra com o caminho
-  (Início / Knowledgebase / …) e as acções da página.
-- Nasceu o **`suite.css`**, um sistema de desenho partilhado e igual nas
-  aplicações: as cores e medidas do `tailwind.config.js` da Nexus Infra,
-  escritas à mão, sem Tailwind nem compilação. Ao mudar algo lá, muda nas três.
-- As páginas **não foram reescritas**. O vocabulário que já usavam (`.btn`,
-  `.cabecalho-pagina`, `.filtros`, …) passou a apontar para o desenho novo —
-  é por isso que a mudança é grande e o risco pequeno. O `app.css` daqui
-  encolheu de 572 para 214 linhas: ficou só o que é mesmo desta aplicação,
-  a consulta, as listas editáveis e a impressão em A4.
-- A impressão foi acertada à estrutura nova: a barra lateral e as barras de
-  topo saem da folha, e o conteúdo volta a ocupar o A4 todo.
+- 🧹 **Sobras da autenticação antiga varridas do servidor + comando `perfis:limpar` + PROC-39** — três pendências fechadas de uma vez. (1) **Dez ficheiros mortos** no servidor desde que a entrada passou para o portal — os dois controladores de autenticação, o email de convite antigo, os dois comandos de consola e as cinco vistas de `auth/`. Já tinham sido apagados no repositório a 21/08; o servidor é que ficara para trás, porque a instalação por tarball não apaga o que já lá está. Confirmado antes de mexer que **nada de vivo lhes apontava** (as únicas referências eram de uns para os outros). (2) **`php artisan perfis:limpar`** (com `--mostrar` para só listar): o perfil de cada pessoa vive nesta base de dados e a conta na do portal — são bases diferentes e nenhuma consegue apagar a outra, pelo que quem é eliminado no portal deixa cá o perfil. Inofensivo (ninguém o lê, a lista vem sempre de quem tem acesso), mas é lixo que se acumula. (3) **PROC-39, "Supermicro AIO: jumpers do painel e configuração LVDS no BIOS"**, com as duas imagens do documento de origem — a página de origem só tinha as imagens, sem uma linha de texto, pelo que a ficha descreve o que se vê nelas, **não inventa passos de reparação**, e diz no próprio texto que precisa de revisão de quem faz o trabalho. Sem migração e sem build. +2 testes (42 no total). `27b39ac`
+- 🎨 **Imagens anexas abrem na própria página** — em vez de um separador novo, a imagem aparece numa camada por cima: fecha com `Esc`, com o botão ou clicando fora, e as setas do teclado percorrem as imagens do mesmo procedimento. Os links continuam a apontar para a imagem, por isso **sem JavaScript o clique leva lá na mesma** e `Ctrl`-clique abre noutro separador como em qualquer link. Os PDF mantêm o separador — é onde o leitor do browser funciona. A camada nunca sai no papel. `6b4c210`
+- 🐛 **Ícones sem tamanho: a lupa da pesquisa aparecia enorme** — ao reescrever o CSS para o sistema partilhado caíram as regras do `.pesquisa`, e um SVG sem regra própria fica do tamanho natural do desenho. Afectava **três páginas**, não uma. Além de repor as regras, o `suite.css` passa a ter um tamanho por omissão para qualquer ícone solto, para esta classe de falha não voltar. De caminho, a pesquisa de acessos do portal — um cartão com rótulo e dois botões para um único campo — passou a uma linha: o Enter procura, e o "Limpar" só aparece quando há o que limpar. `fdb1e9a`
+- 🧰 **Anexos nos procedimentos: imagens de ecrã, fotografias e PDF** — até 12 por procedimento, 10 MB cada; aparecem em miniatura na consulta e **saem no papel**, que é meio caminho andado para quem está à frente de um BIOS ou de uma placa. Foram juntas **8 imagens do documento de origem** aos sete procedimentos que as tinham (PROC-11, 12, 13, 14 com duas, 21, 25 e 32), extraídas do PDF com uma ferramenta temporária que não ficou instalada. **Segurança, que é aqui o que interessa:** os ficheiros **não ficam na pasta pública** — vivem em `storage/app/private/anexos` e são servidos por uma rota que confirma a sessão e a área a cada pedido; se ficassem em `public/`, bastaria saber o endereço de uma imagem para ver conteúdo de outra área, e a separação por áreas passava a valer só para o texto (testado: como leitor de produção, 403 nas imagens da área técnica). O nome no disco é **gerado pela aplicação**, nunca o que vem de fora — um nome de ficheiro é texto escolhido por quem envia e serviria para escrever fora da pasta. Só imagens e PDF, validados pelo conteúdo e não pela extensão; **SVG fica de fora de propósito**, por poder trazer código. Ao apagar um procedimento, os ficheiros saem também do disco. **Requer `php artisan migrate`**; sem build. +15 testes (40 no total). `b59eae2`
+- 🐛 **Página de novo procedimento descalibrada** — três coisas fora do sítio depois da mudança visual: o `.cartao` tinha ficado sem espaçamento interior (os campos encostavam à moldura e as linhas liam-se como riscos soltos a atravessar a página); o formulário esticava-se pela largura toda, passando a **42rem** como os da Nexus Infra; e o rótulo "Categoria" estava dentro de um `<div>` a mais e escapava ao estilo dos outros. O espaçamento foi corrigido no sistema partilhado, pelo que apanha **os sete sítios** que usam cartão. `1cbddc8`
+- 🧰 **O botão de sair devolve à escolha de módulos** — numa suite onde se entra uma vez só, sair de um módulo é voltar ao início, não ir para a rua. A sessão termina no portal, que é onde começa. **Um pormenor que quase se perdia:** aquele botão da Nexus Infra também apagava do aparelho os rascunhos de relatório (medições e notas guardadas localmente, por causa dos tablets partilhados na oficina) — trocá-lo por um link fazia essa limpeza desaparecer sem ninguém dar por isso. Passou para o botão de sair do portal, que funciona porque as três aplicações estão no mesmo endereço e partilham o armazenamento local. `3e1b200`
+- 🎨 **A Knowledgebase passa a ter o aspecto da Nexus Infra** — a barra do topo dá lugar à **barra lateral escura** com a marca, a navegação, o botão "Novo procedimento" e o bloco da pessoa; por cima do conteúdo passa a haver a barra com o caminho (Início / Knowledgebase / …) e as acções da página. Nasce o **`suite.css`**, sistema de desenho partilhado e igual nas aplicações: as cores e medidas do `tailwind.config.js` da Nexus Infra, escritas à mão, **sem Tailwind nem compilação** — a Nexus Infra usa Tailwind compilado e copiar o ficheiro não funcionaria. As páginas **não foram reescritas**: o vocabulário que já usavam (`.btn`, `.cabecalho-pagina`, `.filtros`, …) passou a apontar para o desenho novo — é por isso que a mudança é grande e o risco pequeno. O `app.css` daqui encolheu de 572 para 214 linhas. A letra passa a **Poppins**, que é metade do aspecto. A impressão foi acertada à estrutura nova: a barra lateral e as barras de topo saem da folha e o conteúdo volta a ocupar o A4 todo. Varrimento automático das classes usadas nas páginas contra as definidas no CSS: seis órfãs encontradas e repostas, zero no fim. `8507d47`
+- 🧰 **Entrada única no portal: a Knowledgebase deixa de ter login** — quem chegar por um endereço antigo (`/entrar`) é encaminhado para o portal. Os quatro ecrãs de entrada (entrar, esqueci-me, definir palavra-passe e aceitar convite) passam a viver lá, com o aspecto que a Nexus Infra já tinha. **Um buraco que era preciso tapar primeiro:** o portal não tinha recuperação de palavra-passe nenhuma — tirar a entrada daqui sem isso deixaria quem se esquecesse da palavra-passe sem forma de a repor. `76f76d2`
+- 🔒 **O código de verificação por email deixa de ser pedido a cada entrada** — decisão tomada com o Davide a 21/08, ciente de que retira a segunda barreira a um servidor exposto à internet. O código **não foi apagado**: ficou atrás do interruptor `MFA_ACTIVA` no `.env`, desligado em produção e **ligado nos testes** (via `phpunit.xml`), para os testes do código continuarem a testar o código. Voltar atrás é mudar uma linha e limpar a cache. `7a46067`
+- 🛠️ **A raiz do servidor passa a levar ao portal** — quem escreve só o endereço cai na escolha de módulos. É **uma linha de configuração no Apache** (`raiz-portal.conf`), não uma alteração dentro das aplicações. Chegou-se aqui depois de testar: a Nexus Infra foi montada numa sub-pasta temporária e **não funcionou** (404 nas páginas, 405 na raiz), porque o Livewire aponta para `/livewire/...` a contar da raiz e os endereços dela estão em cache. Mudá-la de sítio implicaria mexer-lhe por dentro, com risco de a deixar em baixo; isto dá o mesmo resultado a quem a usa sem lhe tocar. O cartão da Nexus Infra no portal passou a apontar para `/dashboard` — para `/` devolvia a pessoa ao portal, em ciclo. Sem commit na app. `ba2253a`
+- 🔒 **Sessão partilhada com o portal** — a entrada passa a ser feita lá, e esta aplicação só recebe quem já vem autenticado e com acesso atribuído. Foram precisas **quatro coisas a bater certo** para a sessão ser a mesma, e todas custaram a descobrir: a `APP_KEY`, o nome do cookie (`nexus-infra-session`), **o prefixo de cache com que o Redis guarda a sessão** (deriva do `APP_NAME`, não do `REDIS_PREFIX`) e **o formato de gravação** (`SESSION_SERIALIZATION=php` — o Laravel 13 grava em JSON e a Nexus Infra em `serialize()`). Os perfis (administrador/editor/leitor) e a área continuam a ser decididos aqui, agora na tabela `perfis`; as propriedades `role` e `area` mantiveram o nome para os **dez pontos que impõem a separação por área não serem tocados**. A tabela `users` antiga não foi apagada — fica como rede de segurança. **Requer migração.** `feaf5e1` `fd58c45`
 
-### Alterado
-- **Passou a existir uma só entrada em toda a suite: o portal.** A Nexus Infra
-  tinha a sua própria página de entrada; deixou de a mostrar. Quem lá chegar
-  por um endereço antigo — `/login`, `/esqueci-password`, um link de convite
-  no email — é encaminhado para o portal, com o token e o email preservados.
-- Os quatro ecrãs de entrada (entrar, esqueci-me, definir palavra-passe e
-  aceitar convite) vivem agora no portal, **com o aspecto que a Nexus Infra já
-  tinha**: painel escuro com a marca à esquerda, formulário à direita. Foi
-  reescrito no CSS do portal, sem lhe acrescentar Tailwind nem compilação.
-- O portal **não tinha recuperação de palavra-passe nenhuma**. Passou a ter,
-  a par de aceitar convites — sem isso, tirar a entrada da Nexus Infra deixaria
-  quem se esquecesse da palavra-passe sem forma de a repor.
-- Os componentes de autenticação da Nexus Infra **não foram apagados**: as
-  rotas encaminham, o código fica. Voltar atrás é repor um ficheiro.
+## 2026-08-20
 
-### Alterado
-- **Deixou de ser pedido o código de verificação por email** ao entrar. Passa a
-  bastar o email e a palavra-passe, aqui e nas outras aplicações da suite —
-  a decisão foi tomada com o Davide a 21/08/2026, ciente de que retira a
-  segunda barreira a um servidor exposto à internet.
+- 🧰 **O endereço passa para `/knowledgebase-nexus`** — para condizer com o nome do projecto. O antigo `/procedimentos` redirecciona **preservando caminho e parâmetros**, para não partir favoritos nem os links dos emails já enviados. Nota de instalação: em sub-pasta **não se pode usar `route:cache`** — provoca 405 na página inicial. `d31aeda`
+- 🔒 **"Manter sessão iniciada" — e duas brechas fechadas pelo caminho** — a caixa vale **30 dias** (o Laravel usa 400 por omissão, demasiado para conteúdo interno), e ao implementá-la apareceram duas coisas que não estavam bem: quem entrasse pelo cookie **não passava pela verificação de conta activa** (uma conta desactivada continuava a entrar), e a `remember_token` não era trocada ao mudar a palavra-passe nem ao desactivar a conta. Passou a haver o middleware `GarantirContaActiva` em todos os pedidos web, e a `remember_token` cicla nos dois casos. `3c9d298`
+- 🎨 **Página de entrada: olhinho no campo da palavra-passe** — o botão "Mostrar" dá lugar ao ícone dentro do campo. `1a5b96e` `1db9144`
+- 🐛 **Dois olhos visíveis ao mesmo tempo** — a regra `.campo-password__olho svg { display: block; }` anulava o atributo `hidden` do segundo ícone; reposta a prioridade com `svg[hidden] { display: none; }`. `49cb84e`
+- 🐛 **Botão dos emails partido no Outlook** — aparecia como uma caixa preta com o texto no canto. O Outlook **ignora `padding` dentro de `<a>`**: o espaçamento passou para o `<td>` e acrescentou-se um `roundrect` VML para os cantos redondos. `99adcc0`
+- 🎨 **Emails com a identidade da Nexus** — no mesmo molde dos da Nexus Ops, com tabela em vez de flex e cores da marca. `0c8f154`
+- 🧰 **Passa a chamar-se Knowledgebase Nexus** — nome do projecto em todo o lado. `9bf9094`
+- 🔒 **Separação dos procedimentos por área (técnica / produção)** — o conteúdo técnico só é visível ao Admin e aos técnicos; a produção terá o seu. Imposto no servidor em **dez pontos** (consulta, impressão, administração, edição, eliminação), não só escondido no ecrã. `88cd72c`
+- 🔒 **Login obrigatório para todos e convite de conta por email** — a consulta deixa de ser aberta. As contas nascem sem palavra-passe e recebem um convite com link de uso único. `ba83fb5`
+- 🧰 **Perfil Leitor (só consulta)** — a par de administrador e editor. `7c96761`
+- 🧹 **Fora: nível de intervenção, duplicar, filtro de estado, arquivar** — quatro coisas que o pedido não tinha e que só acrescentavam ruído. O "Apagar" passa a "Eliminar" e o botão "Arquivar" da lista dá lugar a "Editar". `a26fa29` `de90ec7` `43d07f5` `17d4afc` `1104adc`
+- 🎨 **Logótipo oficial e cabeçalho sem título** — fica só o logótipo, como na Nexus Ops. Texto e repetições limpos em todas as páginas. `389a5f5` `45d9e9a` `b7912f0`
 
-  O código não foi apagado: ficou atrás de um interruptor (`MFA_ACTIVA` no
-  `.env`), desligado em produção e ligado nos testes. Voltar a exigi-lo é
-  mudar uma linha e limpar a cache de configuração.
+## 2026-08-19
 
-### Alterado
-- **Quem escreve apenas o endereço do servidor passa a cair no portal**, onde
-  escolhe a aplicação. A Nexus Infra continua exactamente onde estava: só o
-  endereço-raiz (`/`) mudou de destino, e é uma linha de configuração no
-  Apache (`raiz-portal.conf`), não uma alteração dentro das aplicações.
-
-  Chegou-se aqui depois de testar: a Nexus Infra foi montada numa sub-pasta
-  temporária e **não funcionou** (404 nas páginas, 405 na raiz). Duas razões,
-  ambas herdadas de como foi construída — o Livewire aponta para `/livewire/...`
-  a contar da raiz, e os endereços dela estão em cache já a contar com a raiz.
-  Mudá-la de sítio implicaria mexer-lhe por dentro, com risco de a deixar em
-  baixo; esta solução dá o mesmo resultado a quem a usa, sem lhe tocar.
-- O cartão da Nexus Infra no portal aponta agora para `/dashboard` e já não
-  para `/`, que passaria a devolver a pessoa ao portal, em ciclo.
-
-### Alterado
-- **A entrada passa a ser feita no portal.** Esta aplicação deixa de ter login,
-  recuperação de palavra-passe e criação de contas: as pessoas vêm da lista
-  partilhada e só entram se o portal lhes tiver dado acesso a esta aplicação.
-- Os perfis (administrador/editor/leitor) e a área continuam a ser decididos
-  aqui, agora na tabela `perfis`. As propriedades `role` e `area` mantiveram o
-  nome, para os dez pontos que impõem a separação por área não serem tocados.
-- A sessão é partilhada com as restantes aplicações da suite: mesma chave,
-  mesmo cookie, mesmo espaço em Redis e o mesmo formato de gravação.
-
-### Removido
-- Login, "esqueci-me da palavra-passe", convites por email e gestão de contas —
-  tudo isso vive agora no portal. A tabela `users` antiga **não foi apagada**,
-  fica como rede de segurança.
-
-### Alterado
-- O endereço passa a ser **`/knowledgebase-nexus`** em vez de `/procedimentos`,
-  para condizer com o nome do projeto. O endereço antigo redirecciona para o novo,
-  preservando caminho e parâmetros, para não partir favoritos nem os links dos
-  emails já enviados.
-
-### Adicionado
-- Caixa **"Manter sessão iniciada"** na entrada, válida 30 dias (o Laravel usa
-  400 por omissão, o que era demasiado para conteúdo interno).
-
-### Segurança
-- Quem ficar com a **conta desactivada** perde a sessão no pedido seguinte, mesmo
-  tendo marcado "manter sessão iniciada" — esse caminho não passava pela
-  validação do login e deixava entrar contas já desactivadas.
-- Mudar a palavra-passe (na recuperação ou pela administração) passa também a
-  invalidar o "manter sessão iniciada" em todos os dispositivos.
-
-### Alterado
-- **Página de entrada refeita**: cartão centrado no ecrã (deixa de ficar encostado
-  ao topo), marca por cima do cartão, e sem a barra de navegação — os links
-  "Consulta" e "Entrar" não faziam sentido aqui, já que a consulta exige sessão.
-  Botão "Entrar" a toda a largura e um **olhinho** dentro do campo para mostrar
-  ou ocultar a palavra-passe.
-  As páginas de recuperar e definir palavra-passe seguem o mesmo aspecto.
-- O botão **"Apagar"** passa a chamar-se **"Eliminar"** em toda a aplicação
-  (procedimentos, categorias, regras e contas), com as mensagens a condizer.
-- Na lista de administração, o botão **"Arquivar"** dá lugar a **"Editar"**.
-  Arquivar, desarquivar e apagar continuam disponíveis dentro da página de
-  edição, em "Outras acções".
-- Botão dos emails corrigido para o **Outlook**, que ignora o espaçamento dentro
-  de links: o espaçamento passou para a célula da tabela e os cantos arredondados
-  são feitos com VML. Antes aparecia um rectângulo com o texto encostado.
-- **Emails com a identidade da Nexus**, no mesmo formato da Nexus Ops: cartão
-  branco com faixa verde no topo, marca, botão verde legível e endereço de
-  recurso em baixo. Substitui o modelo genérico do Laravel, em que o botão
-  aparecia preto com texto ilegível. Inclui versão em texto simples.
-- A aplicação passa a chamar-se **Knowledgebase Nexus** (separador do browser,
-  assunto dos emails e cabeçalho das folhas impressas). O nome vem de `APP_NAME`
-  no `.env`, por isso muda-se num único sítio.
-
-### Adicionado
-- **Separação por área**: cada procedimento pertence à *Área técnica* ou à
-  *Produção*. Cada pessoa só vê, pesquisa, imprime e edita os da sua área; os
-  administradores vêem todas. O bloqueio é feito no servidor — o acesso directo
-  ao endereço de um procedimento de outra área devolve 403.
-- Todo o conteúdo já existente ficou na **Área técnica**.
-- No formulário, o administrador escolhe a área; quem não é administrador cria
-  sempre na sua. A lista de administração mostra a coluna "Área" ao administrador.
-- Na consulta, o filtro de categorias só mostra as que têm procedimentos visíveis.
-
-### Removido
-- **Arquivar / desarquivar**, por completo: botões, rotas, código e a coluna
-  `archived_at` na base de dados. Um procedimento existe ou é eliminado.
-- Texto **"Base de Procedimentos Técnicos"** ao lado do logótipo: o cabeçalho fica
-  só com a marca. O nome mantém-se no separador do browser.
-- Filtro **"Estado"** na lista de administração. A lista passa a mostrar activos e
-  arquivados em conjunto, com os arquivados marcados por etiqueta — assim
-  continuam acessíveis para se poderem desarquivar.
-- Função **"Duplicar"** procedimento: botões, rota e código. Deixou de fazer
-  sentido no fluxo de trabalho.
-
-### Alterado
-- **Logótipo oficial**: passa a usar o mesmo ficheiro da Nexus Ops
-  (`public/img/nexus-1.png`), em vez da reprodução em SVG feita à mão. O ícone do
-  separador do browser passa também a ser o oficial. "Technical Suite" fica como
-  subtítulo por baixo da marca.
-- **Limpeza de texto em todas as páginas**: retirados subtítulos explicativos,
-  legendas de perfis, textos de ajuda redundantes e informação repetida (a caixa
-  "Ficha" na consulta repetia referência, categoria e data já visíveis; o botão
-  "Editar" na lista de administração repetia a ligação do título). A coluna
-  "Alterado" mostra só a data, com o detalhe na dica do rato, e a contagem de
-  resultados só aparece quando há um filtro activo.
-
-### Adicionado
-- **Perfil "Leitor"**: só consulta e imprime procedimentos. Não vê a área de
-  administração (o link nem aparece) nem os botões de criar/editar, e qualquer
-  tentativa de aceder a `/admin` devolve 403.
-- **Login obrigatório em toda a aplicação**: a consulta deixou de ser aberta;
-  qualquer página exige sessão iniciada (é conteúdo interno num servidor acessível
-  pela internet).
-- **Convite por email**: o administrador cria a conta apenas com nome, email, área
-  e perfil — a pessoa recebe um email com um link para **definir a própria
-  palavra-passe** (válido 3 dias). O administrador nunca vê nem escolhe a palavra-passe.
-- Botão **"Enviar convite"** na lista de utilizadores, para reenviar o link.
-- **"Esqueci-me da palavra-passe"** na página de entrada, com email de recuperação.
-  A resposta é sempre igual, para não revelar se um email tem conta.
-- Envio de email via **Microsoft Graph** (mesma conta Suporte@nxs.pt e app do Entra ID
-  já usada pela Nexus Ops), com transporte próprio em `app/Mail/Transport/GraphTransport.php`.
-
-
-### Removido
-- **Nível de intervenção** (1/2/3): retirado dos procedimentos, da consulta,
-  dos filtros, do formulário, da impressão e da base de dados (coluna `level`).
-
-
-### Adicionado
-- **Gestão de utilizadores** na administração: o administrador cria, edita,
-  desactiva e apaga contas pela interface. Cada conta tem **área** (Área técnica
-  ou Produção) e **perfil** (Administrador ou Editor) — alinhado com o pedido de
-  o portal ser alimentado pela área técnica e pela produção.
-- Perfil **Editor**: cria, edita, duplica e arquiva procedimentos; não gere
-  categorias, regras nem contas, e não apaga definitivamente.
-- Campo **"Problema / sintomas"** nos procedimentos, mostrado antes da solução
-  na consulta e na impressão, e incluído na pesquisa.
-- "Criado por / alterado por" passa a registar nome e área, ex.: "Ana (Produção)".
-- Contas desactivadas não conseguem entrar; protecção contra ficar sem
-  administrador activo.
-- Logótipo "Nexus Technical Suite" (SVG) na barra superior e novo ícone de separador.
-- Configuração Apache para servir a aplicação numa sub-pasta
-  (`deploy/apache-subpasta.conf`), usada no servidor interno da Nexus.
-- Secção no README sobre a instalação real (servidor 192.168.1.69,
-  `https://infra.nexus-solutions.pt:9443/procedimentos`) e como actualizar.
-
-### Alterado
-- Redesenho visual: faixa de destaque com pesquisa integrada e contadores, cartões
-  com barra de nível e conteúdo em duas colunas (solução à esquerda; "registar no
-  ticket", "quando escalar" e ficha à direita), estados vazios com ícone, página
-  de entrada sobre fundo escuro, tipografia Inter (opcional, com fallback), rodapé
-  escuro, ícones nos botões e alertas.
-- Documentado que, em sub-pasta, não se deve usar `route:cache`
-  (provoca erro 405 na página inicial).
-
-## [1.0.0] — 2026-08-19
-
-Primeira versão da Base de Procedimentos Técnicos (Nexus Solutions).
-
-### Adicionado
-- Consulta pública de procedimentos com pesquisa por texto (título, passos,
-  campos, categoria), filtro por categoria e por nível de intervenção.
-- Cartões expansíveis com passos numerados, "o que registar no ticket",
-  "quando escalar", referência, categoria, nível e data/autor da última alteração.
-- Regras de segurança no topo da página de consulta.
-- Impressão em A4 (um procedimento por página) da lista filtrada ou de um
-  único procedimento; regras de segurança na primeira página.
-- Área de administração com autenticação por email e palavra-passe.
-- Procedimentos: criar, editar, duplicar, arquivar/desarquivar e apagar;
-  referência automática `PROC-01`, `PROC-02`… que nunca é reutilizada.
-- Editor de passos com reordenação (botões ↑↓, Alt+↑/↓, arrastar e largar).
-- Gestão de categorias (com protecção contra apagar categorias em uso).
-- Gestão de regras de segurança com reordenação.
-- Estados vazios em todas as listas ("Ainda não há procedimentos. Criar o primeiro.").
-- Comandos de terminal `app:criar-admin` e `app:alterar-password`.
-- Mensagens, validações e páginas de erro em português de Portugal.
-- Interface responsiva (telemóvel/tablet/computador) e acessível
-  (navegação por teclado, foco visível, contraste AA, leitores de ecrã).
-- Script de instalação para Ubuntu (`deploy/instalar.sh`) com Nginx, PHP-FPM,
-  PostgreSQL e HTTPS automático (Certbot).
-- Cópias de segurança diárias da base de dados (`deploy/backup.sh`).
-- 20 testes automáticos de funcionalidade.
-
-### Segurança
-- Palavras-passe guardadas com *hash* (bcrypt).
-- Sessões com expiração (8 horas sem actividade) e cookies seguros em produção.
-- Limite de 5 tentativas de entrada por minuto.
-- Protecção CSRF em todos os formulários.
-
-[Por lançar]: https://github.com/Davide5fonseca/FAQ_Nexus/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/Davide5fonseca/FAQ_Nexus/releases/tag/v1.0.0
+- 🎨 **Redesenho visual da consulta, administração e entrada** — faixa de destaque, cartões sobrepostos, conteúdo em duas colunas (solução à esquerda; "registar no ticket" e "quando escalar" à direita), estados vazios com ícone, tipografia Inter com alternativa do sistema. `fd4d7d8`
+- 🧰 **Utilizadores por área, perfil editor e campo "Problema / sintomas"** — a partir do pedido interno: o conteúdo passa a ser alimentado pela área técnica e pela produção, e cada procedimento ganha o campo que descreve o sintoma observado. `7eb0a23`
+- 🛠️ **Instalação no servidor da Nexus (Apache, sub-pasta, HTTPS)** — a aplicação passa a viver em `/var/www/procedimentos`, servida em sub-pasta com `Alias` + `RewriteBase`, com certificado Let's Encrypt para `infra.nexus-solutions.pt`. **Duas quedas do site pelo caminho, ambas pela mesma causa:** o tarball levava `bootstrap/cache/*.php` com referências a pacotes só de desenvolvimento ("Class Laravel\Pail\PailServiceProvider not found"). A instalação passa a excluir essa pasta, documentado no README. `bfc36b9` `0fcab2a`
+- 🧰 **Versão 1.0.0 — Base de Procedimentos Técnicos** — consulta com pesquisa por texto e filtro por categoria; cartões expansíveis com passos numerados, "o que registar no ticket", "quando escalar", referência automática `PROC-01` que **nunca é reutilizada**, categoria e data/autor da última alteração; regras de segurança no topo; **impressão A4 com um procedimento por página** (a lista filtrada ou um só), com as regras de segurança na primeira folha; área de administração com criar, editar e eliminar; editor de passos com reordenação por botões, `Alt`+`↑`/`↓` e arrastar; gestão de categorias com protecção contra apagar as que estão em uso; estados vazios em todas as listas; mensagens, validações e páginas de erro em português de Portugal; interface responsiva e acessível (navegação por teclado, foco visível, contraste AA, leitores de ecrã); script de instalação para Ubuntu e **cópias de segurança diárias da base de dados**. 20 testes. `c48aa66`
+- 🔒 **Base de segurança** — palavras-passe com *hash* bcrypt, sessões com expiração (8 horas sem actividade), cookies seguros em produção, limite de 5 tentativas de entrada por minuto e protecção CSRF em todos os formulários.
