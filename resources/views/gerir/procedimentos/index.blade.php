@@ -13,10 +13,10 @@
 @endsection
 
 @section('hero')
-<div class="hero">
-    <h1>Procedimentos</h1>
-    <p>Criar, editar e eliminar os procedimentos da Knowledgebase.</p>
-</div>
+{{-- Sem cabeçalho à vista: a barra de topo e a barra lateral já dizem onde se
+     está. O h1 fica, escondido, porque uma página sem cabeçalho principal
+     deixa quem usa leitor de ecrã sem saber o que está a ler. --}}
+<h1 class="visually-hidden">Procedimentos</h1>
 @endsection
 
 @section('content')
