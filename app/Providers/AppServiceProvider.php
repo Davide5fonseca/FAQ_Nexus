@@ -4,10 +4,12 @@ namespace App\Providers;
 
 use App\Mail\Transport\GraphTransport;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -66,6 +68,22 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Só administradores gerem utilizadores, categorias, regras e apagam procedimentos.
+        /*
+         * Marcar o instante em que a sessão foi autenticada.
+         *
+         * Quem volta pelo "Manter sessão iniciada" entra sem passar pelo
+         * formulário, e a sessão nascia sem esta marca — o que fazia com que
+         * fosse tomada por anterior à última mudança de palavra-passe e a
+         * pessoa expulsa. É seguro marcar aqui: ao mudar a palavra-passe o
+         * `remember_token` é trocado, portanto um cookie de "manter" que ainda
+         * sirva é necessariamente posterior a essa mudança.
+         */
+        Event::listen(function (Login $evento) {
+            if (! session()->has('autenticado_em')) {
+                session(['autenticado_em' => now()->timestamp]);
+            }
+        });
+
         Gate::define('admin', fn ($user) => $user->role === 'admin');
 
         // Leitores só consultam: não entram em nenhuma página de administração.
