@@ -8,6 +8,7 @@ _(itens de infra vivem no servidor e não têm commit)._
 
 ## 2026-08-31
 
+- 🧹 **Cabeçalho da consulta fora** — sai o "Procedimentos técnicos" e a linha "Consulte, filtre e imprima os procedimentos da sua área": a página abre agora directamente na pesquisa, como a de administração. Mesmo critério — o `h1` fica escondido para quem usa leitor de ecrã. Com isto já nenhuma vista usa a classe `.hero`, que fica como regra morta no `suite.css` até se limpar o bloco de compatibilidade. Só blade.
 - 🧹 **Cabeçalho da administração de procedimentos fora** — sai o título "Procedimentos" e a linha por baixo: a barra de topo (Início / Knowledgebase / Procedimentos) e a barra lateral já dizem onde se está, e a página começa agora no que interessa. O `h1` **fica, escondido** — uma página sem cabeçalho principal deixa quem usa leitor de ecrã sem saber o que está a ler. Só blade.
 - 🧹 **Contadores fora do topo da administração de procedimentos** — dois cartões a dizer "38 procedimentos" e "12 categorias" por cima de uma lista que mostra exactamente isso. Saíram com as duas consultas que os alimentavam (uma por visita à página) e as quatro regras de CSS que ficaram sem uso. De caminho, o subtítulo dizia "Criar, editar e **arquivar**" — o arquivo foi removido a 20/08 e a frase ficou a prometer uma coisa que já não existe; passa a "eliminar". 42 testes.
 

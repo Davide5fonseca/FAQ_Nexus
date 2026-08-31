@@ -6,10 +6,11 @@
 @endsection
 
 @section('hero')
-<div class="hero no-print">
-    <h1>Procedimentos técnicos</h1>
-    <p>Consulte, filtre e imprima os procedimentos da sua área.</p>
-</div>
+{{-- Sem cabeçalho à vista: a barra de topo e a barra lateral já dizem onde se
+     está, e a pesquisa fica logo no cimo. O h1 fica, escondido, porque uma
+     página sem cabeçalho principal deixa quem usa leitor de ecrã sem saber o
+     que está a ler. --}}
+<h1 class="visually-hidden">Procedimentos técnicos</h1>
 @endsection
 
 @section('content')
