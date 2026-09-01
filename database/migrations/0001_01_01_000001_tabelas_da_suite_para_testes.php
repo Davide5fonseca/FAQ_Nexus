@@ -50,6 +50,10 @@ return new class extends Migration
                 $table->id();
                 $table->unsignedBigInteger('utilizador_id');
                 $table->unsignedBigInteger('aplicacao_id');
+                // O papel e a área de cada pessoa em cada aplicação vivem aqui:
+                // é o portal que os decide e as aplicações que obedecem.
+                $table->string('papel', 20)->nullable();
+                $table->string('contexto', 40)->nullable();
                 $table->timestamps();
                 $table->unique(['utilizador_id', 'aplicacao_id']);
             });

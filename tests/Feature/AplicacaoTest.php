@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
-use App\Models\Perfil;
 use App\Models\Procedure;
 use App\Models\SafetyRule;
 use App\Models\User;
@@ -48,16 +47,34 @@ class AplicacaoTest extends TestCase
             'ativo' => true,
         ]);
 
+        // O papel e a área vêm na própria linha de acesso: é o portal que os
+        // decide, e esta aplicação limita-se a obedecer.
         if ($comAcesso) {
             DB::connection(config('database.suite'))->table('acessos')->insert([
                 'utilizador_id' => $user->id, 'aplicacao_id' => 1,
+                'papel' => $papel, 'contexto' => $area,
                 'created_at' => now(), 'updated_at' => now(),
             ]);
         }
 
-        Perfil::create(['utilizador_id' => $user->id, 'papel' => $papel, 'area' => $area]);
-
         return $user->fresh();
+    }
+
+    /** Mexer na linha de acesso, que é onde o papel e a área passaram a viver. */
+    private function mudarAcesso(User $user, array $valores): void
+    {
+        DB::connection(config('database.suite'))->table('acessos')
+            ->where('utilizador_id', $user->id)->update($valores);
+    }
+
+    private function semPapel(User $user): void
+    {
+        $this->mudarAcesso($user, ['papel' => null]);
+    }
+
+    private function semArea(User $user): void
+    {
+        $this->mudarAcesso($user, ['contexto' => null]);
     }
 
     private function categoria(string $nome = 'Impressoras'): Category
@@ -221,15 +238,26 @@ class AplicacaoTest extends TestCase
         $this->actingAs($editor)->get(route('gerir.utilizadores.index'))->assertForbidden();
     }
 
-    public function test_sem_perfil_definido_e_apenas_leitor(): void
+    public function test_sem_papel_definido_no_portal_e_apenas_leitor(): void
     {
         $user = $this->pessoa();
-        Perfil::where('utilizador_id', $user->id)->delete();
-        $user = $user->fresh();
+        $this->semPapel($user);
 
+        $this->assertSame('leitor', $user->fresh()->role);
+        $this->assertFalse($user->fresh()->pode_editar);
+        $this->actingAs($user->fresh())->get(route('gerir.procedimentos.index'))->assertForbidden();
+    }
+
+    public function test_um_papel_desconhecido_nao_da_poderes_a_ninguem(): void
+    {
+        // Se alguma vez aparecer lixo na coluna, tem de valer o mais restrito.
+        $user = $this->pessoa();
+        $this->mudarAcesso($user, ['papel' => 'super-admin', 'contexto' => 'inventada']);
+
+        $user = $user->fresh();
         $this->assertSame('leitor', $user->role);
-        $this->assertFalse($user->pode_editar);
-        $this->actingAs($user)->get(route('gerir.procedimentos.index'))->assertForbidden();
+        $this->assertFalse($user->is_admin);
+        $this->assertNull($user->area);
     }
 
     public function test_sem_area_a_consulta_explica_em_vez_de_dizer_que_nao_ha_nada(): void
@@ -238,7 +266,7 @@ class AplicacaoTest extends TestCase
         $this->criarProcedimento($admin, ['title' => 'Substituir toner']);
 
         $semArea = $this->pessoa('leitor', 'tecnica');
-        Perfil::where('utilizador_id', $semArea->id)->delete();
+        $this->semArea($semArea);
 
         // Há procedimentos; o que falta é a área. Dizer que não há conteúdo
         // manda esta pessoa procurar um problema que não é dela.
@@ -259,56 +287,16 @@ class AplicacaoTest extends TestCase
             ->assertDontSee('A sua conta ainda não tem área.');
     }
 
-    public function test_a_gestao_assinala_quem_ficou_sem_area(): void
+    // ---------------- Gestão de perfis (passou para o portal) ----------------
+
+    public function test_a_gestao_de_perfis_manda_agora_para_o_portal(): void
     {
+        // Deixou de haver perfis aqui: quem decide é o portal, em "Quem acede
+        // a quê". A morada antiga fica a funcionar para quem a tinha guardada.
         $admin = $this->pessoa('admin', 'tecnica');
-        $sem = $this->pessoa('leitor', 'tecnica');
-        Perfil::where('utilizador_id', $sem->id)->delete();
 
         $this->actingAs($admin)->get(route('gerir.utilizadores.index'))
-            ->assertOk()
-            ->assertSee('Por definir');
-    }
-
-    // ---------------- Gestão de perfis ----------------
-
-    public function test_administrador_altera_o_perfil_de_alguem(): void
-    {
-        $admin = $this->pessoa('admin', 'tecnica');
-        $outro = $this->pessoa('leitor', 'tecnica');
-
-        $this->actingAs($admin)->get(route('gerir.utilizadores.index'))->assertOk()
-            ->assertSee($outro->name);
-
-        $this->actingAs($admin)->put(route('gerir.utilizadores.update', $outro->id), [
-            'papel' => 'editor', 'area' => 'producao',
-        ])->assertRedirect(route('gerir.utilizadores.index'));
-
-        $this->assertDatabaseHas('perfis', [
-            'utilizador_id' => $outro->id, 'papel' => 'editor', 'area' => 'producao',
-        ]);
-    }
-
-    public function test_nao_se_fica_sem_administrador(): void
-    {
-        $admin = $this->pessoa('admin', 'tecnica');
-
-        $this->actingAs($admin)->put(route('gerir.utilizadores.update', $admin->id), [
-            'papel' => 'leitor', 'area' => 'tecnica',
-        ])->assertSessionHasErrors('papel');
-
-        $this->assertSame('admin', $admin->fresh()->role);
-    }
-
-    public function test_quem_nao_tem_acesso_nao_aparece_na_gestao(): void
-    {
-        $admin = $this->pessoa('admin', 'tecnica');
-        $forasteiro = $this->pessoa('editor', 'tecnica', comAcesso: false);
-
-        $this->actingAs($admin)->get(route('gerir.utilizadores.index'))
-            ->assertDontSee($forasteiro->email);
-        $this->actingAs($admin)->get(route('gerir.utilizadores.edit', $forasteiro->id))
-            ->assertNotFound();
+            ->assertRedirect(rtrim(config('app.portal_url'), '/').'/gestao/utilizadores');
     }
 
     // ---------------- Procedimentos ----------------
@@ -465,31 +453,4 @@ class AplicacaoTest extends TestCase
         $this->assertSame([1], SafetyRule::pluck('position')->all());
     }
 
-    // ---------------- Perfis órfãos ----------------
-
-    public function test_o_comando_varre_perfis_de_gente_que_ja_nao_existe(): void
-    {
-        // O perfil vive nesta base de dados e a conta na do portal: são bases
-        // diferentes, por isso quem for eliminado lá deixa cá o perfil. É
-        // inofensivo (ninguém o lê), mas é lixo.
-        $pessoa = $this->pessoa();
-        $orfao = Perfil::create(['utilizador_id' => 99999, 'papel' => 'editor', 'area' => 'tecnica']);
-
-        $this->artisan('perfis:limpar')->assertSuccessful();
-
-        $this->assertNull(Perfil::find($orfao->id), 'o perfil órfão devia ter sido apagado');
-        $this->assertNotNull(
-            Perfil::where('utilizador_id', $pessoa->id)->first(),
-            'o perfil de quem existe tem de ficar'
-        );
-    }
-
-    public function test_o_comando_com_mostrar_nao_apaga_nada(): void
-    {
-        $orfao = Perfil::create(['utilizador_id' => 99998, 'papel' => 'leitor', 'area' => 'producao']);
-
-        $this->artisan('perfis:limpar --mostrar')->assertSuccessful();
-
-        $this->assertNotNull(Perfil::find($orfao->id));
-    }
 }

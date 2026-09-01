@@ -3,7 +3,6 @@
 use App\Http\Controllers\Gerir\CategoryController;
 use App\Http\Controllers\Gerir\ProcedureController as GerirProcedureController;
 use App\Http\Controllers\Gerir\SafetyRuleController;
-use App\Http\Controllers\Gerir\UserController;
 use App\Http\Controllers\AnexoController;
 use App\Http\Controllers\ProcedureController;
 use Illuminate\Support\Facades\Route;
@@ -51,10 +50,17 @@ Route::middleware(['auth', 'acesso', 'can:editar'])->prefix('gerir')->name('geri
     // ---- Só administradores a partir daqui ----
     Route::middleware('can:admin')->group(function () {
 
-    // Perfis de quem tem acesso a esta aplicação
-    Route::get('utilizadores', [UserController::class, 'index'])->name('utilizadores.index');
-    Route::get('utilizadores/{utilizador}/editar', [UserController::class, 'edit'])->name('utilizadores.edit');
-    Route::put('utilizadores/{utilizador}', [UserController::class, 'update'])->name('utilizadores.update');
+    // Perfis: passaram para o portal, em "Quem acede a quê".
+    //
+    // Estiveram aqui e lá ao mesmo tempo, cada um com a sua cópia, e os dois
+    // discordavam — o portal dizia "Leitor · Área técnica" e aqui a pessoa não
+    // via nada. Quem tiver a morada antiga guardada vai dar ao sítio certo.
+    Route::get('utilizadores', fn () => redirect()->away(
+        rtrim(config('app.portal_url'), '/').'/gestao/utilizadores'
+    ))->name('utilizadores.index');
+    Route::get('utilizadores/{utilizador}/editar', fn (int $utilizador) => redirect()->away(
+        rtrim(config('app.portal_url'), '/').'/gestao/utilizadores/'.$utilizador
+    ))->name('utilizadores.edit');
 
     // Categorias
     Route::get('categorias', [CategoryController::class, 'index'])->name('categorias.index');

@@ -4,13 +4,18 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 /**
  * As pessoas vêm do portal (tabela `utilizadores`, partilhada por toda a suite).
  * Esta aplicação não as cria nem lhes mexe: só as lê.
  *
  * O que cada pessoa pode fazer AQUI — administrador, editor ou leitor, e a área
- * a que pertence — continua a ser decidido nesta aplicação, na tabela `perfis`.
+ * a que pertence — também vem do portal, da linha de acesso a esta aplicação
+ * (`acessos.papel` e `acessos.contexto`). Durante algum tempo esteve nos dois
+ * sítios, e os dois discordavam: o portal mostrava "Leitor · Área técnica" e
+ * aqui a pessoa não via nada. Passou a haver um só sítio: o portal.
+ *
  * As propriedades `role` e `area` mantêm os nomes que sempre tiveram, para o
  * resto do código não precisar de saber que a origem mudou.
  */
@@ -52,13 +57,32 @@ class User extends Authenticatable
         ];
     }
 
-    /** O perfil desta pessoa nesta aplicação, lido uma só vez por pedido. */
-    public function perfil(): ?Perfil
+    /**
+     * A linha de acesso desta pessoa a esta aplicação, lida uma só vez por pedido.
+     *
+     * Devolve null a quem o portal não deu acesso — essa pessoa nem chega aqui,
+     * porque o middleware trava-a antes, mas o valor por omissão tem de ser o
+     * mais restrito de todos à mesma.
+     */
+    public function acessoAEstaAplicacao(): ?object
     {
-        return $this->perfilEmMemoria ??= Perfil::where('utilizador_id', $this->id)->first();
+        if (! $this->acessoLido) {
+            $this->acessoLido = true;
+            $this->acessoEmMemoria = DB::connection(config('database.suite'))
+                ->table('acessos')
+                ->join('aplicacoes', 'aplicacoes.id', '=', 'acessos.aplicacao_id')
+                ->where('aplicacoes.chave', config('app.chave'))
+                ->where('acessos.utilizador_id', $this->id)
+                ->select('acessos.papel', 'acessos.contexto')
+                ->first();
+        }
+
+        return $this->acessoEmMemoria;
     }
 
-    private ?Perfil $perfilEmMemoria = null;
+    private bool $acessoLido = false;
+
+    private ?object $acessoEmMemoria = null;
 
     // --- Nomes que o resto da aplicação já usava ---
 
@@ -74,14 +98,23 @@ class User extends Authenticatable
         return (bool) ($this->attributes['ativo'] ?? false);
     }
 
+    /**
+     * Um valor que não reconheçamos vale sempre leitor, nunca mais do que isso:
+     * lixo na base de dados não pode dar poderes a ninguém.
+     */
     public function getRoleAttribute(): string
     {
-        return $this->perfil()?->papel ?? 'leitor';
+        $papel = $this->acessoAEstaAplicacao()?->papel;
+
+        return isset(self::ROLES[$papel]) ? $papel : 'leitor';
     }
 
+    /** Sem área reconhecida não se vê procedimento nenhum, e é o que deve ser. */
     public function getAreaAttribute(): ?string
     {
-        return $this->perfil()?->area;
+        $area = $this->acessoAEstaAplicacao()?->contexto;
+
+        return isset(self::AREAS[$area]) ? $area : null;
     }
 
     public function getIsAdminAttribute(): bool

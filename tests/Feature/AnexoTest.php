@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Anexo;
 use App\Models\Category;
-use App\Models\Perfil;
 use App\Models\Procedure;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,12 +51,12 @@ class AnexoTest extends TestCase
             'ativo' => true,
         ]);
 
+        // O papel e a área vêm na própria linha de acesso, decidida no portal.
         DB::connection(config('database.suite'))->table('acessos')->insert([
             'utilizador_id' => $user->id, 'aplicacao_id' => 1,
+            'papel' => $papel, 'contexto' => $area,
             'created_at' => now(), 'updated_at' => now(),
         ]);
-
-        Perfil::create(['utilizador_id' => $user->id, 'papel' => $papel, 'area' => $area]);
 
         return $user->fresh();
     }
