@@ -43,7 +43,14 @@
                         @unless($u->active) <span class="etiqueta etiqueta--inactiva">Desactivada</span> @endunless
                     </td>
                     <td class="meta">{{ $u->email }}</td>
-                    <td>{{ $perfil?->area ? (\App\Models\User::AREAS[$perfil->area] ?? $perfil->area) : '—' }}</td>
+                    <td>
+                        @if($perfil?->area)
+                            {{ \App\Models\User::AREAS[$perfil->area] ?? $perfil->area }}
+                        @else
+                            {{-- Sem área, esta pessoa entra e não vê procedimento nenhum. --}}
+                            <span class="etiqueta etiqueta--aviso">Por definir</span>
+                        @endif
+                    </td>
                     <td>
                         <span class="etiqueta {{ ($perfil?->papel ?? 'leitor') === 'admin' ? 'etiqueta--perfil-admin' : '' }}">
                             {{ \App\Models\User::ROLES[$perfil?->papel ?? 'leitor'] }}

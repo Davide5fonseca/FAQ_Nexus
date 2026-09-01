@@ -35,6 +35,9 @@ class ProcedureController extends Controller
             'rules' => SafetyRule::orderBy('position')->get(),
             'filters' => $filters,
             'hasAny' => Procedure::visivelPara($utilizador)->exists(),
+            // Sem área não se vê nada, e dizer "ainda não há procedimentos"
+            // seria mentira: há, mas esta pessoa não tem área que os case.
+            'semArea' => $utilizador && ! $utilizador->is_admin && ! $utilizador->area,
         ]);
     }
 

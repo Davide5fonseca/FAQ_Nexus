@@ -16,7 +16,22 @@
 @section('content')
 <div data-consulta class="sobreposto">
 
-    @if(! $hasAny)
+    @if($semArea)
+        {{-- Há procedimentos, mas nenhum da área desta pessoa — e a área ainda
+             não lhe foi atribuída. Antes dizia-se "ainda não há procedimentos",
+             o que a punha à procura de um problema que não é dela. --}}
+        <div class="vazio">
+            <div class="vazio__icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            </div>
+            <h2>A sua conta ainda não tem área.</h2>
+            <p>
+                Os procedimentos estão separados por área, e a sua ainda não foi
+                definida &mdash; por isso não aparece nada. Peça a um administrador
+                da Knowledgebase que a defina.
+            </p>
+        </div>
+    @elseif(! $hasAny)
         <div class="vazio">
             <div class="vazio__icone" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M10 12h4M10 16h4M10 8h4"/></svg>

@@ -232,6 +232,44 @@ class AplicacaoTest extends TestCase
         $this->actingAs($user)->get(route('gerir.procedimentos.index'))->assertForbidden();
     }
 
+    public function test_sem_area_a_consulta_explica_em_vez_de_dizer_que_nao_ha_nada(): void
+    {
+        $admin = $this->pessoa('admin', 'tecnica');
+        $this->criarProcedimento($admin, ['title' => 'Substituir toner']);
+
+        $semArea = $this->pessoa('leitor', 'tecnica');
+        Perfil::where('utilizador_id', $semArea->id)->delete();
+
+        // Há procedimentos; o que falta é a área. Dizer que não há conteúdo
+        // manda esta pessoa procurar um problema que não é dela.
+        $this->actingAs($semArea->fresh())->get(route('consulta'))
+            ->assertOk()
+            ->assertSee('A sua conta ainda não tem área.')
+            ->assertDontSee('Ainda não há procedimentos.');
+    }
+
+    public function test_quem_tem_area_continua_a_ver_os_procedimentos(): void
+    {
+        $admin = $this->pessoa('admin', 'tecnica');
+        $this->criarProcedimento($admin, ['title' => 'Substituir toner']);
+
+        $this->actingAs($this->pessoa('leitor', 'tecnica'))->get(route('consulta'))
+            ->assertOk()
+            ->assertSee('Substituir toner')
+            ->assertDontSee('A sua conta ainda não tem área.');
+    }
+
+    public function test_a_gestao_assinala_quem_ficou_sem_area(): void
+    {
+        $admin = $this->pessoa('admin', 'tecnica');
+        $sem = $this->pessoa('leitor', 'tecnica');
+        Perfil::where('utilizador_id', $sem->id)->delete();
+
+        $this->actingAs($admin)->get(route('gerir.utilizadores.index'))
+            ->assertOk()
+            ->assertSee('Por definir');
+    }
+
     // ---------------- Gestão de perfis ----------------
 
     public function test_administrador_altera_o_perfil_de_alguem(): void
