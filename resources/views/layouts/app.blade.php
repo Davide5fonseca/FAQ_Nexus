@@ -62,12 +62,6 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
                         <span>Regras de segurança</span>
                     </a>
-                    {{-- Quem faz o quê aqui dentro decide-se no portal, e só lá: esteve
-                         nos dois sítios e os dois discordavam. --}}
-                    <a class="nav-item" href="{{ rtrim(config('app.portal_url'), '/') }}/gestao/utilizadores">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                        <span>Quem acede a quê</span>
-                    </a>
                 @endcan
             @endauth
         </nav>
